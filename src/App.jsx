@@ -5635,6 +5635,27 @@ export function AchievementCard({ award, filled = 1 }) {
 }
 
 
+/* True once the element has scrolled into view (stays true). */
+function useSeenOnce(ref) {
+  const [seen, setSeen] = useState(false);
+  useEffect(() => {
+    const node = ref.current;
+    if (!node || seen) return undefined;
+    const io = new IntersectionObserver(
+      entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          setSeen(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.5 }
+    );
+    io.observe(node);
+    return () => io.disconnect();
+  }, [seen]);
+  return seen;
+}
+
 /* ATL skills shown in verified moments: same pattern as the Learner
  * Profile panel, in its own section between Journey and Panthers. */
 const ATL_SKILLS = (SKILL_GROUPS.find(group => group.id === 'atl') || { skills: [] }).skills;
@@ -5652,10 +5673,16 @@ function hasAtlSkills(items) {
 
 function AtlSection({ items = [], token, preview, onOpen, number }) {
   const [open, setOpen] = useState(null);
+  /* One tooltip appears by itself when the panel scrolls into view, on the
+   * first skill that can be tapped, and stays until a skill is tapped. */
+  const panelRef = useRef(null);
+  const seen = useSeenOnce(panelRef);
+  const [tapped, setTapped] = useState(false);
   const shownAtl = ATL_SKILLS.filter(skill => atlMomentsFor(items, skill).length);
   const shownShowed = SHOWED_SKILLS.filter(skill => atlMomentsFor(items, skill).length);
   if (!shownAtl.length && !shownShowed.length) return null;
   const moments = open ? atlMomentsFor(items, open) : [];
+  const autoTip = seen && !tapped ? shownAtl[0] || shownShowed[0] : null;
 
   const pills = (list, shown) =>
     list.map(skill =>
@@ -5663,10 +5690,13 @@ function AtlSection({ items = [], token, preview, onOpen, number }) {
         <button
           type="button"
           key={skill}
-          className={`on ${open === skill ? 'isOpen' : ''}`}
+          className={`on ${open === skill ? 'isOpen' : ''} ${autoTip === skill ? 'tipAuto' : ''}`}
           aria-expanded={open === skill}
           data-tip="Tap to view details"
-          onClick={() => setOpen(current => (current === skill ? null : skill))}
+          onClick={() => {
+            setTapped(true);
+            setOpen(current => (current === skill ? null : skill));
+          }}
         >
           {skill}
         </button>
@@ -5692,7 +5722,7 @@ function AtlSection({ items = [], token, preview, onOpen, number }) {
         </Reveal>
 
         <Reveal delay={120}>
-          <div className="endorseProfile atlPanel">
+          <div className="endorseProfile atlPanel" ref={panelRef}>
             <div className="endorseProfileHead">
               <small>ATL skills · shown in verified moments</small>
               <span>{shownAtl.length} of {ATL_SKILLS.length}{shownAtl.length || shownShowed.length ? ' · tap one to see where' : ''}</span>
@@ -5741,6 +5771,9 @@ const LEARNER_PROFILE = ['Inquirer', 'Knowledgeable', 'Thinker', 'Communicator',
 function RecognitionSection({ entries, items = [], token, preview, onOpen, panthers, awards = [], approvedQuote = null, number = '04' }) {
   const verified = entries.filter(entry => entry.verification_status === 'verified');
   const [openLp, setOpenLp] = useState(null);
+  const lpPanelRef = useRef(null);
+  const lpSeen = useSeenOnce(lpPanelRef);
+  const [lpTapped, setLpTapped] = useState(false);
 
   /* The newest words from a coach or teacher. */
   const voices = [];
@@ -5826,7 +5859,7 @@ function RecognitionSection({ entries, items = [], token, preview, onOpen, panth
         </div>
 
         <Reveal delay={120}>
-          <div className="endorseProfile">
+          <div className="endorseProfile" ref={lpPanelRef}>
             <div className="endorseProfileHead">
               <small>Learner Profile · shown in verified moments</small>
               <span>{shown.size} of 10{shown.size ? ' · tap one to see where' : ''}</span>
@@ -5837,10 +5870,13 @@ function RecognitionSection({ entries, items = [], token, preview, onOpen, panth
                   <button
                     type="button"
                     key={lp}
-                    className={`on ${openLp === lp ? 'isOpen' : ''}`}
+                    className={`on ${openLp === lp ? 'isOpen' : ''} ${lpSeen && !lpTapped && lp === LEARNER_PROFILE.find(x => shown.has(x)) ? 'tipAuto' : ''}`}
                     aria-expanded={openLp === lp}
                     data-tip="Tap to view details"
-                    onClick={() => setOpenLp(current => (current === lp ? null : lp))}
+                    onClick={() => {
+                      setLpTapped(true);
+                      setOpenLp(current => (current === lp ? null : lp));
+                    }}
                   >
                     {lp}
                   </button>

@@ -876,6 +876,10 @@ export async function loadPublicShare(token) {
   return json;
 }
 
+/* Photos are requested as a 1600px copy (longest side): plenty for every
+ * card and the story screen, and far quicker than the original. */
+const PHOTO_SIZE = 1600;
+
 export async function privateEvidenceBlobUrl(evidenceId) {
   const {
     data: { session },
@@ -887,7 +891,7 @@ export async function privateEvidenceBlobUrl(evidenceId) {
 
   const res = await fetch(
     `${supabaseUrl}/functions/v1/journey-media` +
-      `?evidence=${encodeURIComponent(evidenceId)}`,
+      `?evidence=${encodeURIComponent(evidenceId)}&size=${PHOTO_SIZE}`,
 
     {
       headers: {
@@ -951,7 +955,7 @@ export function publicEvidenceUrl(evidenceId, token) {
   return (
     `${supabaseUrl}/functions/v1/journey-media` +
     `?evidence=${encodeURIComponent(evidenceId)}` +
-    `&token=${encodeURIComponent(token)}`
+    `&token=${encodeURIComponent(token)}&size=${PHOTO_SIZE}`
   );
 }
 

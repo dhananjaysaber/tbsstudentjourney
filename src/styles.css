@@ -7166,3 +7166,20 @@ input[type='search']::-webkit-search-decoration { -webkit-appearance: none; }
   .endorseProfileGrid button[data-tip]:hover::after,
   .endorseProfileGrid button[data-tip]:hover::before { animation: none; }
 }
+
+/* Auto tooltip: shown by itself once the panel is in view (on phones too),
+ * and stays until a skill is tapped. */
+.endorseProfileGrid button.tipAuto[data-tip]::after,
+.endorseProfileGrid button.tipAuto[data-tip]::before { display: block; }
+.endorseProfileGrid button.tipAuto[data-tip]::after {
+  opacity: 1;
+  animation: tipPop .5s .3s cubic-bezier(.34, 1.56, .64, 1) both, tipFloat 2.4s .8s ease-in-out infinite;
+}
+.endorseProfileGrid button.tipAuto[data-tip]::before {
+  opacity: 1;
+  animation: tipPointer .5s .3s cubic-bezier(.34, 1.56, .64, 1) both, tipFloatPointer 2.4s .8s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .endorseProfileGrid button.tipAuto[data-tip]::after,
+  .endorseProfileGrid button.tipAuto[data-tip]::before { animation: none; }
+}

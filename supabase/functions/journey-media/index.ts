@@ -1,4 +1,4 @@
-// SUPABASE EDGE FUNCTION: journey-media  (UPDATED)
+// SUPABASE EDGE FUNCTION: journey-media  (UPDATED: resized photos via ?size=, token reuse, browser caching)
 // Streams a Drive-stored evidence file to an authorised viewer.
 //
 // Unchanged from the original:
@@ -7,8 +7,8 @@
 //   · the student themself, and linked parents → their own evidence
 // NEW (member access model):
 //   · any signed-in member → every student's PROFILE PHOTO (galaxy)
-//   · any signed-in member → public evidence of any portfolio the SuperAdmin
-//     has not closed, or of a closed one they hold an active grant for
+//   · any signed-in member → public evidence of a portfolio the SuperAdmin
+//     opened to the TBS community, or that they hold an active grant for
 //
 // Deploy: supabase functions deploy journey-media --no-verify-jwt
 //         (keep JWT verification OFF, as today: <img> tags cannot send headers)
@@ -60,7 +60,18 @@ async function serviceToken(sa: any) {
   return j.access_token;
 }
 
+/* Reuse the Google access token while it is valid (it lasts an hour), instead
+ * of signing in to Google again on every photo. */
+let cachedToken: { value: string; expires: number } | null = null;
+
 async function googleToken() {
+  if (cachedToken && cachedToken.expires > Date.now() + 60_000) return cachedToken.value;
+  const value = await freshGoogleToken();
+  cachedToken = { value, expires: Date.now() + 50 * 60_000 };
+  return value;
+}
+
+async function freshGoogleToken() {
   const clientId = Deno.env.get('STUDENT_JOURNEY_GOOGLE_CLIENT_ID');
   const clientSecret = Deno.env.get('STUDENT_JOURNEY_GOOGLE_CLIENT_SECRET');
   const refreshToken = Deno.env.get('STUDENT_JOURNEY_GOOGLE_REFRESH_TOKEN');
@@ -96,7 +107,7 @@ async function memberMayView(admin: any, email: string, hasAccount: boolean, ev:
   }
 
   const { data: p } = await admin.from('student_journey_profiles')
-    .select('profile_photo_url, community_closed')
+    .select('profile_photo_url, community_visible')
     .eq('student_id', ev.student_id).maybeSingle();
 
   // Every member sees profile photos in the galaxy.
@@ -105,7 +116,7 @@ async function memberMayView(admin: any, email: string, hasAccount: boolean, ev:
   }
 
   if (ev.is_public !== true) return false;
-  if (!p?.community_closed) return { allowed: true, profilePhoto: false };
+  if (p?.community_visible) return { allowed: true, profilePhoto: false };
 
   const { data: g } = await admin.from('portfolio_access_grants')
     .select('id').eq('student_id', ev.student_id).ilike('member_email', email)
@@ -169,6 +180,37 @@ Deno.serve(async req => {
     if (!ev.drive_file_id) return json({ error: 'This media item is not stored in TBS Drive' }, 400);
 
     const gt = await googleToken();
+    const cacheControl = shareToken ? 'private, max-age=900' : cacheable ? 'private, max-age=3600' : 'private, max-age=3600';
+
+    /* ?size=1600 → a resized copy of a photo (longest side), from Drive's own
+     * image service: a few hundred KB instead of the multi-MB original. Falls
+     * back to the original file if Drive has no resized copy. */
+    const size = Math.min(2400, Math.max(200, Number(u.searchParams.get('size')) || 0));
+    if (u.searchParams.get('size') && String(ev.mime_type || 'image/').startsWith('image/')) {
+      try {
+        const meta = await fetch(
+          `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(ev.drive_file_id)}?fields=thumbnailLink,mimeType&supportsAllDrives=true`,
+          { headers: { Authorization: `Bearer ${gt}` } }
+        );
+        const m = meta.ok ? await meta.json() : null;
+        if (m?.thumbnailLink && String(m.mimeType || '').startsWith('image/')) {
+          const link = /=s\d+[^/]*$/.test(m.thumbnailLink)
+            ? m.thumbnailLink.replace(/=s\d+[^/]*$/, `=s${size}`)
+            : `${m.thumbnailLink}=s${size}`;
+          const t = await fetch(link, { headers: { Authorization: `Bearer ${gt}` } });
+          const type = t.headers.get('content-type') || '';
+          if (t.ok && type.startsWith('image/')) {
+            return new Response(t.body, {
+              status: 200,
+              headers: { ...cors, 'content-type': type, 'cache-control': cacheControl }
+            });
+          }
+        }
+      } catch {
+        /* fall through to the original file */
+      }
+    }
+
     const r = await fetch(
       `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(ev.drive_file_id)}?alt=media`,
       { headers: { Authorization: `Bearer ${gt}` } }
@@ -183,8 +225,8 @@ Deno.serve(async req => {
       headers: {
         ...cors,
         'content-type': ev.mime_type || r.headers.get('content-type') || 'application/octet-stream',
-        // Profile photos are re-used across the galaxy: let the browser keep them briefly.
-        'cache-control': shareToken ? 'private, max-age=300' : cacheable ? 'private, max-age=900' : 'private, no-store'
+        // Only authorised viewers reach this point; let their browser keep it.
+        'cache-control': cacheControl
       }
     });
   } catch (e) {
