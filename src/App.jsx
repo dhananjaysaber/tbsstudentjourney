@@ -62,6 +62,7 @@ import {
   X,
   ChevronLeft,
   MousePointerClick,
+  Medal,
   ChevronRight,
   BarChart3,
   Settings2,
@@ -3206,7 +3207,7 @@ function MomentApprovals({ items, onReview, onReviewMany }) {
 /* SuperAdmin-only: portfolios are open to signed-in members by default;
  * the SuperAdmin can close one (e.g. at a family's request). */
 /* School-wide settings (no student needed): TBS community access for everyone,
- * and right-click protection on portfolio pages. SuperAdmin only. */
+ * the Panthers team ranking, and right-click protection. SuperAdmin only. */
 function SchoolSharingSettings({ superadmin }) {
   const [settings, setSettings] = useState(null);
   const [busy, setBusy] = useState('');
@@ -3253,6 +3254,30 @@ function SchoolSharingSettings({ superadmin }) {
           <i />
         </button>
       </div>
+
+      {(() => {
+        const showRank = (settings?.team_ranking || 'on') !== 'off';
+        return (
+          <div className={`communityAccess ${showRank ? 'isOpen' : ''}`}>
+            <Medal />
+            <div>
+              <h3>Team ranking · Panthers</h3>
+              <p>
+                {showRank
+                  ? 'On — portfolios show a “Team ranking” card when a student is in the top quarter of their team on player-rating points.'
+                  : 'Off — no portfolio shows a team ranking, including secure public links.'}
+              </p>
+            </div>
+            <button
+              type="button" role="switch" aria-checked={showRank} aria-label="Show team ranking on portfolios"
+              className="communitySwitch" onClick={() => flip('team_ranking', showRank ? 'off' : 'on')}
+              disabled={!superadmin || !settings || busy === 'team_ranking'}
+            >
+              <i />
+            </button>
+          </div>
+        );
+      })()}
 
       {[
         ['right_click_admin', 'Admin & SuperAdmin', 'Admins and the SuperAdmin'],
@@ -4372,6 +4397,9 @@ function Portfolio({ data, token, preview = false, member = false, editHref = nu
   /* Members' media is fetched with their session, like the private preview. */
   const mediaPreview = preview || member;
 
+  /* School setting: show the Panthers "Team ranking" card (on by default). */
+  const [rankingOn, setRankingOn] = useState(true);
+
   /* School setting: right-click disabled → block the context menu, long-press
    * saving and dragging photos on the portfolio (it deters casual copying). */
   useEffect(() => {
@@ -4381,6 +4409,7 @@ function Portfolio({ data, token, preview = false, member = false, editHref = nu
       loadPortfolioSettings(),
       supabase.rpc('portfolio_can_set_display').then(({ data: canSet }) => Boolean(canSet)).catch(() => false)
     ]).then(([settings, isAdmin]) => {
+      if (live) setRankingOn((settings?.team_ranking || 'on') !== 'off');
       /* Admins follow their own switch; everyone else the other. */
       if (!live || settings[isAdmin ? 'right_click_admin' : 'right_click'] !== 'disabled') return;
       const block = event => event.preventDefault();
@@ -4405,7 +4434,11 @@ function Portfolio({ data, token, preview = false, member = false, editHref = nu
   const evidence = useMemo(() => data.evidence || [], [data.evidence]);
   const profile = data.profile || {};
   const student = data.student || {};
-  const panthers = data.panthers || { teams: [], totals: {} };
+  const panthers = useMemo(() => {
+    const raw = data.panthers || { teams: [], totals: {} };
+    if (rankingOn) return raw;
+    return { ...raw, teams: (raw.teams || []).map(team => ({ ...team, playerRank: null })) };
+  }, [data.panthers, rankingOn]);
 
   const profileImage = resolveProfileEvidence(profile.profile_photo_url, evidence, 'profile_photo');
   const superAdminView = useViewerIsSuperAdmin();

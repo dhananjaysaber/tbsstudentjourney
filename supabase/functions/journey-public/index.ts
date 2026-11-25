@@ -5,6 +5,7 @@
 // the approved coach quote; published Academic awards; and the Panthers record
 // (raw rows, built in the browser exactly as for members).
 // Privacy: other students' IDs are masked and staff emails are never sent.
+// School settings are respected (team_ranking off → no ratings sent).
 // Deploy: supabase functions deploy journey-public --no-verify-jwt
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const cors={'Access-Control-Allow-Origin':'*','Access-Control-Allow-Headers':'authorization, x-client-info, apikey, content-type'};
@@ -39,6 +40,10 @@ async function panthersRows(db:SupabaseClient, sid:string){
     rows(db.from('schedules').select('schedule_id,team_id,title,event_type,event_date,start_time,location,schedule_status,active').eq('active',true).in('team_id',teamIds)),
     rows(db.from('player_ratings').select('student_id,team_id,schedule_id,occurrence_date,points,criteria,rated_at,active').eq('active',true).in('team_id',teamIds)),
   ]);
+
+  // School setting: team ranking off → no rating data leaves the server.
+  const {data:rankSetting}=await db.from('portfolio_settings').select('value').eq('key','team_ranking').maybeSingle();
+  if(rankSetting?.value==='off')playerRatings.length=0;
 
   // Mask other students: ratings keep a stable stand-in (needed for the team rank).
   const alias=new Map<string,string>();
