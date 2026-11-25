@@ -3397,7 +3397,10 @@ function SkillPicker({ value, suggested, onChange }) {
     <div className="skillPicker">
       <div className="skillPickerHead">
         <b>Skills this moment shows</b>
-        <span>{selected.length} / {MAX_SKILLS} chosen</span>
+        <span>
+          {selected.length} / {MAX_SKILLS} chosen
+          {full && <em className="skillPickerFull"> · maximum reached: untick one to choose another</em>}
+        </span>
       </div>
 
       {!!suggested.length && (

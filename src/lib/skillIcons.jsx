@@ -43,7 +43,7 @@ export function skillIcon(name) {
 export function SkillChip({ name }) {
   const { Icon, custom } = skillIcon(name);
   return (
-    <span className={`skillChip${custom ? ' isCustom' : ''}`}>
+    <span className={`storySkillChip${custom ? ' isCustom' : ''}`}>
       <i><Icon aria-hidden="true" /></i>
       {name}
     </span>

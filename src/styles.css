@@ -6817,7 +6817,7 @@ input[type='search']::-webkit-search-decoration { -webkit-appearance: none; }
 
 
 /* Skills: chips with an icon each; pinned around the photo as callouts */
-.skillChip {
+.storySkillChip {
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -6835,8 +6835,8 @@ input[type='search']::-webkit-search-decoration { -webkit-appearance: none; }
   color: #ffffff;
   transition: transform .25s, border-color .25s;
 }
-.skillChip.isCustom { border: 1px dashed rgba(var(--pf-gold-rgb), .6); }
-.skillChip i {
+.storySkillChip.isCustom { border: 1px dashed rgba(var(--pf-gold-rgb), .6); }
+.storySkillChip i {
   display: grid;
   place-items: center;
   width: 30px;
@@ -6845,17 +6845,17 @@ input[type='search']::-webkit-search-decoration { -webkit-appearance: none; }
   background: rgba(var(--pf-gold-rgb), .14);
   color: var(--pf-gold);
 }
-.skillChip svg { width: 17px; height: 17px; stroke-width: 1.7; }
-.skillChip:hover { transform: translateY(-2px); border-color: rgba(var(--pf-gold-rgb), .6); }
+.storySkillChip svg { width: 17px; height: 17px; stroke-width: 1.7; }
+.storySkillChip:hover { transform: translateY(-2px); border-color: rgba(var(--pf-gold-rgb), .6); }
 
 /* old outlined pills are replaced by chips */
 .storySkills { gap: 10px; }
-.storySkills .skillChip { padding: 9px 18px 9px 10px; border-radius: 14px; font-size: 15px; letter-spacing: 0; font-family: Inter, system-ui, sans-serif; }
-.storySkills .skillChip { border: 1px solid rgba(255, 255, 255, .14); }
-.storySkills .skillChip.isCustom { border: 1px dashed rgba(var(--pf-gold-rgb), .6); }
+.storySkills .storySkillChip { padding: 9px 18px 9px 10px; border-radius: 14px; font-size: 15px; letter-spacing: 0; font-family: Inter, system-ui, sans-serif; }
+.storySkills .storySkillChip { border: 1px solid rgba(255, 255, 255, .14); }
+.storySkills .storySkillChip.isCustom { border: 1px dashed rgba(var(--pf-gold-rgb), .6); }
 /* With a photo, the first five sit around it; this row holds any extras
  * (and on small screens, all of them). */
-.storySkills.isRow > .skillChip:nth-last-child(-n+5) { display: none; }
+.storySkills.isRow > .storySkillChip:nth-last-child(-n+5) { display: none; }
 
 .storyCards { max-width: 330px; }
 .storyLayout.hasPhoto { gap: clamp(80px, 9vw, 180px); grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
@@ -6895,7 +6895,7 @@ input[type='search']::-webkit-search-decoration { -webkit-appearance: none; }
 /* Not enough room beside the photo: callouts become the row under the text. */
 @media (max-width: 1180px) {
   .storyCallout, .storySkillsTag { display: none; }
-  .storySkills.isRow > .skillChip:nth-last-child(-n+5) { display: inline-flex; order: -1; }
+  .storySkills.isRow > .storySkillChip:nth-last-child(-n+5) { display: inline-flex; order: -1; }
 }
 @media (prefers-reduced-motion: reduce) {
   .storyCallout { animation: none; }
