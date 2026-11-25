@@ -5315,7 +5315,7 @@ function collectAwards(panthers) {
         id: `month-${row.id || row.month_key}`,
         kind: 'month',
         label: row.recognition_type || 'Player of the Month',
-        title: monthLabel(row.month_key),
+        title: teamShortName(team.team_name),
         team: team.team_name,
         sport,
         date: String(row.month_key || '').slice(0, 10),
@@ -5437,10 +5437,7 @@ const ACH_COLOURS = {
  * over a big outlined word, in the award's colour. */
 function achWord(award) {
   if (award.kind === 'match') return 'MVP';
-  if (award.kind === 'month') {
-    const d = new Date(`${String(award.date || '').slice(0, 10)}T00:00:00`);
-    return Number.isNaN(d.getTime()) ? 'No.1' : d.toLocaleDateString('en-GB', { month: 'short' }).toUpperCase();
-  }
+  if (award.kind === 'month') return 'No.1';
   if (award.kind === 'reward') return String(award.criterion || 'COACH').toUpperCase();
   return 'TBS';
 }
