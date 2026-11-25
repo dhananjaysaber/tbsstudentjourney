@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 
 import { privateEvidenceBlobUrl, publicEvidenceUrl, cachedEvidenceBlobUrl, isCachedBlobUrl } from '../journeyApi';
+import { drawCardFace, cardFontsReady } from '../lib/cardFace';
 
 import './JourneySpiral.css';
 
@@ -367,11 +368,10 @@ const CARD_FRAGMENT = /* glsl */ `
     if (mask < 0.002) discard;
 
     // Cover-fit sample, with a gentle zoom on hover.
-    vec2 uv = vUv;
-    uv = (uv - 0.5) * (1.0 - uHover * 0.06) + 0.5;
-    uv = uv * uRepeat + uOffset;
+    // No zoom: the card's header and footer must stay whole.
+    vec2 uv = vUv * uRepeat + uOffset;
     vec3 photo = texture2D(uMap, uv).rgb;
-    vec3 placeholder = texture2D(uFallback, (vUv - 0.5) * (1.0 - uHover * 0.06) + 0.5).rgb;
+    vec3 placeholder = texture2D(uFallback, vUv).rgb;
     vec3 color = mix(placeholder, photo, uReveal);
 
     // Depth: panels on the far side of the column recede into the dark.
@@ -389,7 +389,7 @@ const CARD_FRAGMENT = /* glsl */ `
 
     // Photographic vignette + highlight on the front-most panel.
     float vig = smoothstep(0.95, 0.25, length((vUv - 0.5) * vec2(1.0, 1.2)));
-    color *= mix(0.72, 1.0, vig);
+    color *= mix(0.9, 1.0, vig);
     color *= 1.0 + uHover * 0.14 + uFocus * 0.04;
 
     // Hairline inner border — brighter when hovered.
@@ -724,6 +724,58 @@ export default function JourneySpiral({
       return textureCache.get(url);
     }
 
+    /* The approved card face (header, framed photo, footer). */
+    const faceCache = new Map();
+    function faceTexture(card, image) {
+      const key = `${card.key}|${image ? 'photo' : 'none'}|${layout.mobile ? 'm' : 'd'}`;
+      if (!faceCache.has(key)) {
+        const canvas = drawCardFace({ card, image, ratio: layout.cardH / layout.cardW, width: layout.mobile ? 760 : 1024 });
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.anisotropy = maxAnisotropy;
+        texture.minFilter = THREE.LinearMipmapLinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        ownedTextures.add(texture);
+        faceCache.set(key, texture);
+      }
+      return faceCache.get(key);
+    }
+
+    const imageCache = new Map();
+    function loadImage(url) {
+      if (!imageCache.has(url)) {
+        imageCache.set(
+          url,
+          new Promise(resolve => {
+            loader.load(
+              url,
+              async image => {
+                try {
+                  await image.decode?.();
+                } catch {
+                  /* carry on */
+                }
+                resolve(disposed ? null : image);
+              },
+              undefined,
+              () => resolve(null)
+            );
+          })
+        );
+      }
+      return imageCache.get(url);
+    }
+
+    async function firstImage(card) {
+      const urls = await candidatesFor(card);
+      for (const url of urls) {
+        // eslint-disable-next-line no-await-in-loop
+        const image = await loadImage(url);
+        if (image) return image;
+      }
+      return null;
+    }
+
     async function firstTexture(card) {
       const urls = await candidatesFor(card);
       for (const url of urls) {
@@ -735,8 +787,7 @@ export default function JourneySpiral({
     }
 
     cards.forEach((card, index) => {
-      const fallback = createFallbackTexture(card);
-      ownedTextures.add(fallback);
+      const fallback = faceTexture(card, null);
 
       const material = new THREE.ShaderMaterial({
         vertexShader: CARD_VERTEX,
@@ -777,8 +828,18 @@ export default function JourneySpiral({
         ease: 'power2.out'
       });
 
-      firstTexture(card).then(texture => {
-        if (!texture || disposed) return;
+      Promise.all([firstImage(card), cardFontsReady()]).then(([image]) => {
+        if (disposed) return;
+        /* Plain card redrawn with the fonts loaded, then the photo card. */
+        const plain = faceTexture(card, null);
+        material.uniforms.uFallback.value = plain;
+        if (!image) {
+          material.uniforms.uMap.value = plain;
+          applyCover(material, plain);
+          return;
+        }
+        mesh.userData.image = image;
+        const texture = faceTexture(card, image);
         material.uniforms.uMap.value = texture;
         applyCover(material, texture);
         /* Cross-dissolve from the placeholder to the photograph. */
@@ -1120,7 +1181,11 @@ export default function JourneySpiral({
         u.uSize.value.set(layout.cardW, layout.cardH);
         u.uCorner.value = layout.corner;
         u.uRadius.value = layout.radius;
-        applyCover(mesh.material, u.uMap.value);
+        /* New card shape: redraw the face to fit it. */
+        const face = faceTexture(mesh.userData.card, mesh.userData.image || null);
+        u.uMap.value = face;
+        u.uFallback.value = faceTexture(mesh.userData.card, null);
+        applyCover(mesh.material, face);
       });
       cardGeometry = next;
     }

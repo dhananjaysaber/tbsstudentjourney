@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { ChevronLeft, ChevronRight, MoveHorizontal, Pause, Play } from 'lucide-react';
 import { buildVisualCards, domainLabel, resolveMediaCandidates } from './JourneySpiral';
 import { isCachedBlobUrl } from '../journeyApi';
+import { drawCardFace, cardFontsReady, ringOrder } from '../lib/cardFace';
 import './JourneyCarousel.css';
 
 /* ------------------------------------------------------------------------
@@ -82,8 +83,8 @@ const FRAG = /* glsl */ `
     float mask = 1.0 - smoothstep(-aa, aa, d);
     if (mask < 0.003) discard;
 
-    vec2 uv = (vUv - 0.5) * (1.0 - uHover * 0.05) + 0.5;
-    vec3 color = texture2D(uMap, uv * uRepeat + uOffset).rgb;
+    /* No zoom: the card's header and footer must stay whole. */
+    vec3 color = texture2D(uMap, vUv * uRepeat + uOffset).rgb;
     color *= mix(0.9, 1.0, uReveal);
     color *= uShade;
     color *= 1.0 + uHover * 0.08;
@@ -91,100 +92,6 @@ const FRAG = /* glsl */ `
     #include <colorspace_fragment>
   }
 `;
-
-/* Portrait cover for a moment with no photo. The title is wrapped and
- * sized to fit the card, so it is always shown in full. */
-function wrapLines(ctx, text, maxWidth) {
-  const words = String(text || '').split(/\s+/).filter(Boolean);
-  const lines = [];
-  let line = '';
-  words.forEach(word => {
-    const test = line ? `${line} ${word}` : word;
-    if (ctx.measureText(test).width > maxWidth && line) {
-      lines.push(line);
-      line = word;
-    } else {
-      line = test;
-    }
-  });
-  if (line) lines.push(line);
-  return lines;
-}
-
-function createPortraitCover(card) {
-  const W = 720;
-  const H = 1280;
-  const canvas = document.createElement('canvas');
-  canvas.width = W;
-  canvas.height = H;
-  const ctx = canvas.getContext('2d');
-
-  const bg = ctx.createLinearGradient(0, 0, W, H);
-  bg.addColorStop(0, '#24236a');
-  bg.addColorStop(0.55, '#151449');
-  bg.addColorStop(1, '#0d0c33');
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, W, H);
-  const glow = ctx.createRadialGradient(W * 0.8, H * 0.18, 10, W * 0.8, H * 0.18, W * 0.9);
-  glow.addColorStop(0, 'rgba(238, 192, 88, .32)');
-  glow.addColorStop(1, 'rgba(238, 192, 88, 0)');
-  ctx.fillStyle = glow;
-  ctx.fillRect(0, 0, W, H);
-
-  ctx.strokeStyle = 'rgba(255,255,255,.04)';
-  ctx.lineWidth = 1;
-  for (let x = 0; x <= W; x += 48) {
-    ctx.beginPath();
-    ctx.moveTo(x + 0.5, 0);
-    ctx.lineTo(x + 0.5, H);
-    ctx.stroke();
-  }
-
-  /* Big outlined number, top right */
-  ctx.strokeStyle = 'rgba(255,255,255,.13)';
-  ctx.lineWidth = 2;
-  ctx.font = 'italic 500 260px "Playfair Display", Georgia, serif';
-  ctx.textAlign = 'right';
-  ctx.strokeText(card.number || '01', W - 50, 430);
-  ctx.textAlign = 'left';
-
-  const pad = 64;
-  const maxWidth = W - pad * 2;
-
-  /* Area label */
-  ctx.fillStyle = '#eec058';
-  ctx.font = '500 26px "DM Mono", monospace';
-  ctx.fillText(domainLabel(card.domain).toUpperCase().split('').join(' '), pad, 210);
-
-  /* Title: largest size (64 → 34px) that fits in five lines */
-  const title = card.story?.title || card.title || 'Journey moment';
-  let size = 64;
-  let lines = [];
-  for (; size >= 34; size -= 2) {
-    ctx.font = `500 ${size}px "Playfair Display", Georgia, serif`;
-    lines = wrapLines(ctx, title, maxWidth);
-    if (lines.length <= 5 && lines.every(line => ctx.measureText(line).width <= maxWidth)) break;
-  }
-  if (lines.length > 6) {
-    lines = lines.slice(0, 6);
-    lines[5] += '…';
-  }
-  const lineHeight = Math.round(size * 1.16);
-  const bottom = 1060;
-  ctx.fillStyle = '#ffffff';
-  lines.forEach((line, i) => ctx.fillText(line, pad, bottom - (lines.length - 1 - i) * lineHeight));
-
-  /* Year */
-  if (card.year) {
-    ctx.fillStyle = 'rgba(255,255,255,.55)';
-    ctx.font = '500 24px "DM Mono", monospace';
-    ctx.fillText(String(card.year), pad, 1120);
-  }
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  return texture;
-}
 
 function coverFit(material, texture, cardW, cardH) {
   const image = texture.image;
@@ -265,53 +172,35 @@ export default function JourneyCarousel({ items = [], evidence = [], token, prev
     const objectUrls = new Set();
     const textureCache = new Map();
 
-    function toTexture(image) {
-      const w = image.naturalWidth || image.width;
-      const h = image.naturalHeight || image.height;
-      const maxSide = layout.mobile ? 900 : 1200;
-      const scale = Math.min(1, maxSide / Math.max(w, h, 1));
-      let texture;
-      if (scale < 1) {
-        const canvas = document.createElement('canvas');
-        canvas.width = Math.round(w * scale);
-        canvas.height = Math.round(h * scale);
-        const ctx = canvas.getContext('2d');
-        ctx.imageSmoothingQuality = 'high';
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-        texture = new THREE.CanvasTexture(canvas);
-      } else {
-        texture = new THREE.Texture(image);
-      }
-      texture.colorSpace = THREE.SRGBColorSpace;
-      texture.anisotropy = maxAniso;
-      texture.minFilter = THREE.LinearMipmapLinearFilter;
-      texture.needsUpdate = true;
-      owned.add(texture);
-      return texture;
-    }
-
-    function loadTexture(url) {
-      if (!textureCache.has(url)) {
-        textureCache.set(
+    const imageCache = new Map();
+    function loadImage(url) {
+      if (!imageCache.has(url)) {
+        imageCache.set(
           url,
           new Promise(resolve => {
-            loader.load(
-              url,
-              image => {
-                if (disposed) return resolve(null);
-                try {
-                  resolve(toTexture(image));
-                } catch {
-                  resolve(null);
-                }
-              },
-              undefined,
-              () => resolve(null)
-            );
+            loader.load(url, image => resolve(disposed ? null : image), undefined, () => resolve(null));
           })
         );
       }
-      return textureCache.get(url);
+      return imageCache.get(url);
+    }
+
+    /* The approved card (header, framed photo, footer), one texture per
+     * photo per layout, shared by every repeat of that card. */
+    const faceCache = new Map();
+    function faceTexture(card, image) {
+      const key = `${card.key}|${image ? 'photo' : 'none'}|${layout.mobile ? 'm' : 'd'}`;
+      if (!faceCache.has(key)) {
+        const canvas = drawCardFace({ card, image, ratio: layout.cardH / layout.cardW, width: layout.mobile ? 820 : 1024 });
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.anisotropy = maxAniso;
+        texture.minFilter = THREE.LinearMipmapLinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        owned.add(texture);
+        faceCache.set(key, texture);
+      }
+      return faceCache.get(key);
     }
 
     const candidateCache = new Map();
@@ -334,10 +223,10 @@ export default function JourneyCarousel({ items = [], evidence = [], token, prev
     /* Build the ring */
     let geometry = new THREE.PlaneGeometry(layout.cardW, layout.cardH, 1, 1);
     const meshes = [];
+    const ordered = ringOrder(builtCards, count);
     for (let i = 0; i < count; i += 1) {
-      const card = builtCards[i % builtCards.length];
-      const fallback = createPortraitCover(card);
-      owned.add(fallback);
+      const card = ordered[i];
+      const fallback = faceTexture(card, null);
       const material = new THREE.ShaderMaterial({
         vertexShader: VERT,
         fragmentShader: FRAG,
@@ -364,16 +253,26 @@ export default function JourneyCarousel({ items = [], evidence = [], token, prev
       meshes.push(mesh);
 
       candidatesFor(card).then(async urls => {
+        await cardFontsReady();
+        if (disposed) return;
         for (const url of urls) {
           // eslint-disable-next-line no-await-in-loop
-          const texture = await loadTexture(url);
+          const image = await loadImage(url);
           if (disposed) return;
-          if (texture) {
+          if (image) {
+            mesh.userData.image = image;
+            const texture = faceTexture(card, image);
             material.uniforms.uMap.value = texture;
             material.uniforms.uReveal.value = 1;
             coverFit(material, texture, layout.cardW, layout.cardH);
             return;
           }
+        }
+        /* No photo: redraw the plain card now the fonts are in. */
+        if (!mesh.userData.image) {
+          const texture = faceTexture(card, null);
+          material.uniforms.uMap.value = texture;
+          coverFit(material, texture, layout.cardW, layout.cardH);
         }
       });
     }
@@ -390,7 +289,10 @@ export default function JourneyCarousel({ items = [], evidence = [], token, prev
           mesh.geometry = geometry;
           mesh.material.uniforms.uSize.value.set(layout.cardW, layout.cardH);
           mesh.material.uniforms.uCorner.value = layout.corner;
-          coverFit(mesh.material, mesh.material.uniforms.uMap.value, layout.cardW, layout.cardH);
+          /* The card's shape changed: redraw its face to the new shape. */
+          const face = faceTexture(mesh.userData.card, mesh.userData.image || null);
+          mesh.material.uniforms.uMap.value = face;
+          coverFit(mesh.material, face, layout.cardW, layout.cardH);
         });
       } else {
         layout = next;

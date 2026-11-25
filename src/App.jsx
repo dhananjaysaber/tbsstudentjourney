@@ -4937,49 +4937,34 @@ function JourneyBlog({ items, token, preview, onOpen }) {
   }
 
   return (
-    <div className="sectionShell journeyBlog">
-      {items.map((item, index) => (
-        <Reveal key={item.id} delay={Math.min(index, 4) * 60}>
-          <article className="journeyPost">
-            <button type="button" className="journeyPostMedia" onClick={() => onOpen(item)} aria-label={`Open ${item.title}`}>
-              {item.evidence ? (
-                <SecureEvidenceImage
-                  evidence={item.evidence}
-                  token={token}
-                  preview={preview}
-                  alt=""
-                  fallback={<MomentCover item={item} />}
-                />
-              ) : (
-                <MomentCover item={item} />
-              )}
-            </button>
-
-            <div className="journeyPostBody">
-              <small>
-                {domainLabel(item.domain)}
-                {item.event_date ? ` · ${formatDate(item.event_date)}` : ''}
-                {item.verification_status === 'verified' && (
-                  <span className="journeyPostVerified">
-                    <ShieldCheck /> TBS verified
-                  </span>
+    <div className="sectionShell journeyBlog journeyCards">
+      {items.map((item, index) => {
+        const skill = arr(item.skills)[0];
+        return (
+          <Reveal key={item.id} delay={Math.min(index, 4) * 60}>
+            <button type="button" className="jCard" onClick={() => onOpen(item)} aria-label={`Open ${item.title}`}>
+              <header>
+                <span>{domainLabel(item.domain)}{item.year ? ` · ${item.year}` : ''}</span>
+                <i>{item.number}</i>
+              </header>
+              <div className="jCardPhoto">
+                {item.evidence ? (
+                  <SecureEvidenceImage evidence={item.evidence} token={token} preview={preview} alt="" fallback={<div className="jCardEmpty" />} />
+                ) : (
+                  <div className="jCardEmpty" />
                 )}
-              </small>
-              <h3>{item.title}</h3>
-              {item.description && <p>{item.description}</p>}
-              {item.reflection && (
-                <blockquote>
-                  <span>What this taught me</span>
-                  <em className="journeyPostExcerpt">{item.reflection}</em>
-                </blockquote>
-              )}
-              <button type="button" className="journeyPostOpen" onClick={() => onOpen(item)}>
-                Read the story <ArrowUpRight />
-              </button>
-            </div>
-          </article>
-        </Reveal>
-      ))}
+              </div>
+              <footer>
+                <h3>{item.title}</h3>
+                <div className="jCardRow">
+                  {skill ? <span className="jCardSkill">{skill}</span> : <span />}
+                  <span className="jCardOpen">Open story →</span>
+                </div>
+              </footer>
+            </button>
+          </Reveal>
+        );
+      })}
     </div>
   );
 }

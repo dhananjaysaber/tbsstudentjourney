@@ -6926,3 +6926,94 @@ input[type='search']::-webkit-search-decoration { -webkit-appearance: none; }
   animation: storyCardPhoto 1s .5s cubic-bezier(.2, .7, .2, 1) both, storyShimmer 1.4s linear infinite;
 }
 @keyframes storyShimmer { to { background-position: -220% 0, 0 0; } }
+
+/* Journey "Blog" view: the approved gallery card, as a grid */
+.journeyCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 28px;
+}
+.jCard {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  aspect-ratio: 300 / 500;
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  overflow: hidden;
+  background: #141a5e;
+  color: #ffffff;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 30px 60px rgba(20, 26, 94, .22);
+  transition: transform .35s cubic-bezier(.2, .7, .2, 1), box-shadow .35s;
+}
+.jCard:hover { transform: translateY(-6px); box-shadow: 0 40px 80px rgba(20, 26, 94, .32); }
+.jCard header {
+  flex: none;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, .1);
+}
+.jCard header span {
+  font-family: "DM Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #e8c066;
+}
+.jCard header i {
+  font-family: "Playfair Display", Georgia, serif;
+  font-style: italic;
+  font-size: 18px;
+  color: rgba(255, 255, 255, .6);
+}
+.jCardPhoto { flex: 1; min-height: 0; margin: 0 10px; border-radius: 12px; overflow: hidden; }
+.jCardPhoto img, .jCardEmpty {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .6s cubic-bezier(.2, .7, .2, 1);
+}
+.jCardEmpty { background: linear-gradient(160deg, #24236a, #0d0c33); }
+.jCard:hover .jCardPhoto img { transform: scale(1.04); }
+.jCard footer {
+  flex: none;
+  height: 118px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.jCard h3 {
+  margin: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.18;
+  color: #ffffff;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.jCardRow { display: flex; justify-content: space-between; align-items: center; }
+.jCardSkill {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 11px;
+  color: #e8c066;
+  border: 1px solid rgba(232, 192, 102, .45);
+  border-radius: 8px;
+  padding: 4px 9px;
+}
+.jCardOpen {
+  font-family: "DM Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .12em;
+  color: rgba(255, 255, 255, .65);
+}
