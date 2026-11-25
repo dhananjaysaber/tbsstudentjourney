@@ -61,6 +61,7 @@ import {
   Users,
   X,
   ChevronLeft,
+  MousePointerClick,
   ChevronRight,
   BarChart3,
   Settings2,
@@ -91,6 +92,10 @@ import {
   removeEvidence,
   loadPublicShare,
   loadPendingEntries,
+  loadPortfolioSettings,
+  setPortfolioSetting,
+  loadCommunityMode,
+  setCommunityMode,
   privateEvidenceBlobUrl,
   cachedEvidenceBlobUrl,
   preloadEvidence,
@@ -1876,12 +1881,16 @@ function Portal({ session, account, children, selected, setSelected, initialTab 
                 setSelected(student);
                 setSearch('');
                 setResults([]);
-                setTab('overview');
+                setTab(current => (current === 'sharing' ? 'sharing' : 'overview'));
               }}
             />
           )}
 
-          {!studentId && !globalTab ? (
+          {tab === 'sharing' && admin && <SchoolSharingSettings superadmin={superadmin} />}
+
+          {!studentId && !globalTab && tab === 'sharing' ? (
+            <p className="sharingPickHint">Pick a student above to set their Journey display, their TBS community access and a secure public link.</p>
+          ) : !studentId && !globalTab ? (
             <EmptySelect parent={parent} />
           ) : loading ? (
             <Splash text="Loading journey…" />
@@ -3164,61 +3173,152 @@ function MomentApprovals({ items, onReview, onReviewMany }) {
 
 /* SuperAdmin-only: portfolios are open to signed-in members by default;
  * the SuperAdmin can close one (e.g. at a family's request). */
-function CommunityAccess({ data, superadmin, onRefresh }) {
-  const [open, setOpen] = useState(!data.profile?.community_closed);
-  const [busy, setBusy] = useState(false);
+/* School-wide settings (no student needed): TBS community access for everyone,
+ * and right-click protection on portfolio pages. SuperAdmin only. */
+function SchoolSharingSettings({ superadmin }) {
+  const [settings, setSettings] = useState(null);
+  const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
-    setOpen(!data.profile?.community_closed);
-  }, [data.profile?.community_closed]);
+    loadPortfolioSettings({ fresh: true }).then(setSettings);
+  }, []);
 
-  async function toggle() {
+  async function flip(key, value) {
     if (!superadmin || busy) return;
-    setBusy(true);
+    setBusy(key);
     setError('');
     try {
-      await setCommunityClosed(data.student.student_id, open);
-      setOpen(!open);
-      Promise.resolve(onRefresh?.()).catch(() => {});
-    } catch (toggleError) {
-      setError(
-        friendlyError(toggleError, 'This setting isn’t ready just yet. Please try again a little later.')
-      );
+      setSettings(await setPortfolioSetting(key, value));
+    } catch (flipError) {
+      setError(friendlyError(flipError, 'This setting couldn’t be saved. Please try again.'));
+    } finally {
+      setBusy('');
+    }
+  }
+
+  const open = (settings?.community_default || 'open') === 'open';
+  const rightClick = (settings?.right_click || 'enabled') === 'enabled';
+
+  return (
+    <section className="panel schoolSettings">
+      <PanelHead kicker="SCHOOL SETTINGS · ALL PORTFOLIOS" title="For everyone at TBS" />
+      <div className={`communityAccess ${open ? 'isOpen' : ''}`}>
+        <Users />
+        <div>
+          <h3>TBS community access · school default</h3>
+          <p>
+            {open
+              ? 'Open — any signed-in parent, student or staff member can view portfolios (approved moments and public evidence only).'
+              : 'Closed — members see the name and photo, and must request access. Only the student, their family and staff can open a portfolio.'}
+            {' '}A student’s own setting overrides this.
+          </p>
+        </div>
+        <button
+          type="button" role="switch" aria-checked={open} aria-label="TBS community access, school default"
+          className="communitySwitch" onClick={() => flip('community_default', open ? 'closed' : 'open')}
+          disabled={!superadmin || !settings || busy === 'community_default'}
+        >
+          <i />
+        </button>
+      </div>
+
+      <div className={`communityAccess ${rightClick ? 'isOpen' : ''}`}>
+        <MousePointerClick />
+        <div>
+          <h3>Right-click on portfolios</h3>
+          <p>
+            {rightClick
+              ? 'Enabled — visitors can right-click (and long-press on phones) on portfolio pages.'
+              : 'Disabled — right-click, long-press and dragging photos are blocked on every portfolio page.'}
+          </p>
+        </div>
+        <button
+          type="button" role="switch" aria-checked={rightClick} aria-label="Right-click on portfolios"
+          className="communitySwitch" onClick={() => flip('right_click', rightClick ? 'disabled' : 'enabled')}
+          disabled={!superadmin || !settings || busy === 'right_click'}
+        >
+          <i />
+        </button>
+      </div>
+
+      {!superadmin && <small className="schoolSettingsNote">Only the SuperAdmin can change these.</small>}
+      {error && (
+        <div className="sharingInlineError" role="alert">
+          <AlertCircle size={17} />
+          <span>{error}</span>
+        </div>
+      )}
+    </section>
+  );
+}
+
+/* This student's TBS community access: follow the school default, or
+ * override it with Open / Closed. */
+function StudentCommunityAccess({ studentId, studentName, superadmin }) {
+  const [mode, setMode] = useState(null);
+  const [schoolDefault, setSchoolDefault] = useState('open');
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState('');
+
+  useEffect(() => {
+    let live = true;
+    setMode(null);
+    Promise.all([loadCommunityMode(studentId), loadPortfolioSettings()])
+      .then(([m, s]) => {
+        if (!live) return;
+        setMode(m);
+        setSchoolDefault(s.community_default || 'open');
+      })
+      .catch(() => live && setMode(''));
+    return () => {
+      live = false;
+    };
+  }, [studentId]);
+
+  async function choose(next) {
+    if (!superadmin || busy || next === mode) return;
+    setBusy(true);
+    setMsg('');
+    try {
+      const result = await setCommunityMode(studentId, next);
+      setMode(result?.mode || '');
+      setMsg('Saved.');
+    } catch (error) {
+      setMsg(friendlyError(error, 'This setting couldn’t be saved. Please try again.'));
     } finally {
       setBusy(false);
     }
   }
 
+  const effective = (mode || schoolDefault) === 'open' ? 'Open' : 'Closed';
+  const choices = [
+    ['', `Use school default (${schoolDefault === 'open' ? 'Open' : 'Closed'})`],
+    ['open', 'Open'],
+    ['closed', 'Closed']
+  ];
+
   return (
-    <div className={`communityAccess ${open ? 'isOpen' : ''}`}>
-      <Users />
-      <div>
-        <h3>TBS community access</h3>
-        <p>
-          {open
-            ? 'Open — any signed-in parent, student or staff member can view this portfolio (approved moments and public evidence only).'
-            : 'Closed — members see the name and photo, and must request access. Only the student, their family and staff can open it.'}
-        </p>
-        {!superadmin && <small>Only the SuperAdmin can change this.</small>}
-        {error && (
-          <div className="sharingInlineError" role="alert">
-            <AlertCircle size={17} />
-            <span>{error}</span>
-          </div>
-        )}
+    <div className="journeyDisplayPanel">
+      <div className="jdRow">
+        <span className="jdLabel">TBS community access · {studentName || 'this student'}</span>
+        <div className="jdChoices">
+          {choices.map(([value, label]) => (
+            <button
+              type="button" key={value || 'default'}
+              className={mode === value ? 'on' : ''}
+              onClick={() => choose(value)}
+              disabled={!superadmin || busy || mode === null}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={open}
-        aria-label="TBS community access"
-        className="communitySwitch"
-        onClick={toggle}
-        disabled={!superadmin || busy}
-      >
-        <i />
-      </button>
+      <span className="jdMsg">
+        {mode === null ? 'Loading…' : `Currently ${effective} for this student.`} {msg}
+        {!superadmin && ' Only the SuperAdmin can change this.'}
+      </span>
     </div>
   );
 }
@@ -3278,11 +3378,11 @@ function Sharing({ data, onRefresh, superadmin }) {
 
   return (
     <section className="panel">
-      <PanelHead kicker="PUBLIC SHARING" title="Controlled, expiring access" />
+      <PanelHead kicker="THIS STUDENT" title={data?.student?.full_name || 'Sharing'} />
 
       <JourneyDisplaySettings studentId={data?.student?.student_id || ''} studentName={data?.student?.full_name || ''} />
 
-      <CommunityAccess data={data} superadmin={superadmin} onRefresh={onRefresh} />
+      <StudentCommunityAccess studentId={data.student.student_id} studentName={data.student.full_name} superadmin={superadmin} />
 
       <div className="sharingBox">
         <Globe2 />
@@ -4229,6 +4329,28 @@ function cvQrUrl(token) {
 function Portfolio({ data, token, preview = false, member = false, editHref = null }) {
   /* Members' media is fetched with their session, like the private preview. */
   const mediaPreview = preview || member;
+
+  /* School setting: right-click disabled → block the context menu, long-press
+   * saving and dragging photos on the portfolio (it deters casual copying). */
+  useEffect(() => {
+    let undo = () => {};
+    loadPortfolioSettings().then(settings => {
+      if (settings.right_click !== 'disabled') return;
+      const block = event => event.preventDefault();
+      const noDrag = event => {
+        if (event.target?.tagName === 'IMG') event.preventDefault();
+      };
+      document.addEventListener('contextmenu', block, true);
+      document.addEventListener('dragstart', noDrag, true);
+      document.documentElement.classList.add('noRightClick');
+      undo = () => {
+        document.removeEventListener('contextmenu', block, true);
+        document.removeEventListener('dragstart', noDrag, true);
+        document.documentElement.classList.remove('noRightClick');
+      };
+    });
+    return () => undo();
+  }, []);
   const entries = useMemo(() => data.entries || [], [data.entries]);
   const evidence = useMemo(() => data.evidence || [], [data.evidence]);
   const profile = data.profile || {};

@@ -7337,3 +7337,10 @@ button.endorseYear:hover .endorseYearGo { opacity: 1; transform: translate(2px, 
   line-height: .9;
   letter-spacing: -.05em;
 }
+
+.schoolSettings .communityAccess + .communityAccess { margin-top: 12px; }
+.schoolSettingsNote { display: block; margin-top: 10px; color: var(--muted, #6b6b80); font-size: 12px; }
+.sharingPickHint { margin: 4px 0 0; padding: 18px 20px; border: 1px dashed rgba(21, 20, 73, .25); border-radius: 14px; font-size: 14px; color: rgba(21, 20, 73, .75); }
+
+/* Right-click disabled (school setting): no long-press menu or image saving on phones. */
+.noRightClick img { -webkit-touch-callout: none; -webkit-user-drag: none; user-select: none; }

@@ -2014,3 +2014,10 @@
     font-size: 12px;
   }
 }
+
+/* Cards with a profile photo: no initials. Visitors: heavily blurred. */
+.ldCardFace.hasPhoto img { position: absolute; inset: 0; }
+.ldCardFace.isBlurred img {
+  filter: blur(6px) saturate(.9);
+  transform: scale(1.25);
+}

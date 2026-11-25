@@ -72,7 +72,7 @@ async function directoryStudents(db: SupabaseClient) {
   for (let from = 0; ; from += 1000) {
     const { data, error } = await db
       .from('student_journey_profiles')
-      .select('student_id, preferred_name, profile_photo_url, community_closed')
+      .select('student_id, preferred_name, profile_photo_url, community_closed, community_mode')
       .range(from, from + 999);
     if (error) throw error;
     profiles.push(...(data || []));
@@ -156,6 +156,16 @@ function accessFor(member: Member, sid: string, communityOpen: boolean, grants: 
   if (grants.has(sid)) return 'granted';
   return 'request';
 }
+
+/* School default for TBS community access ('open' | 'closed'); a student's
+ * own setting (community_mode) overrides it. */
+async function communityDefault(db: SupabaseClient) {
+  const { data } = await db.from('portfolio_settings').select('value').eq('key', 'community_default').maybeSingle();
+  return data?.value === 'closed' ? 'closed' : 'open';
+}
+function communityOpen(profile: Record<string, any>, schoolDefault: string) {
+  return (profile.community_mode || schoolDefault) === 'open';
+}
 // ---- end helpers ----
 
 Deno.serve(async req => {
@@ -172,7 +182,7 @@ Deno.serve(async req => {
 
     const studentId = row.student.student_id;
     const grants = await activeGrants(db, member.email);
-    const access = accessFor(member, studentId, !row.profile.community_closed, grants);
+    const access = accessFor(member, studentId, communityOpen(row.profile, await communityDefault(db)), grants);
 
     if (access === 'request') {
       return json({ valid: false, access, error: 'You need access to view this portfolio.' }, 403);

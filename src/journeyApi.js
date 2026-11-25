@@ -880,7 +880,7 @@ export async function loadPublicShare(token) {
  * card and the story screen, and far quicker than the original. */
 const PHOTO_SIZE = 1600;
 
-export async function privateEvidenceBlobUrl(evidenceId) {
+export async function privateEvidenceBlobUrl(evidenceId, size = PHOTO_SIZE) {
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -891,7 +891,7 @@ export async function privateEvidenceBlobUrl(evidenceId) {
 
   const res = await fetch(
     `${supabaseUrl}/functions/v1/journey-media` +
-      `?evidence=${encodeURIComponent(evidenceId)}&size=${PHOTO_SIZE}`,
+      `?evidence=${encodeURIComponent(evidenceId)}&size=${size}`,
 
     {
       headers: {
@@ -1214,5 +1214,53 @@ export async function setCommunityClosed(studentId, closed) {
   if (Boolean(data?.community_closed) !== Boolean(closed)) {
     throw new Error('Only the SuperAdmin can change TBS community access.');
   }
+  return data;
+}
+
+/* ---------- School-wide portfolio settings ----------
+ * community_default: 'open' | 'closed' (TBS community access for everyone)
+ * right_click: 'enabled' | 'disabled' (right-click / long-press on portfolios) */
+let settingsPromise = null;
+export function loadPortfolioSettings({ fresh = false } = {}) {
+  if (fresh || !settingsPromise) {
+    settingsPromise = supabase
+      .rpc('portfolio_get_settings')
+      .then(({ data, error }) => {
+        if (error) throw error;
+        return data || {};
+      })
+      .catch(error => {
+        settingsPromise = null;
+        console.warn('Portfolio settings unavailable', error);
+        return {};
+      });
+  }
+  return settingsPromise;
+}
+
+export async function setPortfolioSetting(key, value) {
+  const { data, error } = await supabase.rpc('portfolio_set_setting', { p_key: key, p_value: value });
+  if (error) throw error;
+  settingsPromise = Promise.resolve(data || {});
+  return data || {};
+}
+
+/* This student's TBS community access: 'open' | 'closed' | '' (= school default). */
+export async function loadCommunityMode(studentId) {
+  const { data, error } = await supabase
+    .from('student_journey_profiles')
+    .select('community_mode')
+    .eq('student_id', studentId)
+    .maybeSingle();
+  if (error) throw error;
+  return data?.community_mode || '';
+}
+
+export async function setCommunityMode(studentId, mode) {
+  const { data, error } = await supabase.rpc('portfolio_set_community_mode', {
+    p_student_id: studentId,
+    p_mode: mode || null
+  });
+  if (error) throw error;
   return data;
 }

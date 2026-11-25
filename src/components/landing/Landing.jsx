@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -16,7 +16,7 @@ import {
   X
 } from 'lucide-react';
 
-import { supabase } from '../../supabase';
+import { supabase, supabaseUrl } from '../../supabase';
 import {
   loadDirectory,
   privateEvidenceBlobUrl,
@@ -122,8 +122,36 @@ function Mortarboard() {
   );
 }
 
-/* One student card in space. Visitors only ever see initials. */
-function StudentCard({ person, member, photo }) {
+/* Photos for the cards, shared through context so a photo arriving only
+ * re-renders its own card (not the whole field). */
+const CardPhotos = createContext({});
+
+/* Visitors get a tiny 24px copy from the server, shown heavily blurred:
+ * never the real photo. */
+const visitorThumb = person =>
+  person.photoId ? `${supabaseUrl}/functions/v1/journey-media?evidence=${encodeURIComponent(person.photoId)}` : '';
+
+function CardFace({ person, member }) {
+  const photos = useContext(CardPhotos);
+  const [failed, setFailed] = useState(false);
+  const src = member ? photos[person.key] : visitorThumb(person);
+  if (src && !failed) {
+    return (
+      <span className={`ldCardFace hasPhoto ${member ? '' : 'isBlurred'}`}>
+        <img src={src} alt="" loading="lazy" draggable="false" onError={() => setFailed(true)} />
+      </span>
+    );
+  }
+  return (
+    <span className="ldCardFace">
+      <b>{initialsOf(person)}</b>
+    </span>
+  );
+}
+
+/* One student card in space: the clear photo for members; for visitors a
+ * blurred tiny copy and the first name only. */
+function StudentCard({ person, member }) {
   const tone = person.open ? 'isOpen' : person.pending ? 'isPending' : '';
   const look = cardOf(person);
   const style = {
@@ -135,10 +163,7 @@ function StudentCard({ person, member, photo }) {
   return (
     <span className={`ldCard ${tone} ${member ? '' : 'isPrivate'}`} style={style}>
       <span className="ldCardPhoto">
-        {/* Initials only on the cards: no profile photos in space. */}
-        <span className="ldCardFace">
-          <b>{initialsOf(person)}</b>
-        </span>
+        <CardFace person={person} member={member} />
         <span className="ldCap">
           <Mortarboard />
         </span>
@@ -148,6 +173,8 @@ function StudentCard({ person, member, photo }) {
       </span>
       {member ? (
         <span className={`ldCardName ${nameSize(shortNameOf(person))}`}>{shortNameOf(person)}</span>
+      ) : person.firstName ? (
+        <span className={`ldCardName ${nameSize(person.firstName)}`}>{person.firstName}</span>
       ) : (
         <span className="ldCardRedacted" aria-hidden="true">
           <i />
@@ -802,7 +829,7 @@ export default function Landing() {
       while (queue.length) {
         const person = queue.shift();
         try {
-          const url = await privateEvidenceBlobUrl(person.photoId);
+          const url = await privateEvidenceBlobUrl(person.photoId, 240); /* small copy: cards and search */
           blobUrls.current.push(url);
           setPhotos(current => ({ ...current, [person.key]: url }));
         } catch {
@@ -848,7 +875,9 @@ export default function Landing() {
       </div>
       <canvas ref={skyRef} className="ldStars" aria-hidden="true" />
 
-      <OrbitField pool={spacePool} renderStar={renderStar} avoidRef={centreRef} onSelect={openPerson} theme={theme} />
+      <CardPhotos.Provider value={photos}>
+        <OrbitField pool={spacePool} renderStar={renderStar} avoidRef={centreRef} onSelect={openPerson} theme={theme} />
+      </CardPhotos.Provider>
       <div className="ldVignette" aria-hidden="true" />
 
       {/* ---------- top bar ---------- */}

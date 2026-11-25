@@ -107,7 +107,7 @@ async function memberMayView(admin: any, email: string, hasAccount: boolean, ev:
   }
 
   const { data: p } = await admin.from('student_journey_profiles')
-    .select('profile_photo_url, community_visible')
+    .select('profile_photo_url, community_mode')
     .eq('student_id', ev.student_id).maybeSingle();
 
   // Every member sees profile photos in the galaxy.
@@ -116,7 +116,8 @@ async function memberMayView(admin: any, email: string, hasAccount: boolean, ev:
   }
 
   if (ev.is_public !== true) return false;
-  if (p?.community_visible) return { allowed: true, profilePhoto: false };
+  const { data: d } = await admin.from('portfolio_settings').select('value').eq('key', 'community_default').maybeSingle();
+  if ((p?.community_mode || (d?.value === 'closed' ? 'closed' : 'open')) === 'open') return { allowed: true, profilePhoto: false };
 
   const { data: g } = await admin.from('portfolio_access_grants')
     .select('id').eq('student_id', ev.student_id).ilike('member_email', email)
@@ -176,6 +177,22 @@ Deno.serve(async req => {
       }
     }
 
+    /* Visitors (no sign-in, no share link): a profile photo only, and only
+     * as a tiny 24px copy. They never receive the real photo. */
+    let tinyOnly = false;
+    if (!allowed && !shareToken && !auth.startsWith('Bearer ')) {
+      let isProfilePhoto = ev.media_role === 'profile_photo';
+      if (!isProfilePhoto) {
+        const { data: pp } = await admin.from('student_journey_profiles')
+          .select('profile_photo_url').eq('student_id', ev.student_id).maybeSingle();
+        isProfilePhoto = pp?.profile_photo_url === `evidence:${ev.id}`;
+      }
+      if (isProfilePhoto) {
+        allowed = true;
+        tinyOnly = true;
+      }
+    }
+
     if (!allowed) return json({ error: 'Not authorized' }, 403);
     if (!ev.drive_file_id) return json({ error: 'This media item is not stored in TBS Drive' }, 400);
 
@@ -185,8 +202,8 @@ Deno.serve(async req => {
     /* ?size=1600 → a resized copy of a photo (longest side), from Drive's own
      * image service: a few hundred KB instead of the multi-MB original. Falls
      * back to the original file if Drive has no resized copy. */
-    const size = Math.min(2400, Math.max(200, Number(u.searchParams.get('size')) || 0));
-    if (u.searchParams.get('size') && String(ev.mime_type || 'image/').startsWith('image/')) {
+    const size = tinyOnly ? 24 : Math.min(2400, Math.max(200, Number(u.searchParams.get('size')) || 0));
+    if ((tinyOnly || u.searchParams.get('size')) && String(ev.mime_type || 'image/').startsWith('image/')) {
       try {
         const meta = await fetch(
           `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(ev.drive_file_id)}?fields=thumbnailLink,mimeType&supportsAllDrives=true`,
@@ -210,6 +227,9 @@ Deno.serve(async req => {
         /* fall through to the original file */
       }
     }
+
+    // Visitors never fall back to the original file.
+    if (tinyOnly) return json({ error: 'Not available' }, 404);
 
     const r = await fetch(
       `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(ev.drive_file_id)}?alt=media`,

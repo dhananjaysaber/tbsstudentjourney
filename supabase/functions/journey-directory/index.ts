@@ -3,7 +3,8 @@
 //
 //  GET /journey-directory
 //    Landing page: a RANDOM sample of up to 150 students (never all 900).
-//      · Visitors (no sign-in): initials + anonymous key ONLY.
+//      · Visitors (no sign-in): first name, initials, anonymous key and a profile
+//        photo id (served to visitors only as a tiny 24px copy).
 //      · Members: name, year group, profile photo id, access on click.
 //  GET /journey-directory?q=<name>&year=<year group>      (members only)
 //    Workspace "Browse portfolios": server-side search, max 24 results.
@@ -129,7 +130,7 @@ async function directoryStudents(db: SupabaseClient) {
   for (let from = 0; ; from += 1000) {
     const { data, error } = await db
       .from('student_journey_profiles')
-      .select('student_id, preferred_name, profile_photo_url, community_closed')
+      .select('student_id, preferred_name, profile_photo_url, community_closed, community_mode')
       .range(from, from + 999);
     if (error) throw error;
     profiles.push(...(data || []));
@@ -228,6 +229,16 @@ function yearRank(y: string) {
   if (/^reception/i.test(y)) return -1;
   return Number(y.match(/\d+/)?.[0] ?? 999);
 }
+
+/* School default for TBS community access ('open' | 'closed'); a student's
+ * own setting (community_mode) overrides it. */
+async function communityDefault(db: SupabaseClient) {
+  const { data } = await db.from('portfolio_settings').select('value').eq('key', 'community_default').maybeSingle();
+  return data?.value === 'closed' ? 'closed' : 'open';
+}
+function communityOpen(profile: Record<string, any>, schoolDefault: string) {
+  return (profile.community_mode || schoolDefault) === 'open';
+}
 // ---- end helpers ----
 
 const SAMPLE_SIZE = 150;
@@ -251,7 +262,7 @@ function shuffle<T>(list: T[]) {
 async function memberRows(db: SupabaseClient, member: Member, rows: Array<{ student: any; profile: any }>) {
   if (!rows.length) return [];
   const ids = rows.map(r => r.student.student_id);
-  const grants = await activeGrants(db, member.email);
+  const [grants, schoolDefault] = await Promise.all([activeGrants(db, member.email), communityDefault(db)]);
 
   const [{ data: pendingRows }, { data: photos }] = await Promise.all([
     db.from('portfolio_access_requests').select('student_id')
@@ -271,7 +282,7 @@ async function memberRows(db: SupabaseClient, member: Member, rows: Array<{ stud
   return Promise.all(
     rows.map(async ({ student, profile }) => {
       const sid = student.student_id;
-      const access = accessFor(member, sid, !profile.community_closed, grants);
+      const access = accessFor(member, sid, communityOpen(profile, schoolDefault), grants);
       const name = student.full_name || profile.preferred_name || 'Student';
       return {
         key: await studentKey(sid),
@@ -356,11 +367,24 @@ Deno.serve(async req => {
     const sample = shuffle(all).slice(0, SAMPLE_SIZE);
 
     if (!member) {
+      /* Visitors: first name and the id of the profile photo, which the
+       * media service only ever returns to them as a tiny 24px copy. */
+      const ids = sample.map(r => r.student.student_id);
+      const { data: photos } = await db.from('student_journey_evidence').select('id, student_id, created_at')
+        .in('student_id', ids).eq('active', true).eq('media_role', 'profile_photo')
+        .order('created_at', { ascending: false });
+      const photoByStudent = new Map<string, string>();
+      for (const p of photos || []) if (!photoByStudent.has(p.student_id)) photoByStudent.set(p.student_id, p.id);
       const people = await Promise.all(
-        sample.map(async ({ student, profile }) => ({
-          key: await studentKey(student.student_id),
-          initials: initialsOf(student.full_name || profile.preferred_name)
-        }))
+        sample.map(async ({ student, profile }) => {
+          const name = student.full_name || profile.preferred_name || '';
+          return {
+            key: await studentKey(student.student_id),
+            initials: initialsOf(name),
+            firstName: String(profile.preferred_name || name).trim().split(/\s+/)[0] || '',
+            photoId: evidenceIdFrom(profile.profile_photo_url) || photoByStudent.get(student.student_id) || null
+          };
+        })
       );
       return json({ ok: true, mode: 'visitor', total: all.length, people });
     }
