@@ -4334,8 +4334,9 @@ function Portfolio({ data, token, preview = false, member = false, editHref = nu
    * saving and dragging photos on the portfolio (it deters casual copying). */
   useEffect(() => {
     let undo = () => {};
+    let live = true;
     loadPortfolioSettings().then(settings => {
-      if (settings.right_click !== 'disabled') return;
+      if (!live || settings.right_click !== 'disabled') return;
       const block = event => event.preventDefault();
       const noDrag = event => {
         if (event.target?.tagName === 'IMG') event.preventDefault();
@@ -4349,7 +4350,10 @@ function Portfolio({ data, token, preview = false, member = false, editHref = nu
         document.documentElement.classList.remove('noRightClick');
       };
     });
-    return () => undo();
+    return () => {
+      live = false;
+      undo();
+    };
   }, []);
   const entries = useMemo(() => data.entries || [], [data.entries]);
   const evidence = useMemo(() => data.evidence || [], [data.evidence]);
