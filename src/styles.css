@@ -3466,9 +3466,13 @@ a {
   border-top: 1px solid rgba(255, 255, 255, 0.16);
   border-left: 2px solid var(--pf-gold);
   font-family: "Playfair Display", Georgia, serif;
-  font-size: clamp(25px, 2.7vw, 38px);
-  line-height: 1.32;
+  font-size: 22px;
+  line-height: 1.5;
   color: #ffffff;
+}
+
+@media (max-width: 760px) {
+  .storyContent blockquote { font-size: 20px; }
 }
 
 .storyContent blockquote small {
@@ -6810,3 +6814,89 @@ input[type='search']::-webkit-search-decoration { -webkit-appearance: none; }
 .awardsMore button span { color: var(--pf-accent-text); letter-spacing: .1em; }
 .awardsMore button:hover { background: var(--pf-gold); color: #0f1450; }
 .awardsMore button:hover span { color: #0f1450; }
+
+
+/* Skills: chips with an icon each; pinned around the photo as callouts */
+.skillChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+  padding: 9px 18px 9px 10px;
+  border-radius: 14px;
+  background: rgba(13, 18, 70, .78);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, .14);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, .32);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: #ffffff;
+  transition: transform .25s, border-color .25s;
+}
+.skillChip.isCustom { border: 1px dashed rgba(var(--pf-gold-rgb), .6); }
+.skillChip i {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: rgba(var(--pf-gold-rgb), .14);
+  color: var(--pf-gold);
+}
+.skillChip svg { width: 17px; height: 17px; stroke-width: 1.7; }
+.skillChip:hover { transform: translateY(-2px); border-color: rgba(var(--pf-gold-rgb), .6); }
+
+/* old outlined pills are replaced by chips */
+.storySkills { gap: 10px; }
+.storySkills .skillChip { padding: 9px 18px 9px 10px; border-radius: 14px; font-size: 15px; letter-spacing: 0; font-family: Inter, system-ui, sans-serif; }
+.storySkills .skillChip { border: 1px solid rgba(255, 255, 255, .14); }
+.storySkills .skillChip.isCustom { border: 1px dashed rgba(var(--pf-gold-rgb), .6); }
+/* With a photo, the first five sit around it; this row holds any extras
+ * (and on small screens, all of them). */
+.storySkills.isRow > .skillChip:nth-last-child(-n+5) { display: none; }
+
+.storyCards { max-width: 330px; }
+.storyLayout.hasPhoto { gap: clamp(80px, 9vw, 180px); grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.storySkillsTag {
+  position: absolute;
+  top: -58px;
+  right: 0;
+  font-family: "DM Mono", monospace;
+  font-size: 9px;
+  letter-spacing: .22em;
+  color: rgba(var(--pf-gold-rgb), .85);
+}
+.storyCallout {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  transform: translateY(-50%);
+  animation: storyCallIn .7s cubic-bezier(.2, .7, .2, 1) both;
+}
+.storyCallout.left { right: calc(100% - 26px); }
+.storyCallout.right { left: calc(100% - 26px); }
+.storyCallout em { display: block; width: 44px; height: 1.5px; background: linear-gradient(90deg, rgba(255, 255, 255, .25), #ffffff); }
+.storyCallout.right em { background: linear-gradient(90deg, #ffffff, rgba(255, 255, 255, .25)); }
+.storyCallout u {
+  display: block;
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid var(--pf-gold);
+  box-shadow: 0 0 0 4px rgba(var(--pf-gold-rgb), .22), 0 0 14px rgba(var(--pf-gold-rgb), .7);
+}
+@keyframes storyCallIn { from { opacity: 0; translate: 0 10px; } }
+
+/* Not enough room beside the photo: callouts become the row under the text. */
+@media (max-width: 1180px) {
+  .storyCallout, .storySkillsTag { display: none; }
+  .storySkills.isRow > .skillChip:nth-last-child(-n+5) { display: inline-flex; order: -1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .storyCallout { animation: none; }
+}

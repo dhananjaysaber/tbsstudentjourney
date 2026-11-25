@@ -67,6 +67,7 @@ import {
   ListChecks
 } from 'lucide-react';
 import { isPhoto } from './lib/isPhoto';
+import { SkillChip } from './lib/skillIcons';
 
 import { supabase, hasSupabaseConfig } from './supabase';
 import {
@@ -5985,6 +5986,9 @@ function Story({ story, token, preview, onClose }) {
   const figRef = useRef(null);
   const photos = arr(story.media).length ? arr(story.media) : story.evidence ? [story.evidence] : [];
   const hasPhoto = photos.length > 0;
+  const skills = arr(story.skills);
+  /* Up to five skills are pinned around the photo as callouts. */
+  const CALLOUTS = [['left', '14%'], ['right', '30%'], ['left', '50%'], ['right', '68%'], ['left', '84%']];
   const [at, setAt] = useState(0);
   const photo = photos[Math.min(at, photos.length - 1)];
   const step = dir => setAt(n => (n + dir + photos.length) % photos.length);
@@ -6039,9 +6043,10 @@ function Story({ story, token, preview, onClose }) {
             </blockquote>
           )}
 
-          {!!arr(story.skills).length && (
-            <div className="storySkills">
-              {arr(story.skills).map(skill => <span key={skill}>{skill}</span>)}
+          {!!skills.length && (
+            <div className={`storySkills${hasPhoto ? ' isRow' : ''}`}>
+              {(hasPhoto ? skills.slice(5) : skills).map(skill => <SkillChip key={skill} name={skill} />)}
+              {hasPhoto && skills.slice(0, 5).map(skill => <SkillChip key={`m-${skill}`} name={skill} />)}
             </div>
           )}
         </div>
@@ -6067,6 +6072,20 @@ function Story({ story, token, preview, onClose }) {
                 </>
               )}
             </div>
+            {skills.length > 0 && <div className="storySkillsTag" aria-hidden="true">SKILLS SHOWN</div>}
+            {skills.slice(0, 5).map((skill, i) => (
+              <div
+                key={skill}
+                className={`storyCallout ${CALLOUTS[i][0]}`}
+                style={{ top: CALLOUTS[i][1], animationDelay: `${1 + i * 0.14}s` }}
+              >
+                {CALLOUTS[i][0] === 'left' ? (
+                  <><SkillChip name={skill} /><em /><u /></>
+                ) : (
+                  <><u /><em /><SkillChip name={skill} /></>
+                )}
+              </div>
+            ))}
             <figcaption>
               <span>{photo?.caption && photo.caption !== story.title ? photo.caption : story.title}</span>
               <i>{photos.length > 1 ? `${String(at + 1).padStart(2, '0')} / ${String(photos.length).padStart(2, '0')}` : story.number}</i>
