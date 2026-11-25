@@ -7020,3 +7020,58 @@ input[type='search']::-webkit-search-decoration { -webkit-appearance: none; }
 
 /* Blog cards have no header: the photo starts at the top. */
 .jCardPhoto { margin-top: 10px; }
+
+/* ATL Skills section (between Journey and Panthers): soft blue */
+.atlSection {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(80px, 8vw, 120px) 0;
+  background: radial-gradient(70% 60% at 100% 0%, rgba(255, 255, 255, .35), transparent 60%), #dfe5ff;
+  color: #151449;
+}
+.atlWatermark {
+  position: absolute;
+  right: -20px;
+  top: -40px;
+  font-family: Inter, system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(180px, 24vw, 340px);
+  line-height: 1;
+  letter-spacing: -.06em;
+  color: rgba(21, 20, 73, .05);
+  pointer-events: none;
+}
+.atlSection .sectionShell { position: relative; }
+.atlLabel { color: #5b73ff; }
+.atlLabel span { color: #5b73ff; }
+.atlTitle {
+  margin: 22px 0 14px;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(54px, 6vw, 88px);
+  font-weight: 500;
+  line-height: .92;
+  letter-spacing: -.04em;
+  color: #151449;
+}
+.atlTitle em { color: #5b73ff; }
+.atlLead { max-width: 560px; margin: 0; font-size: 17px; line-height: 1.7; color: #3a3f70; }
+.atlPanel { background: rgba(255, 255, 255, .55); }
+.atlPanel .endorseProfileGrid button { color: #ffffff; }
+.atlPanel .endorseProfileGrid button.isOpen { background: #5b73ff; color: #ffffff; box-shadow: none; }
+.atlPanel .lpProofHead b { color: #c7d0ff; }
+.atlPanel .lpProofCard small { color: #c7d0ff; }
+.atlSeal {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 28px;
+  font-family: "DM Mono", monospace;
+  font-size: 11px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: #3a3f70;
+}
+.atlSeal svg { width: 18px; height: 18px; }
+@media (max-width: 760px) {
+  .atlSection .endorseProfileGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

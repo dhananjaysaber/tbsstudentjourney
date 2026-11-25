@@ -4278,6 +4278,7 @@ function Portfolio({ data, token, preview = false, member = false, editHref = nu
     ['ME', 'about'],
     ...(hasAwards ? [['AWARDS', 'awards']] : []),
     ['JOURNEY', 'journey'],
+    ...(hasAtlSkills(entries) ? [['ATL SKILLS', 'atl']] : []),
     ...(hasPanthersData(panthers) ? [['PANTHERS', 'panthers']] : []),
     ['VERIFIED', 'verified'],
     ...(hasMemories ? [['MEMORIES', 'memories']] : []),
@@ -4392,6 +4393,7 @@ function Portfolio({ data, token, preview = false, member = false, editHref = nu
           onOpen={setStory}
         />
 
+        <AtlSection items={items} token={token} preview={mediaPreview} onOpen={setStory} number={numberOf('atl')} />
 
         {hasPanthersData(panthers) && (
           <PanthersJourneySection panthers={panthers} student={student} number={numberOf('panthers')} />
@@ -5629,6 +5631,99 @@ export function AchievementCard({ award, filled = 1 }) {
         {[0, 1, 2].map(i => <i key={i} className={i < filled ? 'on' : ''} />)}
       </div>
     </article>
+  );
+}
+
+
+/* ATL skills shown in verified moments: same pattern as the Learner
+ * Profile panel, in its own section between Journey and Panthers. */
+const ATL_SKILLS = (SKILL_GROUPS.find(group => group.id === 'atl') || { skills: [] }).skills;
+
+function atlMomentsFor(items, skill) {
+  return items.filter(
+    item => item.verification_status === 'verified' && arr(item.skills).some(s => String(s).toLowerCase() === skill.toLowerCase())
+  );
+}
+
+function hasAtlSkills(items) {
+  return ATL_SKILLS.some(skill => atlMomentsFor(items, skill).length);
+}
+
+function AtlSection({ items = [], token, preview, onOpen, number }) {
+  const [open, setOpen] = useState(null);
+  const shown = ATL_SKILLS.filter(skill => atlMomentsFor(items, skill).length);
+  if (!shown.length) return null;
+  const moments = open ? atlMomentsFor(items, open) : [];
+
+  return (
+    <section className="atlSection" id="atl">
+      <div className="atlWatermark" aria-hidden="true">ATL</div>
+      <div className="sectionShell">
+        <Reveal>
+          <div className="sectionLabel atlLabel">
+            <span>{number}</span><i />ATL SKILLS
+          </div>
+          <h2 className="atlTitle">
+            Skills for
+            <br />
+            <em>learning.</em>
+          </h2>
+          <p className="atlLead">The TBS Approaches to Learning skills shown in verified moments.</p>
+        </Reveal>
+
+        <Reveal delay={120}>
+          <div className="endorseProfile atlPanel">
+            <div className="endorseProfileHead">
+              <small>ATL skills · shown in verified moments</small>
+              <span>{shown.length} of {ATL_SKILLS.length} · tap one to see where</span>
+            </div>
+            <div className="endorseProfileGrid">
+              {ATL_SKILLS.map(skill =>
+                shown.includes(skill) ? (
+                  <button
+                    type="button"
+                    key={skill}
+                    className={`on ${open === skill ? 'isOpen' : ''}`}
+                    aria-expanded={open === skill}
+                    onClick={() => setOpen(current => (current === skill ? null : skill))}
+                  >
+                    {skill}
+                  </button>
+                ) : (
+                  <span key={skill}>{skill}</span>
+                )
+              )}
+            </div>
+
+            {open && (
+              <div className="lpProof" key={open}>
+                <div className="lpProofHead">
+                  <b>{open}</b>
+                  <span>{moments.length} moment{moments.length === 1 ? '' : 's'}</span>
+                  <button type="button" className="lpProofClose" aria-label="Close" onClick={() => setOpen(null)}><X /></button>
+                </div>
+                <div className="lpProofRow">
+                  {moments.map(item => (
+                    <button type="button" key={item.id} className="lpProofCard" onClick={() => onOpen?.(item)}>
+                      <span className="lpProofThumb">
+                        {item.evidence ? (
+                          <SecureEvidenceImage evidence={item.evidence} token={token} preview={preview} alt="" fallback={<MomentCover item={item} />} />
+                        ) : (
+                          <MomentCover item={item} />
+                        )}
+                      </span>
+                      <small>{domainLabel(item.domain)}{item.year ? ` · ${item.year}` : ''}</small>
+                      <b>{item.title}</b>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="atlSeal"><ShieldCheck /> Verified by The British School, New Delhi</div>
+        </Reveal>
+      </div>
+    </section>
   );
 }
 
