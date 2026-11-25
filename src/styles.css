@@ -7136,3 +7136,33 @@ input[type='search']::-webkit-search-decoration { -webkit-appearance: none; }
 .endorseProfileGrid button.isOpen[data-tip]::before { display: none; }
 /* touch screens have no hover: rely on the "tap one to see where" line */
 @media (hover: none) { .endorseProfileGrid button[data-tip]::after, .endorseProfileGrid button[data-tip]::before { display: none; } }
+
+/* Tooltip motion: springs up on hover, then floats gently. */
+.endorseProfileGrid button[data-tip]:hover::after,
+.endorseProfileGrid button[data-tip]:focus-visible::after {
+  animation: tipPop .38s cubic-bezier(.34, 1.56, .64, 1) both, tipFloat 2.4s .38s ease-in-out infinite;
+}
+.endorseProfileGrid button[data-tip]:hover::before,
+.endorseProfileGrid button[data-tip]:focus-visible::before {
+  animation: tipPointer .38s cubic-bezier(.34, 1.56, .64, 1) both, tipFloatPointer 2.4s .38s ease-in-out infinite;
+}
+@keyframes tipPop {
+  from { opacity: 0; transform: translate(-50%, 8px) scale(.85); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+@keyframes tipFloat {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, -3px); }
+}
+@keyframes tipPointer {
+  from { opacity: 0; transform: translate(-50%, 8px) rotate(45deg) scale(.85); }
+  to { opacity: 1; transform: translateX(-50%) rotate(45deg); }
+}
+@keyframes tipFloatPointer {
+  0%, 100% { transform: translateX(-50%) rotate(45deg); }
+  50% { transform: translate(-50%, -3px) rotate(45deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .endorseProfileGrid button[data-tip]:hover::after,
+  .endorseProfileGrid button[data-tip]:hover::before { animation: none; }
+}
