@@ -6900,3 +6900,20 @@ input[type='search']::-webkit-search-decoration { -webkit-appearance: none; }
 @media (prefers-reduced-motion: reduce) {
   .storyCallout { animation: none; }
 }
+
+/* Room for the skill callouts on both sides of the photo; never scroll sideways. */
+.storyOverlay { overflow-x: hidden; }
+@media (min-width: 1181px) {
+  .storyLayout.hasPhoto {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0;
+  }
+  .storyLayout.hasPhoto .storyCards {
+    justify-self: end;
+    width: clamp(240px, 22vw, 330px);
+    max-width: none;
+    margin-left: 210px;   /* left callouts */
+    margin-right: 190px;  /* right callouts */
+  }
+  .storyLayout.hasPhoto .storyCards.noSkills { margin-left: 80px; margin-right: 0; }
+}

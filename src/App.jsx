@@ -6052,7 +6052,7 @@ function Story({ story, token, preview, onClose }) {
         </div>
 
         {hasPhoto && (
-          <figure className="storyCards" ref={figRef}>
+          <figure className={`storyCards${skills.length ? '' : ' noSkills'}`} ref={figRef}>
             <div className="storyCard storyCardGold" aria-hidden="true" />
             <div className="storyCard storyCardGlass" aria-hidden="true" />
             <div className="storyCard storyCardPhoto">
