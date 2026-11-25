@@ -6741,3 +6741,72 @@ input[type='search']::-webkit-search-decoration { -webkit-appearance: none; }
 .jdChoices button{border:1px solid rgba(13,45,73,.25);background:transparent;color:#0d2d49;border-radius:999px;padding:6px 14px;font:600 12.5px Inter,system-ui,sans-serif;cursor:pointer}
 .jdChoices button.isActive{background:#d4a843;border-color:#d4a843}
 .jdMsg{color:#2d7a4a}
+
+/* Story photo navigation */
+.storyCardImg { animation: storyPhotoFade .6s ease both; }
+@keyframes storyPhotoFade { from { opacity: 0; transform: scale(1.1); } to { opacity: 1; transform: scale(1.06); } }
+
+.storyNav {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  width: 46px;
+  height: 46px;
+  margin-top: -23px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, .45);
+  border-radius: 50%;
+  background: rgba(10, 14, 58, .45);
+  backdrop-filter: blur(6px);
+  color: #ffffff;
+  cursor: pointer;
+  opacity: .85;
+  transition: opacity .2s, background .2s, transform .2s;
+}
+.storyNav svg { width: 20px; height: 20px; }
+.storyNav.prev { left: 14px; }
+.storyNav.next { right: 14px; }
+.storyNav:hover { opacity: 1; background: rgba(var(--pf-gold-rgb), .95); color: #0f1450; transform: scale(1.06); }
+
+.storyDots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -104px;
+  display: flex;
+  gap: 8px;
+}
+.storyDots button {
+  width: 22px;
+  height: 3px;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, .28);
+  cursor: pointer;
+  transition: width .3s, background .3s;
+}
+.storyDots button.on { width: 40px; background: var(--pf-gold); }
+
+/* Recognised: load more */
+.awardsMore { display: flex; justify-content: center; margin-top: 48px; }
+.awardsMore button {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 30px;
+  border: 1px solid rgba(var(--pf-gold-rgb), .6);
+  border-radius: 999px;
+  background: transparent;
+  color: #ffffff;
+  font-family: "DM Mono", monospace;
+  font-size: 12px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+}
+.awardsMore button span { color: var(--pf-accent-text); letter-spacing: .1em; }
+.awardsMore button:hover { background: var(--pf-gold); color: #0f1450; }
+.awardsMore button:hover span { color: #0f1450; }

@@ -60,6 +60,8 @@ import {
   Trash2,
   Users,
   X,
+  ChevronLeft,
+  ChevronRight,
   BarChart3,
   Settings2,
   ListChecks
@@ -4304,7 +4306,8 @@ function Portfolio({ data, token, preview = false, member = false, editHref = nu
       year: entry.event_date
         ? String(new Date(`${entry.event_date}T00:00:00`).getFullYear())
         : '',
-      evidence: entryMedia[0] || null
+      evidence: entryMedia[0] || null,
+      media: entryMedia
     };
   }), [visibleEntries, evidence]);
 
@@ -5377,6 +5380,7 @@ function collectAwards(panthers) {
 
 /* awards arrive with their comment already chosen (withComments). */
 function AwardsSection({ awards = [], number }) {
+  const [shown, setShown] = useState(8);
 
   if (!awards.length) return null;
 
@@ -5420,12 +5424,20 @@ function AwardsSection({ awards = [], number }) {
         </Reveal>
 
         <div className="awardsGrid achGrid">
-          {awards.map((award, index) => (
-            <Reveal key={award.id} delay={Math.min(index, 6) * 60}>
+          {awards.slice(0, shown).map((award, index) => (
+            <Reveal key={award.id} delay={Math.min(index % 8, 6) * 60}>
               <AchievementCard award={award} filled={Math.min(3, counts[award.kind] || 1)} />
             </Reveal>
           ))}
         </div>
+
+        {awards.length > shown && (
+          <div className="awardsMore">
+            <button type="button" onClick={() => setShown(n => n + 8)}>
+              Load more <span>{shown} of {awards.length}</span>
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
@@ -5972,7 +5984,21 @@ function Story({ story, token, preview, onClose }) {
   /* Option C: the photo on a card with a gold card and a glass card fanned
    * out behind it; the cards drift with the mouse. */
   const figRef = useRef(null);
-  const hasPhoto = Boolean(story.evidence);
+  const photos = arr(story.media).length ? arr(story.media) : story.evidence ? [story.evidence] : [];
+  const hasPhoto = photos.length > 0;
+  const [at, setAt] = useState(0);
+  const photo = photos[Math.min(at, photos.length - 1)];
+  const step = dir => setAt(n => (n + dir + photos.length) % photos.length);
+
+  useEffect(() => {
+    if (photos.length < 2) return undefined;
+    const onKey = event => {
+      if (event.key === 'ArrowRight') step(1);
+      if (event.key === 'ArrowLeft') step(-1);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [photos.length]);
 
   function onMove(event) {
     const node = figRef.current;
@@ -6027,17 +6053,38 @@ function Story({ story, token, preview, onClose }) {
             <div className="storyCard storyCardGlass" aria-hidden="true" />
             <div className="storyCard storyCardPhoto">
               <SecureEvidenceImage
-                evidence={story.evidence}
+                key={photo?.id}
+                evidence={photo}
                 token={token}
                 preview={preview}
-                alt={story.title}
+                alt={photo?.caption || story.title}
+                className="storyCardImg"
                 fallback={<div className="storyCardEmpty" />}
               />
+              {photos.length > 1 && (
+                <>
+                  <button type="button" className="storyNav prev" onClick={() => step(-1)} aria-label="Previous photo"><ChevronLeft /></button>
+                  <button type="button" className="storyNav next" onClick={() => step(1)} aria-label="Next photo"><ChevronRight /></button>
+                </>
+              )}
             </div>
             <figcaption>
-              <span>{story.title}</span>
-              <i>{story.number}</i>
+              <span>{photo?.caption && photo.caption !== story.title ? photo.caption : story.title}</span>
+              <i>{photos.length > 1 ? `${String(at + 1).padStart(2, '0')} / ${String(photos.length).padStart(2, '0')}` : story.number}</i>
             </figcaption>
+            {photos.length > 1 && (
+              <div className="storyDots" role="tablist" aria-label="Photos">
+                {photos.map((item, i) => (
+                  <button
+                    key={item.id || i}
+                    type="button"
+                    className={i === at ? 'on' : ''}
+                    onClick={() => setAt(i)}
+                    aria-label={`Photo ${i + 1}`}
+                  />
+                ))}
+              </div>
+            )}
           </figure>
         )}
       </div>
