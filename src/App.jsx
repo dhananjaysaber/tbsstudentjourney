@@ -1718,12 +1718,12 @@ function Portal({ session, account, children, selected, setSelected, initialTab 
   const panthersTabs = admin || coach ? ['award-panthers', 'award-comments'] : [];
   const awardTabs = [...academicTabs, ...panthersTabs];
   const navGroups = staffOnly
-    ? [['Academic awards', academicTabs], ['Panthers awards', panthersTabs]]
+    ? [['Panthers awards', panthersTabs], ['Academic awards', academicTabs]]
     : [
         ['Me', ['overview', 'profile']],
-        ['Academic awards', academicTabs],
-        ['Panthers awards', panthersTabs],
         ['Journey', ['journey', 'media']],
+        ['Panthers awards', panthersTabs],
+        ['Academic awards', academicTabs],
         ['Admin', ['browse', ...(staff ? ['approvals'] : []), ...(admin ? ['sharing'] : []), ...(superadmin ? ['requests'] : [])]]
       ];
   const nav = navGroups.flatMap(([, items]) => items);
