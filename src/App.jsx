@@ -4285,7 +4285,13 @@ function Portfolio({ data, token, preview = false, member = false, editHref = nu
      * as the ManageBac report. */
     const entryMedia = evidence
       .filter(item => item.entry_id === entry.id)
-      .filter(item => item.evidence_type === 'image' || item.evidence_type === 'video' || (item.media_provider === 'youtube' && item.youtube_video_id))
+      .filter(item =>
+        item.evidence_type === 'image' ||
+        item.evidence_type === 'video' ||
+        (item.media_provider === 'youtube' && item.youtube_video_id) ||
+        /* a photo kept in Drive and saved as a cover/media link */
+        (item.media_provider === 'google_drive' && item.drive_file_id && ['journey_cover', 'journey_media', 'gallery'].includes(item.media_role))
+      )
       .sort((a, b) => {
         if (a.media_role === 'journey_cover') return -1;
         if (b.media_role === 'journey_cover') return 1;
