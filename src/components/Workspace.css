@@ -145,6 +145,18 @@
   background: var(--ws-accent);
 }
 
+.wsNavLabel {
+  display: block;
+  margin: 14px 12px 4px;
+  font: 600 10px/1 'DM Mono', monospace;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.45);
+}
+.wsNavLabel:first-child { margin-top: 4px; }
+
+@media (max-width: 900px) { .wsNavLabel { display: none; } }
+
 .wsNavRule {
   display: block;
   height: 1px;

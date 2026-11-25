@@ -1701,26 +1701,26 @@ function Portal({ session, account, children, selected, setSelected, initialTab 
   /* Publish to portfolio: Admin / SuperAdmin, Key Stage Office, Head of Year. */
   const canPublish =
     admin || (awardRole?.roles || []).some(r => ['key_stage_office', 'head_of_year'].includes(r.award_role));
-  const awardTabs = [
+  /* Left nav follows the portfolio's own order: Me, Academic awards, Panthers
+   * awards, Journey, then admin tools. */
+  const academicTabs = [
     ...(admin || awardStaff ? ['award-entry', 'award-reports'] : []),
     ...(canPublish ? ['award-publish'] : []),
     ...(admin ? ['award-setup', 'award-staff'] : []),
-    ...(superadmin ? ['award-lists'] : []),
-    ...(admin || coach ? ['award-panthers', 'award-comments'] : [])
+    ...(superadmin ? ['award-lists'] : [])
   ];
-  const nav = staffOnly
-    ? awardTabs
+  const panthersTabs = admin || coach ? ['award-panthers', 'award-comments'] : [];
+  const awardTabs = [...academicTabs, ...panthersTabs];
+  const navGroups = staffOnly
+    ? [['Academic awards', academicTabs], ['Panthers awards', panthersTabs]]
     : [
-        'overview',
-        'journey',
-        'profile',
-        'media',
-        'browse',
-        ...(staff ? ['approvals'] : []),
-        ...(admin ? ['sharing'] : []),
-        ...(superadmin ? ['requests'] : []),
-        ...awardTabs
+        ['Me', ['overview', 'profile']],
+        ['Academic awards', academicTabs],
+        ['Panthers awards', panthersTabs],
+        ['Journey', ['journey', 'media']],
+        ['Admin', ['browse', ...(staff ? ['approvals'] : []), ...(admin ? ['sharing'] : []), ...(superadmin ? ['requests'] : [])]]
       ];
+  const nav = navGroups.flatMap(([, items]) => items);
 
   const navItems = {
     overview: ['Overview', LayoutDashboard],
@@ -1777,26 +1777,22 @@ function Portal({ session, account, children, selected, setSelected, initialTab 
         </a>
 
         <nav className="wsNav">
-          {nav.map((item, index) => {
-            const [label, Icon] = navItems[item];
-            const groupBreak =
-              index > 0 &&
-              (item === 'browse' ||
-                (item === 'approvals' && nav[index - 1] === 'browse') ||
-                (item === 'award-entry' && !staffOnly));
-            const badge =
-              item === 'requests' ? requestCount : 0;
-            return (
-              <React.Fragment key={item}>
-                {groupBreak && <span className="wsNavRule" aria-hidden="true" />}
-                <button className={tab === item ? 'on' : ''} onClick={() => setTab(item)}>
-                  <Icon />
-                  <span>{label}</span>
-                  {badge > 0 && <span className="navBadge">{badge}</span>}
-                </button>
-              </React.Fragment>
-            );
-          })}
+          {navGroups.filter(([, items]) => items.length).map(([groupLabel, items]) => (
+            <React.Fragment key={groupLabel}>
+              <span className="wsNavLabel">{groupLabel}</span>
+              {items.map(item => {
+                const [label, Icon] = navItems[item];
+                const badge = item === 'requests' ? requestCount : 0;
+                return (
+                  <button key={item} className={tab === item ? 'on' : ''} onClick={() => setTab(item)}>
+                    <Icon />
+                    <span>{label}</span>
+                    {badge > 0 && <span className="navBadge">{badge}</span>}
+                  </button>
+                );
+              })}
+            </React.Fragment>
+          ))}
         </nav>
 
         <div className="wsUser">
@@ -3278,6 +3274,8 @@ function Sharing({ data, onRefresh, superadmin }) {
     <section className="panel">
       <PanelHead kicker="PUBLIC SHARING" title="Controlled, expiring access" />
 
+      <JourneyDisplaySettings studentId={data?.student?.student_id || ''} studentName={data?.student?.full_name || ''} />
+
       <CommunityAccess data={data} superadmin={superadmin} onRefresh={onRefresh} />
 
       <div className="sharingBox">
@@ -4694,6 +4692,71 @@ function AboutSection({ profile, student }) {
 
 const JOURNEY_MODES = [['carousel', 'Carousel'], ['spiral', 'Spiral'], ['blog', 'Blog']];
 
+/* Admin-only: how the "Not a timeline" Journey section is shown. */
+function JourneyDisplaySettings({ studentId, studentName }) {
+  const [st, setSt] = useState({ ready: false, canSet: false, override: null, def: null });
+  const [msg, setMsg] = useState('');
+
+  useEffect(() => {
+    let live = true;
+    supabase.rpc('portfolio_get_display_mode', { p_student_id: String(studentId || '') })
+      .then(({ data, error }) => {
+        if (!live) return;
+        const m = !error && data ? data : {};
+        setSt({ ready: true, canSet: !!m.can_set, override: m.override || null, def: m.default || null });
+      })
+      .catch(() => { if (live) setSt(x => ({ ...x, ready: true })); });
+    return () => { live = false; };
+  }, [studentId]);
+
+  async function save(scope, mode, apply) {
+    setMsg('');
+    const { error } = await supabase.rpc('portfolio_set_display_mode', { p_scope: scope, p_mode: mode || '' });
+    if (error) { setMsg('Could not save. Please try again.'); return; }
+    setSt(x => ({ ...x, ...apply }));
+    setMsg('Saved.');
+  }
+
+  if (!st.ready || !st.canSet) return null;
+  const defMode = st.def || 'carousel';
+  const label = key => JOURNEY_MODES.find(([k]) => k === key)?.[1];
+
+  return (
+    <div className="journeyDisplayPanel">
+      <h3>Journey display</h3>
+      <p>How the “Not a timeline. A constellation of experiences.” section is shown on portfolios. Viewers get no switch.</p>
+
+      <div className="jdRow">
+        <span className="jdLabel">School default (everyone)</span>
+        <div className="jdChoices">
+          {JOURNEY_MODES.map(([key, name]) => (
+            <button type="button" key={key} className={defMode === key ? 'isActive' : ''} onClick={() => save('default', key, { def: key })}>
+              {name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {studentId && (
+        <div className="jdRow">
+          <span className="jdLabel">This student{studentName ? ` · ${studentName}` : ''}</span>
+          <div className="jdChoices">
+            <button type="button" className={st.override ? '' : 'isActive'} onClick={() => save(studentId, '', { override: null })}>
+              Use school default ({label(defMode)})
+            </button>
+            {JOURNEY_MODES.map(([key, name]) => (
+              <button type="button" key={key} className={st.override === key ? 'isActive' : ''} onClick={() => save(studentId, key, { override: key })}>
+                {name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      {msg && <small className="jdMsg" role="status">{msg}</small>}
+    </div>
+  );
+}
+
 function JourneySection({ items, evidence, token, preview, onOpen, number = '02', studentId = '' }) {
   const domains = useMemo(() => {
     const seen = new Set();
@@ -4709,9 +4772,9 @@ function JourneySection({ items, evidence, token, preview, onOpen, number = '02'
   const [activeDomain, setActiveDomain] = useState('all');
   /* Carousel (default), Spiral, or a simple blog-style list of the same moments. */
   const [view, setView] = useState('carousel');
-  /* Display is chosen by an Admin: a school-wide default plus an optional
-   * per-student override. Viewers get no switch; the section waits for the setting. */
-  const [display, setDisplay] = useState({ ready: false, canSet: false, override: null, def: null });
+  /* The layout is set by an Admin in Workspace > Sharing & access (school default
+   * plus an optional per-student override). Viewers get no switch. */
+  const [display, setDisplay] = useState({ ready: false });
 
   useEffect(() => {
     let live = true;
@@ -4719,17 +4782,12 @@ function JourneySection({ items, evidence, token, preview, onOpen, number = '02'
       .then(({ data, error }) => {
         if (!live) return;
         const m = !error && data ? data : {};
-        setDisplay({ ready: true, canSet: !!m.can_set, override: m.override || null, def: m.default || null });
+        setDisplay({ ready: true });
         setView(m.override || m.default || 'carousel');
       })
       .catch(() => { if (live) setDisplay(d => ({ ...d, ready: true })); });
     return () => { live = false; };
   }, [studentId]);
-
-  async function saveDisplay(scope, mode) {
-    const { error } = await supabase.rpc('portfolio_set_display_mode', { p_scope: scope, p_mode: mode || '' });
-    return !error;
-  }
 
   useEffect(() => {
     if (activeDomain !== 'all' && !domains.includes(activeDomain)) {
@@ -4812,45 +4870,6 @@ function JourneySection({ items, evidence, token, preview, onOpen, number = '02'
             </div>
           )}
 
-          {display.canSet && (
-            <div className="journeyAdminBar" role="group" aria-label="Admin: journey display">
-              <span className="jabLabel">ADMIN · THIS PORTFOLIO</span>
-              <button
-                type="button"
-                className={display.override ? '' : 'isActive'}
-                onClick={async () => {
-                  if (await saveDisplay(studentId, '')) { setDisplay(d => ({ ...d, override: null })); setView(display.def || 'carousel'); }
-                }}
-              >
-                School default ({JOURNEY_MODES.find(([k]) => k === (display.def || 'carousel'))?.[1]})
-              </button>
-              {JOURNEY_MODES.map(([key, label]) => (
-                <button
-                  type="button"
-                  key={key}
-                  className={display.override === key ? 'isActive' : ''}
-                  onClick={async () => {
-                    if (await saveDisplay(studentId, key)) { setDisplay(d => ({ ...d, override: key })); setView(key); }
-                  }}
-                >
-                  {label}
-                </button>
-              ))}
-              <span className="jabLabel jabSep">SCHOOL DEFAULT</span>
-              {JOURNEY_MODES.map(([key, label]) => (
-                <button
-                  type="button"
-                  key={`d-${key}`}
-                  className={(display.def || 'carousel') === key ? 'isActive' : ''}
-                  onClick={async () => {
-                    if (await saveDisplay('default', key)) { setDisplay(d => ({ ...d, def: key })); if (!display.override) setView(key); }
-                  }}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
       </div>
 
@@ -5554,10 +5573,14 @@ function AchievementArt({ award }) {
 /* The big word at the foot of an award card: the sport (the match result,
  * month and award type already show in the lines above). */
 function achBigWord(award) {
+  if (award.kind === 'school') {
+    /* Academic awards: the subject/category if there is one, otherwise the award's name. */
+    const w = String(award.category || award.label || '').trim();
+    return w ? `${w}.` : 'Honoured.';
+  }
   const sport = String(award.sport || '').split(' · ')[0].trim()
     || String(award.team || '').replace(/^Panthers\s+/i, '').replace(/\s+(U\d+|Mixed|Boys|Girls).*$/i, '').trim();
-  if (sport) return `${sport}.`;
-  return award.kind === 'school' ? 'Honoured.' : 'Panthers.';
+  return sport ? `${sport}.` : 'Panthers.';
 }
 
 export function AchievementCard({ award, filled = 1 }) {
@@ -5588,10 +5611,7 @@ export function AchievementCard({ award, filled = 1 }) {
         {award.kind === 'match' && award.report && award.report !== award.comment && (
           <p className="achReport">Match report: {award.report}</p>
         )}
-        {(() => {
-          const word = achBigWord(award);
-          return <div className="achBig" style={word.length > 9 ? { fontSize: 'clamp(30px, 2.8vw, 42px)' } : undefined}>{word}</div>;
-        })()}
+        <div className="achBig">{achBigWord(award)}</div>
         <div className="achSource">
           <ShieldCheck /> {award.kind === 'school' ? 'Verified by TBS' : 'TBS Panthers record'}
         </div>

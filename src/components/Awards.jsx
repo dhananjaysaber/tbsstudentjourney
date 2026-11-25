@@ -2478,6 +2478,7 @@ export function schoolAwardCards(rows = []) {
       id: `school-${n.id}`,
       kind: 'school',
       label: name,
+      category: n.category || '',
       title,
       team: `${n.term} · ${n.academic_year}${n.focus ? ` · Focus: ${n.focus}` : ''}`,
       sport: '',
