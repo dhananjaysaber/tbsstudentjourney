@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, LayoutGrid, Play, X } from 'lucide
 
 import { privateEvidenceBlobUrl, publicEvidenceUrl } from '../journeyApi';
 import { setPageScrollLocked } from '../lib/smoothScroll';
+import { isPhoto } from '../lib/isPhoto';
 import './MemoryWall.css';
 
 /* =========================================================================
@@ -293,7 +294,7 @@ export default function MemoryWall({ number = '05', evidence, profilePhoto, item
   const photos = useMemo(() => {
     const list = (evidence || []).filter(
       item =>
-        (item.evidence_type === 'image' || (item.media_provider === 'youtube' && item.youtube_video_id)) &&
+        (isPhoto(item) || (item.media_provider === 'youtube' && item.youtube_video_id)) &&
         !['profile_photo', 'hero_banner'].includes(item.media_role)
     );
     if (list.length) return list;

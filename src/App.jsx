@@ -66,6 +66,7 @@ import {
   Settings2,
   ListChecks
 } from 'lucide-react';
+import { isPhoto } from './lib/isPhoto';
 
 import { supabase, hasSupabaseConfig } from './supabase';
 import {
@@ -2065,7 +2066,7 @@ function Portal({ session, account, children, selected, setSelected, initialTab 
           initial={builder}
           evidence={builder.id ? (data?.evidence || []).filter(item => item.entry_id === builder.id) : []}
           library={(data?.evidence || []).filter(
-            item => item.active !== false && item.evidence_type === 'image' && (!builder.id || item.entry_id !== builder.id)
+            item => item.active !== false && isPhoto(item) && (!builder.id || item.entry_id !== builder.id)
           )}
           student={data?.student || selected}
           role={account.role}
@@ -2284,7 +2285,7 @@ function draftGaps(entry, evidence = []) {
   if (words(entry.reflection) < 10) gaps.push(['Reflection', 3]);
   if (!arr(entry.skills).length) gaps.push(['Skills', 3]);
   const mine = evidence.filter(item => item.entry_id === entry.id);
-  const photos = mine.some(item => item.evidence_type === 'image' || item.media_provider === 'youtube');
+  const photos = mine.some(item => isPhoto(item) || item.media_provider === 'youtube');
   if (!mine.length) gaps.push(['Photo or file', 4]);
   return { gaps, photos, step: gaps.length ? Math.min(...gaps.map(([, n]) => n)) : 4 };
 }
@@ -2742,7 +2743,7 @@ function MediaManager({ data, admin, onPublic, onRefresh }) {
         {(data.evidence || []).map(evidence => (
           <article key={evidence.id}>
             <div className="mediaThumb">
-              {evidence.evidence_type === 'image' ? (
+              {isPhoto(evidence) ? (
                 <SecureEvidenceImage evidence={evidence} preview />
               ) : (
                 <div className="filePlaceholder"><FileText /></div>
@@ -3461,7 +3462,7 @@ function JourneyBuilder({ initial, student, role, onClose, onDone, evidence = []
   const [featured, setFeatured] = useState(null);
   /* Photos already on this moment (when editing or finishing a draft). */
   const [existing, setExisting] = useState(() =>
-    evidence.filter(item => item.active !== false && item.media_role !== 'evidence' && (item.evidence_type === 'image' || item.evidence_type === 'video'))
+    evidence.filter(item => item.active !== false && item.media_role !== 'evidence' && (isPhoto(item) || item.evidence_type === 'video'))
   );
   const [mediaBusy, setMediaBusy] = useState('');
   /* Photos picked from the student's existing media (Media & evidence). */
@@ -3861,7 +3862,7 @@ function JourneyBuilder({ initial, student, role, onClose, onDone, evidence = []
                           />
                           {cover && <em className="jgFeaturedTag">Featured</em>}
                           <div className="jgPhotoTools">
-                            {!cover && item.evidence_type === 'image' && (
+                            {!cover && isPhoto(item) && (
                               <button type="button" aria-label="Make this the featured photo" title="Make featured" disabled={!!mediaBusy} onClick={() => makeCover(item)}>
                                 <Star />
                               </button>
@@ -4254,7 +4255,7 @@ function Portfolio({ data, token, preview = false, member = false, editHref = nu
     Boolean(profileImage) ||
     evidence.some(
       item =>
-        (item.evidence_type === 'image' || (item.media_provider === 'youtube' && item.youtube_video_id)) &&
+        (isPhoto(item) || (item.media_provider === 'youtube' && item.youtube_video_id)) &&
         !['profile_photo', 'hero_banner'].includes(item.media_role)
     );
 
@@ -4288,11 +4289,9 @@ function Portfolio({ data, token, preview = false, member = false, editHref = nu
     const entryMedia = evidence
       .filter(item => item.entry_id === entry.id)
       .filter(item =>
-        item.evidence_type === 'image' ||
+        isPhoto(item) ||
         item.evidence_type === 'video' ||
-        (item.media_provider === 'youtube' && item.youtube_video_id) ||
-        /* a photo kept in Drive and saved as a cover/media link */
-        (item.media_provider === 'google_drive' && item.drive_file_id && ['journey_cover', 'journey_media', 'gallery'].includes(item.media_role))
+        (item.media_provider === 'youtube' && item.youtube_video_id)
       )
       .sort((a, b) => {
         if (a.media_role === 'journey_cover') return -1;
