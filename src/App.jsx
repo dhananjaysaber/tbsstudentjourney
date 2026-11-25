@@ -3198,7 +3198,6 @@ function SchoolSharingSettings({ superadmin }) {
   }
 
   const open = (settings?.community_default || 'open') === 'open';
-  const rightClick = (settings?.right_click || 'enabled') === 'enabled';
 
   return (
     <section className="panel schoolSettings">
@@ -3223,24 +3222,32 @@ function SchoolSharingSettings({ superadmin }) {
         </button>
       </div>
 
-      <div className={`communityAccess ${rightClick ? 'isOpen' : ''}`}>
-        <MousePointerClick />
-        <div>
-          <h3>Right-click on portfolios</h3>
-          <p>
-            {rightClick
-              ? 'Enabled — visitors can right-click (and long-press on phones) on portfolio pages.'
-              : 'Disabled — right-click, long-press and dragging photos are blocked on every portfolio page.'}
-          </p>
-        </div>
-        <button
-          type="button" role="switch" aria-checked={rightClick} aria-label="Right-click on portfolios"
-          className="communitySwitch" onClick={() => flip('right_click', rightClick ? 'disabled' : 'enabled')}
-          disabled={!superadmin || !settings || busy === 'right_click'}
-        >
-          <i />
-        </button>
-      </div>
+      {[
+        ['right_click_admin', 'Admin & SuperAdmin', 'Admins and the SuperAdmin'],
+        ['right_click', 'everyone else', 'visitors, students, parents and other staff']
+      ].map(([key, who, whoLong]) => {
+        const blocked = settings?.[key] === 'disabled';
+        return (
+          <div key={key} className={`communityAccess ${blocked ? 'isOpen' : ''}`}>
+            <MousePointerClick />
+            <div>
+              <h3>Block right-click · {who}</h3>
+              <p>
+                {blocked
+                  ? `On — right-click, long-press saving and dragging photos are blocked on portfolio pages for ${whoLong}.`
+                  : `Off — ${whoLong} can right-click (and long-press on phones) on portfolio pages.`}
+              </p>
+            </div>
+            <button
+              type="button" role="switch" aria-checked={blocked} aria-label={`Block right-click for ${whoLong}`}
+              className="communitySwitch" onClick={() => flip(key, blocked ? 'enabled' : 'disabled')}
+              disabled={!superadmin || !settings || busy === key}
+            >
+              <i />
+            </button>
+          </div>
+        );
+      })}
 
       {!superadmin && <small className="schoolSettingsNote">Only the SuperAdmin can change these.</small>}
       {error && (
@@ -4337,10 +4344,10 @@ function Portfolio({ data, token, preview = false, member = false, editHref = nu
     let live = true;
     Promise.all([
       loadPortfolioSettings(),
-      /* Admins and the SuperAdmin are never blocked. */
       supabase.rpc('portfolio_can_set_display').then(({ data: canSet }) => Boolean(canSet)).catch(() => false)
     ]).then(([settings, isAdmin]) => {
-      if (!live || isAdmin || settings.right_click !== 'disabled') return;
+      /* Admins follow their own switch; everyone else the other. */
+      if (!live || settings[isAdmin ? 'right_click_admin' : 'right_click'] !== 'disabled') return;
       const block = event => event.preventDefault();
       const noDrag = event => {
         if (event.target?.tagName === 'IMG') event.preventDefault();

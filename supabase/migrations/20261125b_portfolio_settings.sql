@@ -105,3 +105,9 @@ grant execute on function public.portfolio_get_settings() to anon, authenticated
 grant execute on function public.portfolio_community_open(text) to authenticated, service_role;
 grant execute on function public.portfolio_set_setting(text, text) to authenticated;
 grant execute on function public.portfolio_set_community_mode(text, text) to authenticated;
+
+-- right_click_admin: right-click for Admin / SuperAdmin ('enabled' | 'disabled');
+-- right_click covers everyone else.
+insert into public.portfolio_settings (key, value) values ('right_click_admin', 'enabled')
+on conflict (key) do nothing;
+-- (portfolio_set_setting re-created to accept 'right_click_admin'; see migration portfolio_settings_right_click_admin)
