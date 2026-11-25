@@ -5674,6 +5674,60 @@ const LEARNER_PROFILE = ['Inquirer', 'Knowledgeable', 'Thinker', 'Communicator',
 /* The school's endorsement: a real second voice (coach or teacher), what
  * TBS has verified, and the Learner Profile it shows. */
 
+/* All the verified moments of one year (or "Earlier"), as a page of cards.
+ * A card opens the moment's story on top; closing it comes back here. */
+function YearMoments({ year, years = [], items = [], token, preview, onOpen, onClose }) {
+  const listed = years.filter(y => y !== 'Earlier');
+  const oldest = listed.length ? Math.min(...listed) : 0;
+  const yearOf = item => (item.event_date ? new Date(`${item.event_date}T00:00:00`).getFullYear() : null);
+  const moments = items
+    .filter(item => item.verification_status === 'verified')
+    .filter(item => (year === 'Earlier' ? yearOf(item) && yearOf(item) < oldest : yearOf(item) === year))
+    .sort((a, b) => String(b.event_date || '').localeCompare(String(a.event_date || '')));
+
+  useEffect(() => {
+    const onKey = event => event.key === 'Escape' && onClose();
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  return (
+    <div className="yearPage" role="dialog" aria-label={`Moments from ${year}`}>
+      <div className="yearPageTop">
+        <span>VERIFIED MOMENTS · {String(year).toUpperCase()}</span>
+        <button type="button" onClick={onClose}>CLOSE <X /></button>
+      </div>
+      <div className="yearPageBody">
+        <small>{moments.length} verified moment{moments.length === 1 ? '' : 's'}</small>
+        <h2>{year === 'Earlier' ? 'Earlier years.' : `${year}.`}</h2>
+        <div className="journeyCards">
+          {moments.map(item => {
+            const skill = arr(item.skills)[0];
+            return (
+              <button type="button" key={item.id} className="jCard" onClick={() => onOpen?.(item)} aria-label={`Open ${item.title}`}>
+                <div className="jCardPhoto">
+                  {item.evidence ? (
+                    <SecureEvidenceImage evidence={item.evidence} token={token} preview={preview} alt="" fallback={<div className="jCardEmpty" />} />
+                  ) : (
+                    <div className="jCardEmpty" />
+                  )}
+                </div>
+                <footer>
+                  <h3>{item.title}</h3>
+                  <div className="jCardRow">
+                    {skill ? <span className="jCardSkill">{skill}</span> : <span>{domainLabel(item.domain)}</span>}
+                    <span className="jCardOpen">Open story →</span>
+                  </div>
+                </footer>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* "Who I am, how I learn.": three cards (Learner Profile, ATL skills, What it
  * showed) with a progress ring, a count on each quality, and one shared row
  * of moments for the quality that is tapped. One tooltip for the whole set. */
@@ -5812,6 +5866,7 @@ function GrowthCards({ items = [], shownLp, lpMoments, lpAwards, token, preview,
 
 function RecognitionSection({ entries, items = [], token, preview, onOpen, panthers, awards = [], approvedQuote = null, number = '04' }) {
   const verified = entries.filter(entry => entry.verification_status === 'verified');
+  const [openYear, setOpenYear] = useState(null);
 
   /* The newest words from a coach or teacher. */
   const voices = [];
@@ -5896,11 +5951,18 @@ function RecognitionSection({ entries, items = [], token, preview, onOpen, panth
                   <div className="endorseYears">
                     <small>By year · most recent first</small>
                     {byYear.map(([year, count]) => (
-                      <div className="endorseYear" key={year}>
+                      <button
+                        type="button"
+                        className="endorseYear"
+                        key={year}
+                        onClick={() => setOpenYear(year)}
+                        aria-label={`See the ${count} moment${count === 1 ? '' : 's'} from ${year}`}
+                      >
                         <span>{year}</span>
                         <span className="endorseYearBar"><i style={{ width: `${(count / maxYear) * 100}%` }} /></span>
                         <b>{String(count).padStart(2, '0')}</b>
-                      </div>
+                        <ArrowUpRight className="endorseYearGo" aria-hidden="true" />
+                      </button>
                     ))}
                   </div>
                 )}
@@ -5934,6 +5996,17 @@ function RecognitionSection({ entries, items = [], token, preview, onOpen, panth
           Verified by The British School, New Delhi{lastDate ? ` · last verified ${formatDate(String(lastDate).slice(0, 10))}` : ''}
         </div>
       </div>
+      {openYear && (
+        <YearMoments
+          year={openYear}
+          years={byYear.map(([y]) => y)}
+          items={items}
+          token={token}
+          preview={preview}
+          onOpen={onOpen}
+          onClose={() => setOpenYear(null)}
+        />
+      )}
     </section>
   );
 }
