@@ -4278,7 +4278,6 @@ function Portfolio({ data, token, preview = false, member = false, editHref = nu
     ['ME', 'about'],
     ...(hasAwards ? [['AWARDS', 'awards']] : []),
     ['JOURNEY', 'journey'],
-    ...(hasAtlSkills(entries) ? [['SKILLS', 'atl']] : []),
     ...(hasPanthersData(panthers) ? [['PANTHERS', 'panthers']] : []),
     ['VERIFIED', 'verified'],
     ...(hasMemories ? [['MEMORIES', 'memories']] : []),
@@ -4392,8 +4391,6 @@ function Portfolio({ data, token, preview = false, member = false, editHref = nu
           preview={mediaPreview}
           onOpen={setStory}
         />
-
-        <AtlSection items={items} token={token} preview={mediaPreview} onOpen={setStory} number={numberOf('atl')} />
 
         {hasPanthersData(panthers) && (
           <PanthersJourneySection panthers={panthers} student={student} number={numberOf('panthers')} />
@@ -5671,109 +5668,150 @@ function hasAtlSkills(items) {
   return [...ATL_SKILLS, ...SHOWED_SKILLS].some(skill => atlMomentsFor(items, skill).length);
 }
 
-function AtlSection({ items = [], token, preview, onOpen, number }) {
-  const [open, setOpen] = useState(null);
-  /* One tooltip appears by itself when the panel scrolls into view, on the
-   * first skill that can be tapped, and stays until a skill is tapped. */
-  const panelRef = useRef(null);
-  const seen = useSeenOnce(panelRef);
-  const [tapped, setTapped] = useState(false);
-  const shownAtl = ATL_SKILLS.filter(skill => atlMomentsFor(items, skill).length);
-  const shownShowed = SHOWED_SKILLS.filter(skill => atlMomentsFor(items, skill).length);
-  if (!shownAtl.length && !shownShowed.length) return null;
-  const moments = open ? atlMomentsFor(items, open) : [];
-  const autoTip = seen && !tapped ? shownAtl[0] || shownShowed[0] : null;
-
-  const pills = (list, shown) =>
-    list.map(skill =>
-      shown.includes(skill) ? (
-        <button
-          type="button"
-          key={skill}
-          className={`on ${open === skill ? 'isOpen' : ''} ${autoTip === skill ? 'tipAuto' : ''}`}
-          aria-expanded={open === skill}
-          data-tip="Tap to view details"
-          onClick={() => {
-            setTapped(true);
-            setOpen(current => (current === skill ? null : skill));
-          }}
-        >
-          {skill}
-        </button>
-      ) : (
-        <span key={skill}>{skill}</span>
-      )
-    );
-
-  return (
-    <section className="atlSection" id="atl">
-      <div className="atlWatermark" aria-hidden="true">ATL</div>
-      <div className="sectionShell">
-        <Reveal>
-          <div className="sectionLabel atlLabel">
-            <span>{number}</span><i />SKILLS
-          </div>
-          <h2 className="atlTitle">
-            Skills for
-            <br />
-            <em>learning.</em>
-          </h2>
-          <p className="atlLead">The TBS Approaches to Learning skills, and what they showed, in verified moments.</p>
-        </Reveal>
-
-        <Reveal delay={120}>
-          <div className="endorseProfile atlPanel" ref={panelRef}>
-            <div className="endorseProfileHead">
-              <small>ATL skills · shown in verified moments</small>
-              <span>{shownAtl.length} of {ATL_SKILLS.length}{shownAtl.length || shownShowed.length ? ' · tap one to see where' : ''}</span>
-            </div>
-            <div className="endorseProfileGrid">{pills(ATL_SKILLS, shownAtl)}</div>
-
-            <div className="atlRowLabel">What it showed · {shownShowed.length} of {SHOWED_SKILLS.length}</div>
-            <div className="endorseProfileGrid atlShowedGrid">{pills(SHOWED_SKILLS, shownShowed)}</div>
-
-            {open && (
-              <div className="lpProof" key={open}>
-                <div className="lpProofHead">
-                  <b>{open}</b>
-                  <span>{moments.length} moment{moments.length === 1 ? '' : 's'}</span>
-                  <button type="button" className="lpProofClose" aria-label="Close" onClick={() => setOpen(null)}><X /></button>
-                </div>
-                <div className="lpProofRow">
-                  {moments.map(item => (
-                    <button type="button" key={item.id} className="lpProofCard" onClick={() => onOpen?.(item)}>
-                      <span className="lpProofThumb">
-                        {item.evidence ? (
-                          <SecureEvidenceImage evidence={item.evidence} token={token} preview={preview} alt="" fallback={<MomentCover item={item} />} />
-                        ) : (
-                          <MomentCover item={item} />
-                        )}
-                      </span>
-                      <small>{domainLabel(item.domain)}{item.year ? ` · ${item.year}` : ''}</small>
-                      <b>{item.title}</b>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-          <div className="atlSeal"><ShieldCheck /> Verified by The British School, New Delhi</div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
 
 const LEARNER_PROFILE = ['Inquirer', 'Knowledgeable', 'Thinker', 'Communicator', 'Principled', 'Open-minded', 'Caring', 'Risk-taker', 'Balanced', 'Reflective'];
 
 /* The school's endorsement: a real second voice (coach or teacher), what
  * TBS has verified, and the Learner Profile it shows. */
+
+/* "Who I am, how I learn.": three cards (Learner Profile, ATL skills, What it
+ * showed) with a progress ring, a count on each quality, and one shared row
+ * of moments for the quality that is tapped. One tooltip for the whole set. */
+function GrowthRing({ value, total, colour }) {
+  const c = 2 * Math.PI * 34;
+  return (
+    <svg className="growthRing" viewBox="0 0 80 80" aria-hidden="true">
+      <circle cx="40" cy="40" r="34" fill="none" stroke="rgba(21,20,73,.12)" strokeWidth="7" />
+      <circle
+        cx="40" cy="40" r="34" fill="none" stroke={colour} strokeWidth="7" strokeLinecap="round"
+        strokeDasharray={`${(c * value) / Math.max(1, total)} ${c}`} transform="rotate(-90 40 40)"
+      />
+      <text x="40" y="46" textAnchor="middle">{value}/{total}</text>
+    </svg>
+  );
+}
+
+function GrowthCards({ items = [], shownLp, lpMoments, lpAwards, token, preview, onOpen }) {
+  const [open, setOpen] = useState(null);
+  const ref = useRef(null);
+  const seen = useSeenOnce(ref);
+  const [tapped, setTapped] = useState(false);
+
+  const groups = [
+    {
+      id: 'lp',
+      label: 'Learner Profile',
+      noun: ['quality', 'qualities'],
+      list: LEARNER_PROFILE,
+      count: q => lpMoments(q).length + lpAwards(q).length,
+      shown: q => shownLp.has(q),
+      colour: '#151449'
+    },
+    { id: 'atl', label: 'ATL skills', noun: ['skill', 'skills'], list: ATL_SKILLS, colour: '#5b73ff' },
+    { id: 'showed', label: 'What it showed', noun: ['quality', 'qualities'], list: SHOWED_SKILLS, colour: '#5b73ff' }
+  ].map(group => {
+    const count = group.count || (q => atlMomentsFor(items, q).length);
+    const isShown = group.shown || (q => count(q) > 0);
+    const on = group.list.filter(isShown);
+    const momentIds = new Set(on.flatMap(q => (group.id === 'lp' ? lpMoments(q) : atlMomentsFor(items, q)).map(m => m.id)));
+    return { ...group, count, on, moments: momentIds.size };
+  });
+
+  const firstTip = (groups.find(g => g.on.length) || { on: [] }).on[0];
+  const autoTip = seen && !tapped ? firstTip : null;
+  const openGroup = open && groups.find(g => g.list.includes(open));
+  const openMoments = open ? (openGroup?.id === 'lp' ? lpMoments(open) : atlMomentsFor(items, open)) : [];
+  const openAwards = open && openGroup?.id === 'lp' ? lpAwards(open) : [];
+
+  return (
+    <div className="growth" ref={ref}>
+      <div className="growthHead">
+        <h3>Who I am, <em>how I learn.</em></h3>
+        <span>Shown in verified moments · tap a quality to see where</span>
+      </div>
+
+      <div className="growthCards">
+        {groups.map(group => (
+          <div key={group.id} className={`growthCard is-${group.id}`}>
+            <div className="growthCardHead">
+              <GrowthRing value={group.on.length} total={group.list.length} colour={group.colour} />
+              <div>
+                <small>{group.label}</small>
+                <b>
+                  {group.on.length} {group.noun[group.on.length === 1 ? 0 : 1]}
+                  {group.moments ? ` · ${group.moments} moment${group.moments === 1 ? '' : 's'}` : ''}
+                </b>
+              </div>
+            </div>
+            <div className="growthPills endorseProfileGrid">
+              {group.list.map(q =>
+                group.on.includes(q) ? (
+                  <button
+                    type="button"
+                    key={q}
+                    className={`on ${open === q ? 'isOpen' : ''} ${autoTip === q ? 'tipAuto' : ''}`}
+                    aria-expanded={open === q}
+                    data-tip="Tap to view details"
+                    onClick={() => {
+                      setTapped(true);
+                      setOpen(current => (current === q ? null : q));
+                    }}
+                  >
+                    {q}
+                    <em className="growthCount">{group.count(q)}</em>
+                  </button>
+                ) : (
+                  <span key={q}>{q}</span>
+                )
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {open && (
+        <div className="lpProof growthProof" key={open}>
+          <div className="lpProofHead">
+            <b>{open}</b>
+            <span>
+              {[
+                openMoments.length ? `${openMoments.length} moment${openMoments.length === 1 ? '' : 's'}` : '',
+                openAwards.length ? `${openAwards.length} school award${openAwards.length === 1 ? '' : 's'}` : ''
+              ].filter(Boolean).join(' · ')}
+              {openMoments.length ? ' · tap one to open its story' : ''}
+            </span>
+            <button type="button" className="lpProofClose" aria-label="Close" onClick={() => setOpen(null)}><X /></button>
+          </div>
+          <div className="lpProofRow">
+            {openMoments.map(item => (
+              <button type="button" key={item.id} className="lpProofCard" onClick={() => onOpen?.(item)}>
+                <span className="lpProofThumb">
+                  {item.evidence ? (
+                    <SecureEvidenceImage evidence={item.evidence} token={token} preview={preview} alt="" fallback={<MomentCover item={item} />} />
+                  ) : (
+                    <MomentCover item={item} />
+                  )}
+                </span>
+                <small>{domainLabel(item.domain)}{item.year ? ` · ${item.year}` : ''}</small>
+                <b>{item.title}</b>
+              </button>
+            ))}
+            {openAwards.map(award => (
+              <div key={award.id} className="lpProofCard isAward">
+                <span className="lpProofThumb lpProofAward"><Award /><em>{award.label}</em></span>
+                <small>School award</small>
+                <b>{award.title}</b>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function RecognitionSection({ entries, items = [], token, preview, onOpen, panthers, awards = [], approvedQuote = null, number = '04' }) {
   const verified = entries.filter(entry => entry.verification_status === 'verified');
-  const [openLp, setOpenLp] = useState(null);
-  const lpPanelRef = useRef(null);
-  const lpSeen = useSeenOnce(lpPanelRef);
-  const [lpTapped, setLpTapped] = useState(false);
 
   /* The newest words from a coach or teacher. */
   const voices = [];
@@ -5795,6 +5833,15 @@ function RecognitionSection({ entries, items = [], token, preview, onOpen, panth
 
   const years = verified.map(entry => entry.event_date && new Date(`${entry.event_date}T00:00:00`).getFullYear()).filter(Boolean);
   const span = years.length ? (Math.min(...years) === Math.max(...years) ? `${Math.min(...years)}` : `${Math.min(...years)} – ${Math.max(...years)}`) : '';
+  /* Count per year, most recent first; past ten years the oldest are
+   * folded into one "Earlier" row. */
+  const yearCounts = years.reduce((acc, y) => acc.set(y, (acc.get(y) || 0) + 1), new Map());
+  let byYear = [...yearCounts.entries()].sort((a, b) => b[0] - a[0]);
+  if (byYear.length > 10) {
+    const earlier = byYear.slice(8).reduce((sum, [, c]) => sum + c, 0);
+    byYear = [...byYear.slice(0, 8), ['Earlier', earlier]];
+  }
+  const maxYear = Math.max(1, ...byYear.map(([, c]) => c));
   const areas = [...new Set(verified.map(entry => domainLabel(entry.domain)).filter(Boolean))];
   const words = [
     ...verified.flatMap(entry => arr(entry.skills)),
@@ -5845,6 +5892,18 @@ function RecognitionSection({ entries, items = [], token, preview, onOpen, panth
                   <b>{String(verified.length).padStart(2, '0')}</b>
                   {span && <span>{span.includes('–') ? 'across' : 'in'} <strong>{span}</strong></span>}
                 </p>
+                {byYear.length > 1 && (
+                  <div className="endorseYears">
+                    <small>By year · most recent first</small>
+                    {byYear.map(([year, count]) => (
+                      <div className="endorseYear" key={year}>
+                        <span>{year}</span>
+                        <span className="endorseYearBar"><i style={{ width: `${(count / maxYear) * 100}%` }} /></span>
+                        <b>{String(count).padStart(2, '0')}</b>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               {areas.length > 0 && (
                 <div>
@@ -5859,71 +5918,15 @@ function RecognitionSection({ entries, items = [], token, preview, onOpen, panth
         </div>
 
         <Reveal delay={120}>
-          <div className="endorseProfile" ref={lpPanelRef}>
-            <div className="endorseProfileHead">
-              <small>Learner Profile · shown in verified moments</small>
-              <span>{shown.size} of 10{shown.size ? ' · tap one to see where' : ''}</span>
-            </div>
-            <div className="endorseProfileGrid">
-              {LEARNER_PROFILE.map(lp =>
-                shown.has(lp) ? (
-                  <button
-                    type="button"
-                    key={lp}
-                    className={`on ${openLp === lp ? 'isOpen' : ''} ${lpSeen && !lpTapped && lp === LEARNER_PROFILE.find(x => shown.has(x)) ? 'tipAuto' : ''}`}
-                    aria-expanded={openLp === lp}
-                    data-tip="Tap to view details"
-                    onClick={() => {
-                      setLpTapped(true);
-                      setOpenLp(current => (current === lp ? null : lp));
-                    }}
-                  >
-                    {lp}
-                  </button>
-                ) : (
-                  <span key={lp}>{lp}</span>
-                )
-              )}
-            </div>
-
-            {openLp && (
-              <div className="lpProof" key={openLp}>
-                <div className="lpProofHead">
-                  <b>{openLp}</b>
-                  <span>
-                    {(() => {
-                      const m = lpMoments(openLp).length;
-                      const a = lpAwards(openLp).length;
-                      return [m ? `${m} moment${m === 1 ? '' : 's'}` : '', a ? `${a} school award${a === 1 ? '' : 's'}` : ''].filter(Boolean).join(' · ');
-                    })()}
-                  </span>
-                  <button type="button" className="lpProofClose" aria-label="Close" onClick={() => setOpenLp(null)}><X /></button>
-                </div>
-                <div className="lpProofRow">
-                  {lpMoments(openLp).map(item => (
-                    <button type="button" key={item.id} className="lpProofCard" onClick={() => onOpen?.(item)}>
-                      <span className="lpProofThumb">
-                        {item.evidence ? (
-                          <SecureEvidenceImage evidence={item.evidence} token={token} preview={preview} alt="" fallback={<MomentCover item={item} />} />
-                        ) : (
-                          <MomentCover item={item} />
-                        )}
-                      </span>
-                      <small>{domainLabel(item.domain)}{item.year ? ` · ${item.year}` : ''}</small>
-                      <b>{item.title}</b>
-                    </button>
-                  ))}
-                  {lpAwards(openLp).map(award => (
-                    <div key={award.id} className="lpProofCard isAward">
-                      <span className="lpProofThumb lpProofAward"><Award /><em>{award.label}</em></span>
-                      <small>School award</small>
-                      <b>{award.title}</b>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          <GrowthCards
+            items={items}
+            shownLp={shown}
+            lpMoments={lpMoments}
+            lpAwards={lpAwards}
+            token={token}
+            preview={preview}
+            onOpen={onOpen}
+          />
         </Reveal>
 
         <div className="endorseSeal">
