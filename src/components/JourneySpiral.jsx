@@ -445,12 +445,13 @@ const STAR_FRAGMENT = /* glsl */ `
 function layoutFor(width) {
   const mobile = width < 760;
 
-  const cardW = mobile ? 1.42 : 1.78;
-  const cardH = mobile ? 0.98 : 1.2;
+  /* Desktop cards enlarged ~20% (was 1.78 × 1.2). */
+  const cardW = mobile ? 1.42 : 2.2;
+  const cardH = mobile ? 0.98 : 1.48;
   const perTurn = mobile ? 7 : 9;
   const gap = mobile ? 0.2 : 0.26;
   const radius = ((cardW + gap) * perTurn) / (Math.PI * 2);
-  const turnHeight = cardH + (mobile ? 0.5 : 0.62);
+  const turnHeight = cardH + (mobile ? 0.5 : 0.45);
 
   return {
     mobile,
@@ -549,7 +550,7 @@ export default function JourneySpiral({
       const aspect = width / height;
       const halfTan = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
 
-      const neededHeight = layout.mobile ? 6.6 : 8.9;
+      const neededHeight = layout.mobile ? 6.6 : 9.2;
       const neededWidth = layout.radius * 2 + (layout.mobile ? 0.9 : 2.2);
 
       const distance = Math.max(
