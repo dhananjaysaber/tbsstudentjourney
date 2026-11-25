@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#ffffff" />
+  <script>
+    /* Apply the saved theme before the first paint. Student portfolios have
+       their own setting and open in light mode; every other page follows
+       the device setting until someone chooses. */
+    (function () {
+      var p = location.pathname, q = location.search;
+      var portfolio = /^\/(p|portfolio)\//.test(p) || /[?&](share|previewStudent)=/.test(q);
+      var theme = null;
+      try { theme = localStorage.getItem(portfolio ? 'tbs-theme-portfolio-v2' : 'tbs-theme'); } catch (e) {}
+      if (theme !== 'light' && theme !== 'dark') {
+        theme = portfolio
+          ? 'light'
+          : window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.documentElement.setAttribute('data-theme', theme);
+      var meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', theme === 'dark' ? '#151449' : '#ffffff');
+    })();
+  </script>
+  <title>TBS Student Journey Portfolio</title>
+  <script type="module" crossorigin src="/assets/index-080482c0.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-ab4144d4.css">
+</head>
+<body>
+  <div id="root"></div>
+</body>
+</html>

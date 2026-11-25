@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a2e4a"/><stop offset="1" stop-color="#d0704a"/></linearGradient>
+<radialGradient id="l" cx=".85" cy=".1" r=".8"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+<rect width="1200" height="800" fill="url(#g)"/><rect width="1200" height="800" fill="url(#l)"/>
+<circle cx="420" cy="330" r="170" fill="#eec058" fill-opacity=".85"/><rect x="560" y="200" width="300" height="300" rx="24" fill="#f6f1e7" fill-opacity=".9" transform="rotate(12 710 350)"/><path d="M820 520 L1020 260 L1080 560Z" fill="#151449" fill-opacity=".75"/>
+<g font-family="Georgia, 'Times New Roman', serif"><text x="64" y="724" font-size="30" fill="#fff" fill-opacity=".9" font-style="italic">Creative project</text></g>
+<text x="1136" y="724" text-anchor="end" font-family="ui-monospace, Menlo, monospace" font-size="18" letter-spacing="4" fill="#fff" fill-opacity=".6">DEMO IMAGE</text>
+</svg>
