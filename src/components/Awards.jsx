@@ -1678,6 +1678,8 @@ export function AwardStaff() {
   const [importing, setImporting] = useState(false);
   const [busy, setBusy] = useState(false);
   const [query, setQuery] = useState('');
+  /* Staff who are switched off sit in their own tab, so the Active list stays clean. */
+  const [statusView, setStatusView] = useState('active');
   const [onlyNeeds, setOnlyNeeds] = useState(false);
   const [flash, say] = useFlash();
 
@@ -1704,8 +1706,11 @@ export function AwardStaff() {
   const needs = p => p.active && (!(p.roles || []).length || p.roles.some(roleIncomplete));
   const needCount = people.filter(needs).length;
   const shown = people.filter(
-    p => (!query || `${p.full_name} ${p.email}`.toLowerCase().includes(query.toLowerCase())) && (!onlyNeeds || needs(p))
+    p => (statusView === 'all' || (statusView === 'off' ? !p.active : p.active)) &&
+      (!query || `${p.full_name} ${p.email}`.toLowerCase().includes(query.toLowerCase())) && (!onlyNeeds || needs(p))
   );
+  const activeCount = people.filter(p => p.active).length;
+  const offCount = people.length - activeCount;
   const counts = Object.keys(AWARD_ROLES).map(r => [r, people.filter(p => p.active && (p.roles || []).some(x => x.award_role === r)).length]);
   const picked = people.filter(p => selected.has(p.id));
   const allShownPicked = shown.length > 0 && shown.every(p => selected.has(p.id));
@@ -1844,6 +1849,13 @@ export function AwardStaff() {
         ) : (
           <div className="awTableTools">
             <input className="awSearch" placeholder="Search staff by name or email" value={query} onChange={e => setQuery(e.target.value)} />
+            <div className="awStatusTabs" role="tablist" aria-label="Staff status">
+              {[['active', `Active ${activeCount}`], ['off', `Switched off ${offCount}`], ['all', 'All']].map(([key, label]) => (
+                <button type="button" role="tab" aria-selected={statusView === key} key={key} className={statusView === key ? 'on' : ''} onClick={() => { setStatusView(key); setSelected(new Set()); }}>
+                  {label}
+                </button>
+              ))}
+            </div>
             <span className="awMuted">Tick people to assign roles and classes in bulk.</span>
             {onlyNeeds && <button className="awBtn text sm" onClick={() => setOnlyNeeds(false)}>Show everyone</button>}
           </div>
