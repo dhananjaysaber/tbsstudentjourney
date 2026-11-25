@@ -4278,7 +4278,7 @@ function Portfolio({ data, token, preview = false, member = false, editHref = nu
     ['ME', 'about'],
     ...(hasAwards ? [['AWARDS', 'awards']] : []),
     ['JOURNEY', 'journey'],
-    ...(hasAtlSkills(entries) ? [['ATL SKILLS', 'atl']] : []),
+    ...(hasAtlSkills(entries) ? [['SKILLS', 'atl']] : []),
     ...(hasPanthersData(panthers) ? [['PANTHERS', 'panthers']] : []),
     ['VERIFIED', 'verified'],
     ...(hasMemories ? [['MEMORIES', 'memories']] : []),
@@ -5638,6 +5638,7 @@ export function AchievementCard({ award, filled = 1 }) {
 /* ATL skills shown in verified moments: same pattern as the Learner
  * Profile panel, in its own section between Journey and Panthers. */
 const ATL_SKILLS = (SKILL_GROUPS.find(group => group.id === 'atl') || { skills: [] }).skills;
+const SHOWED_SKILLS = (SKILL_GROUPS.find(group => group.id === 'cas') || { skills: [] }).skills;
 
 function atlMomentsFor(items, skill) {
   return items.filter(
@@ -5646,14 +5647,33 @@ function atlMomentsFor(items, skill) {
 }
 
 function hasAtlSkills(items) {
-  return ATL_SKILLS.some(skill => atlMomentsFor(items, skill).length);
+  return [...ATL_SKILLS, ...SHOWED_SKILLS].some(skill => atlMomentsFor(items, skill).length);
 }
 
 function AtlSection({ items = [], token, preview, onOpen, number }) {
   const [open, setOpen] = useState(null);
-  const shown = ATL_SKILLS.filter(skill => atlMomentsFor(items, skill).length);
-  if (!shown.length) return null;
+  const shownAtl = ATL_SKILLS.filter(skill => atlMomentsFor(items, skill).length);
+  const shownShowed = SHOWED_SKILLS.filter(skill => atlMomentsFor(items, skill).length);
+  if (!shownAtl.length && !shownShowed.length) return null;
   const moments = open ? atlMomentsFor(items, open) : [];
+
+  const pills = (list, shown) =>
+    list.map(skill =>
+      shown.includes(skill) ? (
+        <button
+          type="button"
+          key={skill}
+          className={`on ${open === skill ? 'isOpen' : ''}`}
+          aria-expanded={open === skill}
+          data-tip="Tap to view details"
+          onClick={() => setOpen(current => (current === skill ? null : skill))}
+        >
+          {skill}
+        </button>
+      ) : (
+        <span key={skill}>{skill}</span>
+      )
+    );
 
   return (
     <section className="atlSection" id="atl">
@@ -5661,39 +5681,26 @@ function AtlSection({ items = [], token, preview, onOpen, number }) {
       <div className="sectionShell">
         <Reveal>
           <div className="sectionLabel atlLabel">
-            <span>{number}</span><i />ATL SKILLS
+            <span>{number}</span><i />SKILLS
           </div>
           <h2 className="atlTitle">
             Skills for
             <br />
             <em>learning.</em>
           </h2>
-          <p className="atlLead">The TBS Approaches to Learning skills shown in verified moments.</p>
+          <p className="atlLead">The TBS Approaches to Learning skills, and what they showed, in verified moments.</p>
         </Reveal>
 
         <Reveal delay={120}>
           <div className="endorseProfile atlPanel">
             <div className="endorseProfileHead">
               <small>ATL skills · shown in verified moments</small>
-              <span>{shown.length} of {ATL_SKILLS.length} · tap one to see where</span>
+              <span>{shownAtl.length} of {ATL_SKILLS.length}{shownAtl.length || shownShowed.length ? ' · tap one to see where' : ''}</span>
             </div>
-            <div className="endorseProfileGrid">
-              {ATL_SKILLS.map(skill =>
-                shown.includes(skill) ? (
-                  <button
-                    type="button"
-                    key={skill}
-                    className={`on ${open === skill ? 'isOpen' : ''}`}
-                    aria-expanded={open === skill}
-                    onClick={() => setOpen(current => (current === skill ? null : skill))}
-                  >
-                    {skill}
-                  </button>
-                ) : (
-                  <span key={skill}>{skill}</span>
-                )
-              )}
-            </div>
+            <div className="endorseProfileGrid">{pills(ATL_SKILLS, shownAtl)}</div>
+
+            <div className="atlRowLabel">What it showed · {shownShowed.length} of {SHOWED_SKILLS.length}</div>
+            <div className="endorseProfileGrid atlShowedGrid">{pills(SHOWED_SKILLS, shownShowed)}</div>
 
             {open && (
               <div className="lpProof" key={open}>
@@ -5832,6 +5839,7 @@ function RecognitionSection({ entries, items = [], token, preview, onOpen, panth
                     key={lp}
                     className={`on ${openLp === lp ? 'isOpen' : ''}`}
                     aria-expanded={openLp === lp}
+                    data-tip="Tap to view details"
                     onClick={() => setOpenLp(current => (current === lp ? null : lp))}
                   >
                     {lp}

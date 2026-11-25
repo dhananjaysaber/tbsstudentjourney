@@ -7075,3 +7075,64 @@ input[type='search']::-webkit-search-decoration { -webkit-appearance: none; }
 @media (max-width: 760px) {
   .atlSection .endorseProfileGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* ATL section: second row, "What it showed" (7 qualities) */
+.atlRowLabel {
+  margin-top: 8px;
+  font-family: "DM Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: #5b73ff;
+}
+.atlShowedGrid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+@media (max-width: 1100px) { .atlShowedGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 760px) { .atlShowedGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Tooltip on skills that can be clicked (Learner Profile and Skills panels) */
+.endorseProfileGrid button[data-tip] { position: relative; }
+.endorseProfileGrid button[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 12px);
+  transform: translate(-50%, 4px);
+  white-space: nowrap;
+  padding: 7px 12px;
+  border-radius: 9px;
+  background: #fbf3dc;
+  border: 1.5px dashed #151449;
+  color: #151449;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: 0 10px 24px -12px rgba(21, 20, 73, .45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease;
+  z-index: 5;
+}
+/* pointer: a small diamond with the same dashed edge */
+.endorseProfileGrid button[data-tip]::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 7px);
+  width: 9px;
+  height: 9px;
+  background: #fbf3dc;
+  border-right: 1.5px dashed #151449;
+  border-bottom: 1.5px dashed #151449;
+  transform: translateX(-50%) rotate(45deg);
+  opacity: 0;
+  transition: opacity .18s ease;
+  z-index: 6;
+}
+.endorseProfileGrid button[data-tip]:hover::after,
+.endorseProfileGrid button[data-tip]:focus-visible::after { opacity: 1; transform: translate(-50%, 0); }
+.endorseProfileGrid button[data-tip]:hover::before,
+.endorseProfileGrid button[data-tip]:focus-visible::before { opacity: 1; }
+.endorseProfileGrid button.isOpen[data-tip]::after,
+.endorseProfileGrid button.isOpen[data-tip]::before { display: none; }
+/* touch screens have no hover: rely on the "tap one to see where" line */
+@media (hover: none) { .endorseProfileGrid button[data-tip]::after, .endorseProfileGrid button[data-tip]::before { display: none; } }
