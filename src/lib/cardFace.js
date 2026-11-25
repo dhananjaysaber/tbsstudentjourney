@@ -70,7 +70,7 @@ function wrap(ctx, text, maxWidth, maxLines) {
  * image: a loaded HTMLImageElement / canvas, or null for no photo
  * ratio: card height ÷ width
  */
-export function drawCardFace({ card, image = null, ratio = 1.78, width = 1024 }) {
+export function drawCardFace({ card, image = null, ratio = 1.78, width = 1024, withHeader = true }) {
   const W = width;
   const H = Math.round(width * ratio);
   const canvas = document.createElement('canvas');
@@ -85,27 +85,30 @@ export function drawCardFace({ card, image = null, ratio = 1.78, width = 1024 })
   ctx.fillStyle = NAVY;
   ctx.fillRect(0, 0, W, H);
 
-  const header = 46 * u;
+  /* Without a header the photo starts near the top edge. */
+  const header = withHeader ? 46 * u : 10 * u;
   const footer = (ratio < 1 ? 96 : 118) * u; /* tighter on wide cards */
   const side = 18 * u;
   const inset = 10 * u;
 
   /* header */
-  const area = (AREA[card.domain] || 'Journey').toUpperCase();
-  const label = card.year ? `${area} · ${card.year}` : area;
-  ctx.textBaseline = 'middle';
-  ctx.fillStyle = GOLD;
-  ctx.font = `${10 * u}px "DM Mono", monospace`;
-  if ('letterSpacing' in ctx) ctx.letterSpacing = `${1.8 * u}px`;
-  ctx.fillText(label, side, header / 2);
-  if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
-  ctx.textAlign = 'right';
-  ctx.fillStyle = 'rgba(255,255,255,.6)';
-  ctx.font = `italic 500 ${18 * u}px "Playfair Display", Georgia, serif`;
-  ctx.fillText(card.number || '', W - side, header / 2);
-  ctx.textAlign = 'left';
-  ctx.fillStyle = 'rgba(255,255,255,.1)';
-  ctx.fillRect(0, header - Math.max(1, u), W, Math.max(1, u));
+  if (withHeader) {
+    const area = (AREA[card.domain] || 'Journey').toUpperCase();
+    const label = card.year ? `${area} · ${card.year}` : area;
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = GOLD;
+    ctx.font = `${10 * u}px "DM Mono", monospace`;
+    if ('letterSpacing' in ctx) ctx.letterSpacing = `${1.8 * u}px`;
+    ctx.fillText(label, side, header / 2);
+    if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+    ctx.textAlign = 'right';
+    ctx.fillStyle = 'rgba(255,255,255,.6)';
+    ctx.font = `italic 500 ${18 * u}px "Playfair Display", Georgia, serif`;
+    ctx.fillText(card.number || '', W - side, header / 2);
+    ctx.textAlign = 'left';
+    ctx.fillStyle = 'rgba(255,255,255,.1)';
+    ctx.fillRect(0, header - Math.max(1, u), W, Math.max(1, u));
+  }
 
   /* photo */
   const px = inset;

@@ -4943,10 +4943,6 @@ function JourneyBlog({ items, token, preview, onOpen }) {
         return (
           <Reveal key={item.id} delay={Math.min(index, 4) * 60}>
             <button type="button" className="jCard" onClick={() => onOpen(item)} aria-label={`Open ${item.title}`}>
-              <header>
-                <span>{domainLabel(item.domain)}{item.year ? ` · ${item.year}` : ''}</span>
-                <i>{item.number}</i>
-              </header>
               <div className="jCardPhoto">
                 {item.evidence ? (
                   <SecureEvidenceImage evidence={item.evidence} token={token} preview={preview} alt="" fallback={<div className="jCardEmpty" />} />

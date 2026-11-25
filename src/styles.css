@@ -7017,3 +7017,6 @@ input[type='search']::-webkit-search-decoration { -webkit-appearance: none; }
   letter-spacing: .12em;
   color: rgba(255, 255, 255, .65);
 }
+
+/* Blog cards have no header: the photo starts at the top. */
+.jCardPhoto { margin-top: 10px; }

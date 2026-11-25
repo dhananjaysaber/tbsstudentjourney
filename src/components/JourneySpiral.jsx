@@ -729,7 +729,7 @@ export default function JourneySpiral({
     function faceTexture(card, image) {
       const key = `${card.key}|${image ? 'photo' : 'none'}|${layout.mobile ? 'm' : 'd'}`;
       if (!faceCache.has(key)) {
-        const canvas = drawCardFace({ card, image, ratio: layout.cardH / layout.cardW, width: layout.mobile ? 760 : 1024 });
+        const canvas = drawCardFace({ card, image, ratio: layout.cardH / layout.cardW, width: layout.mobile ? 760 : 1024, withHeader: false });
         const texture = new THREE.CanvasTexture(canvas);
         texture.colorSpace = THREE.SRGBColorSpace;
         texture.anisotropy = maxAnisotropy;
