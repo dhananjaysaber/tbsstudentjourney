@@ -3306,7 +3306,7 @@ function StudentCommunityAccess({ studentId, studentName, superadmin }) {
           {choices.map(([value, label]) => (
             <button
               type="button" key={value || 'default'}
-              className={mode === value ? 'on' : ''}
+              className={mode === value ? 'isActive' : ''}
               onClick={() => choose(value)}
               disabled={!superadmin || busy || mode === null}
             >
@@ -4335,8 +4335,12 @@ function Portfolio({ data, token, preview = false, member = false, editHref = nu
   useEffect(() => {
     let undo = () => {};
     let live = true;
-    loadPortfolioSettings().then(settings => {
-      if (!live || settings.right_click !== 'disabled') return;
+    Promise.all([
+      loadPortfolioSettings(),
+      /* Admins and the SuperAdmin are never blocked. */
+      supabase.rpc('portfolio_can_set_display').then(({ data: canSet }) => Boolean(canSet)).catch(() => false)
+    ]).then(([settings, isAdmin]) => {
+      if (!live || isAdmin || settings.right_click !== 'disabled') return;
       const block = event => event.preventDefault();
       const noDrag = event => {
         if (event.target?.tagName === 'IMG') event.preventDefault();
