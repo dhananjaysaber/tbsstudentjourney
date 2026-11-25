@@ -150,6 +150,8 @@ const s = StyleSheet.create({
   expTags: { fontSize: 5.3, letterSpacing: 0.9, color: C.goldDeep, marginTop: 2.5 },
 
   skill: { marginBottom: 6 },
+  growthGroup: { marginBottom: 4 },
+  growthLabel: { fontSize: 5.4, color: C.taupe, letterSpacing: 0.8, marginBottom: 4 },
   skillRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 2.4 },
   skillName: { fontSize: 7.4 },
   skillCount: { fontFamily: 'Mono', fontSize: 5.7, color: C.taupe },
@@ -336,7 +338,44 @@ function ExperienceItems({ items }) {
 function SideColumn({ m }) {
   return (
     <View style={s.side}>
-      {m.skills.rows.length ? (
+      {m.growth.length ? (
+        <View style={s.section} wrap={false}>
+          <Heading>Who I am · how I learn</Heading>
+          {m.growth.map(group => (
+            <View key={group.id} style={s.growthGroup}>
+              <Text style={[s.mono, s.growthLabel]}>
+                {group.label.toUpperCase()} · {group.rows.length} OF {group.total}
+              </Text>
+              {group.rows.map(row => (
+                <View key={row.label} style={s.skill}>
+                  <View style={s.skillRow}>
+                    <Text style={s.skillName}>{row.label}</Text>
+                    <Text style={s.skillCount}>{row.count}</Text>
+                  </View>
+                  <Bar share={row.share} />
+                </View>
+              ))}
+            </View>
+          ))}
+        </View>
+      ) : null}
+
+      {m.verifiedYears.length ? (
+        <View style={s.section} wrap={false}>
+          <Heading>Verified moments · by year</Heading>
+          {m.verifiedYears.map(row => (
+            <View key={row.year} style={s.skill}>
+              <View style={s.skillRow}>
+                <Text style={s.skillName}>{row.year}</Text>
+                <Text style={s.skillCount}>{row.count}</Text>
+              </View>
+              <Bar share={row.share} />
+            </View>
+          ))}
+        </View>
+      ) : null}
+
+      {!m.growth.length && m.skills.rows.length ? (
         <View style={s.section} wrap={false}>
           <Heading>{m.skills.mode === 'skills' ? 'Skills · evidenced' : 'Areas · evidenced'}</Heading>
           {m.skills.rows.map((row, index) => (
@@ -412,7 +451,9 @@ function awardHeight(award) {
 
 function sideHeight(m) {
   let h = 0;
-  if (m.skills.rows.length) h += 15 + m.skills.rows.length * 18.5 + 15;
+  if (m.growth.length) h += 15 + m.growth.reduce((sum, g) => sum + 10 + g.rows.length * 18.5 + 4, 0) + 15;
+  if (m.verifiedYears.length) h += 15 + m.verifiedYears.length * 18.5 + 15;
+  if (!m.growth.length && m.skills.rows.length) h += 15 + m.skills.rows.length * 18.5 + 15;
   if (m.teams.length) h += 15 + m.teams.reduce((sum, t) => sum + 13 + (t.stats.length ? lines(t.stats.join(' · '), 6.6, 160) * 9 : 0) + 4, 0) + 15;
   if (m.quote) h += 22 + lines(m.quote.text, 9.4, 138, 0.45) * 13.2 + lines(m.quote.attribution, 5.3, 138, 0.75) * 8 + 9;
   return h;
@@ -465,7 +506,7 @@ export default function CvPdf({ model: m, photo, qr, issuedTo = '' }) {
     m.nextChapter ? { key: 'next', label: 'Next chapter', text: m.nextChapter } : null
   ].filter(Boolean);
   const hasChips = Boolean(m.strengths.length || m.interests.length);
-  const hasSide = Boolean(m.skills.rows.length || m.teams.length || m.quote);
+  const hasSide = Boolean(m.growth.length || m.verifiedYears.length || m.skills.rows.length || m.teams.length || m.quote);
   const layout = splitLayout(m);
 
   return (

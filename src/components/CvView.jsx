@@ -381,7 +381,42 @@ export default function CvView({
             and use the full width once it ends, so the page never shows a gap. */}
         <div className="cvBody">
           <aside className="cvSide">
-            {m.skills.rows.length > 0 && (
+            {m.growth.length > 0 && (
+              <section>
+                <h2 className="cvH">Who I am · how I learn</h2>
+                {m.growth.map(group => (
+                  <div className="cvGrowth" key={group.id}>
+                    <small>{group.label} · {group.rows.length} of {group.total}</small>
+                    {group.rows.map(row => (
+                      <div className="cvSkill" key={row.label}>
+                        <div>
+                          <span>{row.label}</span>
+                          <span>{row.count}</span>
+                        </div>
+                        <i><b style={{ width: `${Math.max(8, Math.round(row.share * 100))}%` }} /></i>
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </section>
+            )}
+
+            {m.verifiedYears.length > 0 && (
+              <section>
+                <h2 className="cvH">Verified moments · by year</h2>
+                {m.verifiedYears.map(row => (
+                  <div className="cvSkill" key={row.year}>
+                    <div>
+                      <span>{row.year}</span>
+                      <span>{row.count}</span>
+                    </div>
+                    <i><b style={{ width: `${Math.max(8, Math.round(row.share * 100))}%` }} /></i>
+                  </div>
+                ))}
+              </section>
+            )}
+
+            {m.growth.length === 0 && m.skills.rows.length > 0 && (
               <section>
                 <h2 className="cvH">{m.skills.mode === 'skills' ? 'Skills · evidenced' : 'Areas · evidenced'}</h2>
                 {m.skills.rows.map((row, index) => (

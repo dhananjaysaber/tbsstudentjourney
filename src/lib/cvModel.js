@@ -2,7 +2,7 @@
  * and the downloadable PDF (CvPdf), so the two always say the same thing. */
 
 import { cvCoachQuote } from './coachVoice';
-import { skillCounts } from './skills';
+import { skillCounts, SKILL_GROUPS } from './skills';
 
 const DOMAIN_LABELS = {
   sport: 'Sport',
@@ -40,6 +40,43 @@ const toDate = value => {
   const date = new Date(`${String(value).slice(0, 10)}T00:00:00`);
   return Number.isNaN(date.getTime()) ? null : date;
 };
+
+
+/* "Who I am, how I learn": the three skill groups, counted from verified
+ * moments only (same as the portfolio page). Only groups with something
+ * shown are included. */
+function growthGroups(verified) {
+  const labels = { profile: 'Learner Profile', atl: 'ATL skills', cas: 'What it showed' };
+  return ['profile', 'atl', 'cas']
+    .map(id => {
+      const group = SKILL_GROUPS.find(g => g.id === id);
+      if (!group) return null;
+      const rows = group.skills
+        .map(skill => ({
+          label: skill,
+          count: verified.filter(item => list(item.skills).some(s => s.toLowerCase() === skill.toLowerCase())).length
+        }))
+        .filter(row => row.count > 0)
+        .sort((a, b) => b.count - a.count);
+      const top = Math.max(1, ...rows.map(row => row.count));
+      return rows.length
+        ? { id, label: labels[id], total: group.skills.length, rows: rows.map(row => ({ ...row, share: row.count / top })) }
+        : null;
+    })
+    .filter(Boolean);
+}
+
+/* Verified moments per calendar year, most recent first. */
+function verifiedYears(verified) {
+  const counts = new Map();
+  verified.forEach(item => {
+    const date = toDate(item.event_date);
+    if (date) counts.set(date.getFullYear(), (counts.get(date.getFullYear()) || 0) + 1);
+  });
+  const rows = [...counts.entries()].sort((a, b) => b[0] - a[0]);
+  const top = Math.max(1, ...rows.map(([, c]) => c));
+  return rows.map(([year, count]) => ({ year, count, share: count / top }));
+}
 
 export function academicYearOf(value) {
   const date = toDate(value);
@@ -254,6 +291,8 @@ export function buildCvModel({
     awardCards,
     awardMore,
     skills: skillCounts(items, 5),
+    growth: growthGroups(verified),
+    verifiedYears: verifiedYears(verified),
     teams: teams.map(team => ({
       id: team.team_id,
       name: teamShort(team.team_name),

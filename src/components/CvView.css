@@ -351,3 +351,15 @@
 .cvGateResend:disabled { color: rgba(21, 20, 73, 0.45); text-decoration: none; cursor: default; }
 .cvGateMain:focus-visible, .cvGateGhost:focus-visible, .cvGateResend:focus-visible { outline: 2px solid #eec058; outline-offset: 2px; }
 .cvAwardReport { margin-top: 4px !important; font-size: 8.6px !important; color: var(--taupe) !important; }
+
+/* Who I am · how I learn */
+.cvGrowth { margin-bottom: 6px; }
+.cvGrowth > small {
+  display: block;
+  margin: 2px 0 5px;
+  font-family: 'DM Mono', monospace;
+  font-size: 7px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--taupe);
+}
