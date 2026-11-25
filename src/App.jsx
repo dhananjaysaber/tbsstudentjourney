@@ -597,8 +597,9 @@ function monthLabel(value) {
     : date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
 }
 
-async function loadPanthersJourney(studentId) {
-  if (!studentId) return { teams: [], totals: {} };
+/* Raw Panthers rows for one student (read with the viewer's login).
+ * The secure public link gets the same rows from the server instead. */
+async function fetchPanthersRows(studentId) {
 
   const [memberships, rewards, monthAwards] = await Promise.all([
     safeRows(
@@ -655,24 +656,7 @@ async function loadPanthersJourney(studentId) {
   ];
 
   if (!teamIds.length) {
-    return {
-      teams: [],
-      totals: {
-        rewards: rewards.length,
-        playerOfMonth: monthAwards.length,
-        teams: 0,
-        attendanceRecords: 0,
-        attended: 0,
-        knownAttendance: 0,
-        selectedGames: 0,
-        publishedResults: 0,
-        playerOfMatch: 0,
-        progressReports: 0,
-        ratingRecords: 0,
-        activities: [],
-        seasons: []
-      }
-    };
+    return { memberships, rewards, monthAwards, teams: [], attendance: [], squads: [], results: [], reports: [], schedules: [], playerRatings: [] };
   }
 
   const [teams, attendance, squads, results, reports, schedules, playerRatings] = await Promise.all([
@@ -749,6 +733,39 @@ async function loadPanthersJourney(studentId) {
       'player ratings'
     )
   ]);
+
+  return { memberships, rewards, monthAwards, teams, attendance, squads, results, reports, schedules, playerRatings };
+}
+
+/* Builds the Panthers record shown on the portfolio from raw rows. */
+function buildPanthersJourney(studentId, rows) {
+  const { memberships = [], rewards = [], monthAwards = [], teams = [], attendance = [], squads = [], results = [], reports = [], schedules = [], playerRatings = [] } = rows || {};
+  const teamIds = [
+    ...new Set(
+      [...memberships, ...rewards, ...monthAwards].map(row => row.team_id).filter(Boolean)
+    )
+  ];
+
+  if (!teamIds.length) {
+    return {
+      teams: [],
+      totals: {
+        rewards: rewards.length,
+        playerOfMonth: monthAwards.length,
+        teams: 0,
+        attendanceRecords: 0,
+        attended: 0,
+        knownAttendance: 0,
+        selectedGames: 0,
+        publishedResults: 0,
+        playerOfMatch: 0,
+        progressReports: 0,
+        ratingRecords: 0,
+        activities: [],
+        seasons: []
+      }
+    };
+  }
 
   const teamMap = new Map(teams.map(team => [team.team_id, team]));
   const scheduleMap = new Map(schedules.map(item => [item.schedule_id, item]));
@@ -943,6 +960,11 @@ async function loadPanthersJourney(studentId) {
       seasons: [...new Set(built.flatMap(team => team.seasons || []).filter(Boolean))].sort()
     }
   };
+}
+
+async function loadPanthersJourney(studentId) {
+  if (!studentId) return { teams: [], totals: {} };
+  return buildPanthersJourney(studentId, await fetchPanthersRows(studentId));
 }
 
 /* Approvals → "Draft more": write quotes for Panthers students who have
@@ -4279,7 +4301,10 @@ function PublicGate({ token }) {
     );
   }
 
-  return <Portfolio data={state.data} token={token} />;
+  const data = state.data.panthersRows
+    ? { ...state.data, panthers: buildPanthersJourney(state.data.student?.student_id, state.data.panthersRows) }
+    : state.data;
+  return <Portfolio data={data} token={token} />;
 }
 
 function toPublicShape(data, preview = false) {
