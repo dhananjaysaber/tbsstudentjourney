@@ -193,7 +193,7 @@ Deno.serve(async req => {
         .select('student_id,full_name,year_group,profile_photo_url')
         .eq('student_id', studentId).eq('active', true).maybeSingle(),
       db.from('student_journey_profiles')
-        .select('preferred_name,headline,about_me,interests,strengths,languages,goals,aspirations,proud_moment,profile_photo_url,banner_image_url,profile_public')
+        .select('preferred_name,headline,about_me,interests,strengths,languages,goals,aspirations,proud_moment,closing_thought,profile_photo_url,banner_image_url,profile_public')
         .eq('student_id', studentId).maybeSingle(),
       db.from('student_journey_entries')
         .select('id,student_id,entry_type,domain,title,event_date,end_date,organisation,level,description,reflection,skills,is_featured,verification_status,is_public,display_order')

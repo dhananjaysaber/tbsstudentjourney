@@ -7344,3 +7344,15 @@ button.endorseYear:hover .endorseYearGo { opacity: 1; transform: translate(2px, 
 
 /* Right-click disabled (school setting): no long-press menu or image saving on phones. */
 .noRightClick img { -webkit-touch-callout: none; -webkit-user-drag: none; user-select: none; }
+
+/* Next chapter: goals alone span the width; the student's closing thought is optional. */
+.nextDetails.single {
+  grid-template-columns: 1fr;
+}
+.nextDetails.single article {
+  max-width: 860px;
+}
+.nextThought p {
+  font-family: "Playfair Display", Georgia, serif;
+  font-style: italic;
+}

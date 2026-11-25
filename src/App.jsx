@@ -189,6 +189,7 @@ const emptyProfile = {
   goals: '',
   aspirations: '',
   proud_moment: '',
+  closing_thought: '',
   profile_photo_url: '',
   banner_image_url: ''
 };
@@ -2657,6 +2658,15 @@ function ProfileEditor({ data, admin, staff = admin, editor = null, onRefresh })
             value={profile.aspirations}
             placeholder="Where would you like your journey to take you next?"
             set={value => update('aspirations', value)}
+          />
+          <Field
+            wide
+            area
+            rows={2}
+            label="A thought to end on (optional)"
+            value={profile.closing_thought}
+            placeholder="One line in your own words to close your portfolio. Leave blank to hide it."
+            set={value => update('closing_thought', value)}
           />
         </div>
       </div>
@@ -6283,20 +6293,21 @@ function NextChapter({ profile, student, number = '05' }) {
             <blockquote className="nextStatement">“{aspiration}”</blockquote>
           </div>
 
-          {profile.goals && (
-            <div className="nextDetails">
-              <article>
-                <small>WHAT I WANT TO WORK TOWARDS</small>
-                <p>{profile.goals}</p>
-              </article>
+          {(profile.goals || profile.closing_thought) && (
+            <div className={`nextDetails${profile.goals && profile.closing_thought ? '' : ' single'}`}>
+              {profile.goals && (
+                <article>
+                  <small>WHAT I WANT TO WORK TOWARDS</small>
+                  <p>{profile.goals}</p>
+                </article>
+              )}
 
-              <article>
-                <small>THE IDEA</small>
-                <p>
-                  A portfolio is not a finish line. It is a record of what has shaped me and a place
-                  to keep adding what comes next.
-                </p>
-              </article>
+              {profile.closing_thought && (
+                <article className="nextThought">
+                  <small>A THOUGHT TO END ON</small>
+                  <p>{profile.closing_thought}</p>
+                </article>
+              )}
             </div>
           )}
         </Reveal>
