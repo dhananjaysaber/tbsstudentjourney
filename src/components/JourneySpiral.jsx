@@ -10,7 +10,7 @@ import {
   Sparkles
 } from 'lucide-react';
 
-import { privateEvidenceBlobUrl, publicEvidenceUrl } from '../journeyApi';
+import { privateEvidenceBlobUrl, publicEvidenceUrl, cachedEvidenceBlobUrl, isCachedBlobUrl } from '../journeyApi';
 
 import './JourneySpiral.css';
 
@@ -198,7 +198,7 @@ export async function resolveMediaCandidates({ evidence, token, preview }) {
 
   if (preview && evidence.drive_file_id) {
     try {
-      candidates.push(await privateEvidenceBlobUrl(evidence.id));
+      candidates.push(await cachedEvidenceBlobUrl(evidence.id));
     } catch {
       /* fall through to thumbnail / media URL */
     }
@@ -1200,7 +1200,7 @@ export default function JourneySpiral({
       starGeometry.dispose();
       starMaterial.dispose();
       renderer.dispose();
-      objectUrls.forEach(url => URL.revokeObjectURL(url));
+      objectUrls.forEach(url => !isCachedBlobUrl(url) && URL.revokeObjectURL(url));
 
       if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement);
       apiRef.current = null;

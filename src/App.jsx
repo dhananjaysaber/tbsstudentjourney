@@ -92,6 +92,8 @@ import {
   loadPublicShare,
   loadPendingEntries,
   privateEvidenceBlobUrl,
+  cachedEvidenceBlobUrl,
+  preloadEvidence,
   publicEvidenceUrl,
   countPendingAccessRequests,
   setCommunityClosed,
@@ -4050,7 +4052,7 @@ function MediaChooser({ items, picked, max, onClose, onDone }) {
   );
 }
 
-function SecureEvidenceImage({ evidence, token, preview = false, alt = '', className = '', fallback = null }) {
+function SecureEvidenceImage({ evidence, token, preview = false, alt = '', className = '', fallback = null, eager = false }) {
   /* Several possible sources, tried in turn: the secure Drive copy first,
    * then the thumbnail and the original link. If one fails to load, the
    * next is used (the same as the spiral gallery). */
@@ -4059,7 +4061,6 @@ function SecureEvidenceImage({ evidence, token, preview = false, alt = '', class
 
   useEffect(() => {
     let active = true;
-    let blobUrl = '';
 
     async function load() {
       setAt(0);
@@ -4074,8 +4075,7 @@ function SecureEvidenceImage({ evidence, token, preview = false, alt = '', class
         list.push(publicEvidenceUrl(evidence.id, token));
       } else if (preview && evidence.drive_file_id) {
         try {
-          blobUrl = await privateEvidenceBlobUrl(evidence.id);
-          list.push(blobUrl);
+          list.push(await cachedEvidenceBlobUrl(evidence.id));
         } catch (error) {
           console.error('Secure media failed', error);
         }
@@ -4088,7 +4088,6 @@ function SecureEvidenceImage({ evidence, token, preview = false, alt = '', class
 
     return () => {
       active = false;
-      if (blobUrl && blobUrl.startsWith('blob:')) URL.revokeObjectURL(blobUrl);
     };
   }, [
     evidence?.id,
@@ -4109,7 +4108,18 @@ function SecureEvidenceImage({ evidence, token, preview = false, alt = '', class
     );
   }
 
-  return <img className={className} src={src} alt={alt} loading="lazy" referrerPolicy="no-referrer" onError={() => setAt(n => n + 1)} />;
+  return (
+    <img
+      className={className}
+      src={src}
+      alt={alt}
+      loading={eager ? 'eager' : 'lazy'}
+      decoding="async"
+      fetchpriority={eager ? 'high' : undefined}
+      referrerPolicy="no-referrer"
+      onError={() => setAt(n => n + 1)}
+    />
+  );
 }
 
 function PublicGate({ token }) {
@@ -5993,6 +6003,11 @@ function Story({ story, token, preview, onClose }) {
   const photo = photos[Math.min(at, photos.length - 1)];
   const step = dir => setAt(n => (n + dir + photos.length) % photos.length);
 
+  /* Fetch every photo of this moment straight away, so switching is instant. */
+  useEffect(() => {
+    preloadEvidence(photos, { token, preview });
+  }, [story.id]);
+
   useEffect(() => {
     if (photos.length < 2) return undefined;
     const onKey = event => {
@@ -6063,6 +6078,7 @@ function Story({ story, token, preview, onClose }) {
                 preview={preview}
                 alt={photo?.caption || story.title}
                 className="storyCardImg"
+                eager
                 fallback={<div className="storyCardEmpty" />}
               />
               {photos.length > 1 && (

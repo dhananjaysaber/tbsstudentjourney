@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { ChevronLeft, ChevronRight, MoveHorizontal, Pause, Play } from 'lucide-react';
 import { buildVisualCards, domainLabel, resolveMediaCandidates } from './JourneySpiral';
+import { isCachedBlobUrl } from '../journeyApi';
 import './JourneyCarousel.css';
 
 /* ------------------------------------------------------------------------
@@ -612,7 +613,7 @@ export default function JourneyCarousel({ items = [], evidence = [], token, prev
       meshes.forEach(mesh => mesh.material.dispose());
       geometry.dispose();
       owned.forEach(texture => texture.dispose());
-      objectUrls.forEach(url => URL.revokeObjectURL(url));
+      objectUrls.forEach(url => !isCachedBlobUrl(url) && URL.revokeObjectURL(url));
       renderer.dispose();
       renderer.domElement.remove();
       apiRef.current = null;

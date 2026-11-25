@@ -905,6 +905,48 @@ export async function privateEvidenceBlobUrl(evidenceId) {
   return URL.createObjectURL(await res.blob());
 }
 
+/* Secure photos are fetched once per visit and kept, so the journey,
+ * story screen and gallery all reuse the same copy instead of downloading
+ * it again. */
+const blobCache = new Map();
+const cachedBlobUrls = new Set();
+
+export function cachedEvidenceBlobUrl(evidenceId) {
+  if (!blobCache.has(evidenceId)) {
+    const pending = privateEvidenceBlobUrl(evidenceId).then(
+      url => {
+        cachedBlobUrls.add(url);
+        return url;
+      },
+      error => {
+        blobCache.delete(evidenceId);
+        throw error;
+      }
+    );
+    blobCache.set(evidenceId, pending);
+  }
+  return blobCache.get(evidenceId);
+}
+
+export function isCachedBlobUrl(url) {
+  return cachedBlobUrls.has(url);
+}
+
+/* Start downloading photos before they are shown. */
+export function preloadEvidence(list = [], { token, preview } = {}) {
+  list.filter(Boolean).forEach(item => {
+    const warm = url => {
+      if (!url) return;
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = url;
+    };
+    if (item.drive_file_id && token) warm(publicEvidenceUrl(item.id, token));
+    else if (item.drive_file_id && preview) cachedEvidenceBlobUrl(item.id).then(warm).catch(() => {});
+    else warm(item.thumbnail_url || item.media_url);
+  });
+}
+
 export function publicEvidenceUrl(evidenceId, token) {
   return (
     `${supabaseUrl}/functions/v1/journey-media` +
