@@ -5969,36 +5969,31 @@ function PortfolioFooter() {
 }
 
 function Story({ story, token, preview, onClose }) {
-  const photo = story.evidence ? (
-    <SecureEvidenceImage
-      evidence={story.evidence}
-      token={token}
-      preview={preview}
-      alt={story.title}
-      className="storyPhotoImg"
-      fallback={<div className="storyPhotoEmpty"><span>{story.number}</span></div>}
-    />
-  ) : null;
+  /* Option C: the photo on a card with a gold card and a glass card fanned
+   * out behind it; the cards drift with the mouse. */
+  const figRef = useRef(null);
+  const hasPhoto = Boolean(story.evidence);
+
+  function onMove(event) {
+    const node = figRef.current;
+    if (!node || !window.matchMedia('(hover: hover)').matches) return;
+    const r = node.closest('.storyOverlay').getBoundingClientRect();
+    node.style.setProperty('--mx', ((event.clientX - r.left) / r.width - 0.5).toFixed(3));
+    node.style.setProperty('--my', ((event.clientY - r.top) / r.height - 0.5).toFixed(3));
+  }
 
   return (
-    <div className="storyOverlay">
-      {/* Soft, blurred copy of the photo as the room's atmosphere. */}
-      <div className="storyBackground" aria-hidden="true">
-        {photo ? (
-          <SecureEvidenceImage evidence={story.evidence} token={token} preview={preview} alt="" fallback={<div className="storyFallback" />} />
-        ) : (
-          <div className="storyFallback" />
-        )}
+    <div className="storyOverlay" onMouseMove={onMove}>
+      <div className="storyBackground">
+        <div className="storyFallback" />
       </div>
-
-      <div className="storyFilm" />
 
       <div className="storyTop">
         <span>STUDENT JOURNEY · {story.number}</span>
         <button onClick={onClose}>CLOSE <X /></button>
       </div>
 
-      <div className={`storyLayout${photo ? ' hasPhoto' : ''}`}>
+      <div className={`storyLayout${hasPhoto ? ' hasPhoto' : ''}`}>
         <div className="storyContent">
           <small>{domainLabel(story.domain)} · {formatDate(story.event_date)}</small>
           <h2>{story.title}</h2>
@@ -6026,9 +6021,19 @@ function Story({ story, token, preview, onClose }) {
           )}
         </div>
 
-        {photo && (
-          <figure className="storyPhoto">
-            <div className="storyPhotoFrame">{photo}</div>
+        {hasPhoto && (
+          <figure className="storyCards" ref={figRef}>
+            <div className="storyCard storyCardGold" aria-hidden="true" />
+            <div className="storyCard storyCardGlass" aria-hidden="true" />
+            <div className="storyCard storyCardPhoto">
+              <SecureEvidenceImage
+                evidence={story.evidence}
+                token={token}
+                preview={preview}
+                alt={story.title}
+                fallback={<div className="storyCardEmpty" />}
+              />
+            </div>
             <figcaption>
               <span>{story.title}</span>
               <i>{story.number}</i>
