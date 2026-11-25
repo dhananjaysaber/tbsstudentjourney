@@ -1,0 +1,346 @@
+/* =========================================================================
+   BROWSE PORTFOLIOS (workspace) — light, calm, circle portraits
+   ========================================================================= */
+
+.bp {
+  --bp-ink: #1d1a1c;
+  --bp-soft: #6f6668;
+  --bp-faint: #a29a9b;
+  --bp-line: rgba(29, 26, 28, .08);
+  --bp-line-2: rgba(29, 26, 28, .14);
+  --bp-accent: #b8892a;
+  --bp-accent-soft: rgba(184, 137, 42, .08);
+  color: var(--bp-ink);
+}
+
+.bpHead small {
+  font-family: "DM Mono", monospace;
+  font-size: 9px;
+  letter-spacing: .18em;
+  color: var(--bp-accent);
+}
+
+.bpHead h2 {
+  margin: 8px 0 6px;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(30px, 3.4vw, 40px);
+  font-weight: 600;
+  letter-spacing: -.02em;
+  line-height: 1.1;
+}
+
+.bpHead p {
+  margin: 0;
+  color: var(--bp-soft);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.bpBar {
+  position: sticky;
+  top: 80px;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 10px;
+  margin: 26px 0 18px;
+}
+
+.bpSearch,
+.bpYear select {
+  height: 52px;
+  border: 1px solid var(--bp-line-2);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(29, 26, 28, .04), 0 10px 30px rgba(29, 26, 28, .05);
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.bpSearch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px 0 18px;
+}
+
+.bpSearch:focus-within,
+.bpYear select:focus {
+  border-color: rgba(184, 137, 42, .5);
+  box-shadow: 0 0 0 4px var(--bp-accent-soft);
+}
+
+.bpSearch > svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  color: var(--bp-faint);
+}
+
+.bpSearch input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--bp-ink);
+  font-size: 15px;
+}
+
+.bpSearch input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.bpSearch button {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--bp-faint);
+  cursor: pointer;
+}
+
+.bpSearch button:hover {
+  background: rgba(29, 26, 28, .05);
+  color: var(--bp-ink);
+}
+
+.bpSearch button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.bpYear select {
+  width: 100%;
+  padding: 0 40px 0 16px;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: 0;
+  color: var(--bp-ink);
+  font-size: 14px;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a29a9b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+}
+
+.bpVisuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.bpEmpty {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 70px 20px;
+  border: 1px dashed var(--bp-line-2);
+  border-radius: 18px;
+  text-align: center;
+  color: var(--bp-soft);
+}
+
+.bpEmpty svg {
+  width: 26px;
+  height: 26px;
+  padding: 14px;
+  box-sizing: content-box;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--bp-accent);
+  box-shadow: 0 0 0 1px var(--bp-line);
+}
+
+.bpEmpty p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.bpSummary {
+  margin: 0 0 14px;
+  color: var(--bp-soft);
+  font-size: 12.5px;
+}
+
+.bpGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 14px;
+  transition: opacity .2s ease;
+}
+
+.bpGrid.isLoading {
+  opacity: .5;
+}
+
+.bpCard {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 14px;
+  padding: 26px 18px 18px;
+  border: 1px solid var(--bp-line);
+  border-radius: 18px;
+  background: #fff;
+  text-align: center;
+  box-shadow: 0 1px 2px rgba(29, 26, 28, .04);
+  transition: transform .3s var(--ease), box-shadow .3s ease, border-color .3s ease;
+}
+
+.bpCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--bp-line-2);
+  box-shadow: 0 16px 40px rgba(29, 26, 28, .08);
+}
+
+.bpPortrait {
+  width: 88px;
+  height: 88px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #efe8e0;
+  box-shadow: 0 0 0 3px #fff, 0 0 0 4px var(--bp-line-2);
+}
+
+.bpPortrait.isOpen {
+  box-shadow: 0 0 0 3px #fff, 0 0 0 4.5px rgba(184, 137, 42, .55);
+}
+
+.bpPortrait {
+  display: grid;
+  place-items: center;
+}
+
+.bpPortrait b {
+  font-family: "Playfair Display", serif;
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  color: #6f6668;
+}
+
+.bpPortrait.isOpen b {
+  color: #b8892a;
+}
+
+.bpPortrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.bpCardText {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.bpCardText b {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.bpCardText small {
+  color: var(--bp-faint);
+  font-size: 12px;
+}
+
+.bpCardActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 2px;
+}
+
+.bpBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--bp-line-2);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--bp-ink);
+  font-size: 12.5px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, color .2s ease;
+}
+
+.bpBtn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.bpBtn:hover:not(:disabled) {
+  border-color: var(--bp-accent);
+  color: var(--bp-accent);
+}
+
+.bpBtn.isPrimary {
+  border-color: var(--bp-ink);
+  background: var(--bp-ink);
+  color: #fff;
+}
+
+.bpBtn.isPrimary:hover {
+  border-color: var(--bp-accent);
+  background: var(--bp-accent);
+  color: #fff;
+}
+
+.bpBtn.isPending {
+  border-style: dashed;
+  color: var(--bp-soft);
+  cursor: default;
+}
+
+.bpBtn:disabled {
+  opacity: .6;
+  cursor: default;
+}
+
+.bpError {
+  margin: 0;
+  color: var(--bp-accent);
+  font-size: 11.5px;
+}
+
+@media (max-width: 820px) {
+  .bpBar {
+    position: static;
+    grid-template-columns: 1fr;
+  }
+
+  .bpGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .bpCard {
+    padding: 20px 12px 14px;
+  }
+
+  .bpPortrait {
+    width: 70px;
+    height: 70px;
+  }
+}

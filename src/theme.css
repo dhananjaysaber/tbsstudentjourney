@@ -1,0 +1,283 @@
+/* =========================================================================
+   TBS THEME
+   The official palette from the TBS Communications Brand Guidelines 2026,
+   in a light and a dark theme. The theme is set on <html data-theme="…">
+   by the script in index.html (before the first paint) and by the
+   sun / moon toggle (src/components/ThemeToggle.jsx).
+
+   Primary    Navy   #151449   Gold   #eec058   White  #ffffff
+   Secondary  Grey   #e7e7e7   Beige  #decaba   Taupe  #998670
+   ========================================================================= */
+
+:root {
+  --tbs-navy: #151449;
+  --tbs-gold: #eec058;
+  --tbs-white: #ffffff;
+  --tbs-grey: #e7e7e7;
+  --tbs-beige: #decaba;
+  --tbs-taupe: #998670;
+
+  /* Navy and gold steps, mixed only from the palette */
+  --tbs-navy-deep: #0d0c33;
+  --tbs-navy-raised: #1e1d5c;
+  --tbs-navy-high: #2a2970;
+  --tbs-gold-soft: #f3d38c;
+}
+
+/* ---------- light (default) ---------- */
+:root,
+:root[data-theme='light'] {
+  --c-bg: #ffffff;
+  --c-bg-soft: #f4f4f5;
+  --c-bg-deep: #e7e7e7;
+  --c-surface: #ffffff;
+  --c-surface-2: #f4f4f5;
+  --c-surface-3: #e7e7e7;
+
+  --c-text: #151449;
+  --c-text-2: rgba(21, 20, 73, 0.74);
+  --c-text-3: rgba(21, 20, 73, 0.52);
+  --c-line: rgba(21, 20, 73, 0.12);
+  --c-line-2: rgba(21, 20, 73, 0.22);
+
+  /* Buttons and links: navy in light, gold in dark */
+  --c-accent: #151449;
+  --c-accent-hover: #2a2970;
+  --c-on-accent: #ffffff;
+  --c-accent-soft: rgba(21, 20, 73, 0.07);
+  --c-accent-ring: rgba(21, 20, 73, 0.16);
+
+  /* Gold as a highlight, never as small text on white */
+  --c-gold: #eec058;
+  --c-gold-soft: rgba(238, 192, 88, 0.22);
+  --c-gold-ink: #151449;
+  --c-taupe: #998670;
+  --c-beige: #decaba;
+
+  --c-success: #2d805b;
+  --c-warning: #998670;
+  --c-danger: #a3312c;
+  --c-danger-soft: rgba(163, 49, 44, 0.08);
+
+  --c-shadow-sm: 0 6px 18px rgba(21, 20, 73, 0.08);
+  --c-shadow: 0 22px 60px rgba(21, 20, 73, 0.12);
+  --c-shadow-lg: 0 40px 110px rgba(21, 20, 73, 0.18);
+  --c-backdrop: rgba(21, 20, 73, 0.42);
+}
+
+/* ---------- dark ---------- */
+:root[data-theme='dark'] {
+  --c-bg: #151449;
+  --c-bg-soft: #11103f;
+  --c-bg-deep: #0d0c33;
+  --c-surface: #1e1d5c;
+  --c-surface-2: #252468;
+  --c-surface-3: #2a2970;
+
+  --c-text: #ffffff;
+  --c-text-2: rgba(255, 255, 255, 0.76);
+  --c-text-3: rgba(255, 255, 255, 0.54);
+  --c-line: rgba(255, 255, 255, 0.12);
+  --c-line-2: rgba(255, 255, 255, 0.24);
+
+  --c-accent: #eec058;
+  --c-accent-hover: #f3d38c;
+  --c-on-accent: #151449;
+  --c-accent-soft: rgba(238, 192, 88, 0.12);
+  --c-accent-ring: rgba(238, 192, 88, 0.26);
+
+  --c-gold: #eec058;
+  --c-gold-soft: rgba(238, 192, 88, 0.18);
+  --c-gold-ink: #eec058;
+  --c-taupe: #decaba;
+  --c-beige: #decaba;
+
+  --c-success: #7fd1a6;
+  --c-warning: #eec058;
+  --c-danger: #ff9b92;
+  --c-danger-soft: rgba(255, 155, 146, 0.1);
+
+  --c-shadow-sm: 0 6px 18px rgba(5, 4, 24, 0.35);
+  --c-shadow: 0 22px 60px rgba(5, 4, 24, 0.45);
+  --c-shadow-lg: 0 40px 110px rgba(5, 4, 24, 0.6);
+  --c-backdrop: rgba(9, 8, 36, 0.72);
+}
+
+/* =========================================================================
+   STUDENT PORTFOLIO COLOURS
+   The portfolio keeps its layout; only its colours come from here.
+   "stage" = the deep sections (hero, journey, Panthers), always navy.
+   "paper" = the light sections, white in light mode and navy in dark mode.
+   "ink"   = text and lines that sit on paper.
+   ========================================================================= */
+
+:root,
+:root[data-theme='light'] {
+  --pf-ink-rgb: 21, 20, 73;
+  --pf-stage-rgb: 21, 20, 73;
+  --pf-stage2-rgb: 30, 29, 92;
+  --pf-paper-rgb: 255, 255, 255;
+  --pf-paper2-rgb: 244, 244, 245;
+  --pf-paper3-rgb: 231, 231, 231;
+  --pf-accent-rgb: 238, 192, 88;
+  --pf-on-accent: #151449;
+  --pf-accent-text: #eec058;
+  --pf-gold-rgb: 238, 192, 88;
+  --pf-gold: #eec058;
+  --pf-gold-text: #998670;
+  --pf-muted: #998670;
+  --pf-muted-rgb: 153, 134, 112;
+}
+
+:root[data-theme='dark'] {
+  --pf-ink-rgb: 255, 255, 255;
+  --pf-stage-rgb: 13, 12, 51;
+  --pf-stage2-rgb: 21, 20, 73;
+  --pf-paper-rgb: 30, 29, 92;
+  --pf-paper2-rgb: 37, 36, 104;
+  --pf-paper3-rgb: 42, 41, 112;
+  --pf-accent-rgb: 238, 192, 88;
+  --pf-on-accent: #151449;
+  --pf-accent-text: #eec058;
+  --pf-gold-rgb: 238, 192, 88;
+  --pf-gold: #eec058;
+  --pf-gold-text: #eec058;
+  --pf-muted: #decaba;
+  --pf-muted-rgb: 222, 202, 186;
+}
+
+/* Native controls (inputs, scrollbars) follow the theme only on the pages
+   that have it: the landing page and the student portfolio. */
+.ld,
+.ldModalBackdrop,
+.publicPortfolio {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] .ld,
+:root[data-theme='dark'] .ldModalBackdrop,
+:root[data-theme='dark'] .publicPortfolio {
+  color-scheme: dark;
+}
+
+/* Smooth hand-over when the toggle is pressed (not on first load). */
+html.isThemeSwitching,
+html.isThemeSwitching *,
+html.isThemeSwitching *::before,
+html.isThemeSwitching *::after {
+  transition:
+    background-color 0.45s ease,
+    border-color 0.45s ease,
+    color 0.35s ease,
+    fill 0.35s ease,
+    stroke 0.35s ease !important;
+}
+
+/* Light / dark versions of the same picture (e.g. the crest). */
+:root[data-theme='dark'] .onlyLight,
+:root:not([data-theme='dark']) .onlyDark {
+  display: none !important;
+}
+
+/* =========================================================================
+   THEME TOGGLE
+   ========================================================================= */
+
+.themeToggle {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--c-line-2);
+  border-radius: 50%;
+  background: var(--c-surface);
+  color: var(--c-text);
+  cursor: pointer;
+  transition: border-color 0.25s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.themeToggle:hover {
+  border-color: var(--c-accent);
+  transform: scale(1.05);
+}
+
+.themeToggle:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 3px;
+}
+
+.themeToggle svg {
+  position: absolute;
+  width: 17px;
+  height: 17px;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+}
+
+.themeToggle .isSun {
+  color: var(--tbs-gold);
+}
+
+/* Light theme shows the moon (switch to dark); dark shows the sun. */
+:root:not([data-theme='dark']) .themeToggle .isSun {
+  opacity: 0;
+  transform: translateY(120%) rotate(-90deg);
+}
+
+:root[data-theme='dark'] .themeToggle .isMoon {
+  opacity: 0;
+  transform: translateY(-120%) rotate(90deg);
+}
+
+.themeToggle.isSmall {
+  width: 38px;
+  height: 38px;
+}
+
+.themeToggle.isSmall svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* On the portfolio: in the left rail on desktop, top-right on phones. */
+.railToggle.themeToggle {
+  width: 36px;
+  height: 36px;
+  border-color: rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: #ffffff;
+}
+
+.railToggle.themeToggle svg {
+  width: 15px;
+  height: 15px;
+}
+
+.pfToggle.themeToggle {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .pfToggle.themeToggle {
+    position: fixed;
+    z-index: 90;
+    top: 14px;
+    right: 14px;
+    display: grid;
+    width: 38px;
+    height: 38px;
+    border-color: rgba(255, 255, 255, 0.24);
+    background: rgba(13, 12, 51, 0.6);
+    color: #ffffff;
+    backdrop-filter: blur(10px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .themeToggle svg {
+    transition: none;
+  }
+}

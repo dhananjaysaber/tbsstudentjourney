@@ -1,0 +1,717 @@
+/* =========================================================
+   JOURNEY SPIRAL GALLERY
+   All rules are scoped to #journey and use the sg* prefix so
+   nothing in the legacy stylesheet can override them.
+========================================================= */
+
+#journey .sgShell {
+  --sg-ink: #ffffff;
+  --sg-dim: rgba(255, 255, 255, 0.56);
+  --sg-faint: rgba(255, 255, 255, 0.32);
+  --sg-line: rgba(255, 255, 255, 0.14);
+  --sg-red: rgb(var(--pf-gold-rgb));
+  --sg-red-deep: rgb(var(--pf-gold-rgb));
+  --sg-ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  position: relative;
+  width: 100%;
+  height: clamp(700px, 94vh, 980px);
+  overflow: hidden;
+  isolation: isolate;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: pan-y;
+  outline: none;
+  color: var(--sg-ink);
+  background:
+    radial-gradient(120% 70% at 50% 110%, rgb(var(--pf-stage2-rgb)) 0%, transparent 60%),
+    radial-gradient(90% 60% at 50% 45%, rgb(var(--pf-stage-rgb)) 0%, rgb(var(--pf-stage-rgb)) 60%, rgb(var(--pf-stage-rgb)) 100%);
+}
+
+#journey .sgShell:focus-visible {
+  box-shadow: inset 0 0 0 2px rgba(var(--pf-gold-rgb), 0.55);
+}
+
+/* ---------- atmosphere ---------- */
+
+#journey .sgAtmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+#journey .sgGlow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#journey .sgGlowCore {
+  width: min(620px, 70vw);
+  height: min(760px, 90%);
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 255, 255, 0.075),
+    rgba(255, 255, 255, 0.02) 55%,
+    transparent
+  );
+}
+
+#journey .sgGlowRed {
+  top: 64%;
+  width: min(900px, 110vw);
+  height: 46%;
+  background: radial-gradient(closest-side, rgba(var(--pf-gold-rgb), 0.2), transparent);
+  animation: sgBreathe 9s ease-in-out infinite alternate;
+  will-change: opacity;
+}
+
+/* A soft column of light the helix turns around. */
+#journey .sgColumn {
+  position: absolute;
+  left: 50%;
+  top: 4%;
+  bottom: 4%;
+  width: 180px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.035) 40%,
+    rgba(255, 255, 255, 0.06) 50%,
+    rgba(255, 255, 255, 0.035) 60%,
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(transparent, rgb(var(--pf-stage-rgb)) 25%, rgb(var(--pf-stage-rgb)) 75%, transparent);
+  mask-image: linear-gradient(transparent, rgb(var(--pf-stage-rgb)) 25%, rgb(var(--pf-stage-rgb)) 75%, transparent);
+  filter: blur(6px);
+}
+
+@keyframes sgBreathe {
+  from {
+    opacity: 0.7;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+#journey .sgCanvas {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+#journey .sgShell.isReady .sgCanvas {
+  opacity: 1;
+}
+
+#journey .sgCanvas canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  cursor: grab;
+  touch-action: pan-y;
+  outline: none;
+}
+
+#journey .sgShell.isDragging .sgCanvas canvas {
+  cursor: grabbing;
+}
+
+#journey .sgShell.isHovering .sgCanvas canvas {
+  cursor: pointer;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #journey .sgCanvas canvas,
+  #journey .sgShell.isDragging .sgCanvas canvas,
+  #journey .sgShell.isHovering .sgCanvas canvas {
+    cursor: none;
+  }
+}
+
+#journey .sgVignette {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgb(var(--pf-stage-rgb)) 0%, transparent 13%, transparent 84%, rgb(var(--pf-stage-rgb)) 100%),
+    radial-gradient(130% 95% at 50% 50%, transparent 58%, rgba(var(--pf-stage-rgb), 0.65) 100%);
+}
+
+/* ---------- top meta ---------- */
+
+#journey .sgTop {
+  position: absolute;
+  z-index: 5;
+  top: 30px;
+  left: clamp(24px, 4vw, 64px);
+  right: clamp(24px, 4vw, 64px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--sg-dim);
+}
+
+#journey .sgLive {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#journey .sgLive i {
+  position: relative;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--sg-red);
+}
+
+#journey .sgLive i::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 1px solid var(--sg-red);
+  animation: sgPing 2.4s var(--sg-ease) infinite;
+}
+
+@keyframes sgPing {
+  from {
+    opacity: 0.9;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+#journey .sgCount {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  letter-spacing: 0.14em;
+}
+
+#journey .sgCount b {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 30px;
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  color: var(--sg-ink);
+}
+
+#journey .sgCount em {
+  font-style: normal;
+  color: var(--sg-red);
+}
+
+/* ---------- active caption ---------- */
+
+#journey .sgCaption {
+  position: absolute;
+  z-index: 5;
+  left: clamp(24px, 4vw, 64px);
+  bottom: clamp(40px, 7vh, 72px);
+  width: min(360px, 28vw);
+  pointer-events: none;
+  animation: sgCaptionIn 0.9s var(--sg-ease) both;
+}
+
+@keyframes sgCaptionIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+#journey .sgCaptionIndex {
+  position: relative;
+  z-index: -1;
+  display: block;
+  margin: 0 0 -0.22em -0.06em;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(120px, 12vw, 190px);
+  font-style: italic;
+  font-weight: 500;
+  line-height: 0.8;
+  letter-spacing: -0.06em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.16);
+}
+
+#journey .sgCaption small {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 14px;
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sg-red);
+}
+
+#journey .sgCaption small i {
+  width: 28px;
+  height: 1px;
+  background: currentColor;
+}
+
+#journey .sgCaption small em {
+  font-style: normal;
+  color: var(--sg-faint);
+}
+
+#journey .sgCaption small em::before {
+  content: '·';
+  margin-right: 12px;
+}
+
+#journey .sgCaption h3 {
+  margin: 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(28px, 2.5vw, 40px);
+  font-weight: 500;
+  line-height: 1.04;
+  letter-spacing: -0.028em;
+  color: var(--sg-ink);
+  text-wrap: balance;
+  text-shadow: 0 4px 30px rgba(6, 5, 30, 0.8);
+}
+
+#journey .sgOpen {
+  pointer-events: auto;
+  margin-top: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  height: 44px;
+  padding: 0 8px 0 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  background: rgba(var(--pf-stage-rgb), 0.86);
+  color: var(--sg-ink);
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+#journey .sgOpen svg {
+  width: 28px;
+  height: 28px;
+  padding: 7px;
+  border-radius: 50%;
+  background: var(--sg-red);
+  color: #ffffff;
+  transition: transform 0.45s var(--sg-ease);
+}
+
+#journey .sgOpen:hover {
+  border-color: rgba(var(--pf-gold-rgb), 0.7);
+  background: rgba(var(--pf-gold-rgb), 0.22);
+}
+
+#journey .sgOpen:hover svg {
+  transform: rotate(45deg);
+}
+
+#journey .sgOpen:focus-visible {
+  outline: 2px solid var(--sg-red);
+  outline-offset: 3px;
+}
+
+/* ---------- story rail ---------- */
+
+#journey .sgRail {
+  position: absolute;
+  z-index: 5;
+  right: clamp(24px, 4vw, 64px);
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  max-height: 56%;
+  overflow: hidden;
+}
+
+#journey .sgRail button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--sg-faint);
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  cursor: pointer;
+}
+
+#journey .sgRail button span {
+  opacity: 0;
+  transform: translateX(6px);
+  transition: opacity 0.35s ease, transform 0.45s var(--sg-ease), color 0.3s ease;
+}
+
+#journey .sgRail button i {
+  width: 14px;
+  height: 1px;
+  background: currentColor;
+  transition: width 0.5s var(--sg-ease), background 0.3s ease;
+}
+
+#journey .sgRail button:hover {
+  color: var(--sg-ink);
+}
+
+#journey .sgRail button:hover span,
+#journey .sgRail button.isActive span {
+  opacity: 1;
+  transform: none;
+}
+
+#journey .sgRail button:hover i {
+  width: 24px;
+}
+
+#journey .sgRail button.isActive {
+  color: var(--sg-ink);
+}
+
+#journey .sgRail button.isActive i {
+  width: 40px;
+  height: 2px;
+  background: var(--sg-red);
+}
+
+#journey .sgRail button:focus-visible {
+  outline: 1px solid var(--sg-red);
+  outline-offset: 3px;
+}
+
+/* ---------- controls ---------- */
+
+#journey .sgControls {
+  position: absolute;
+  z-index: 6;
+  right: clamp(24px, 4vw, 64px);
+  bottom: clamp(40px, 7vh, 72px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#journey .sgControls button {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  background: rgba(var(--pf-stage-rgb), 0.82);
+  color: var(--sg-ink);
+  cursor: pointer;
+  transition: transform 0.35s var(--sg-ease), border-color 0.3s ease, background 0.3s ease;
+}
+
+#journey .sgControls button svg {
+  width: 17px;
+  height: 17px;
+}
+
+#journey .sgControls .sgPlay {
+  width: 38px;
+  height: 38px;
+  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--sg-dim);
+}
+
+#journey .sgControls .sgPlay svg {
+  width: 13px;
+  height: 13px;
+}
+
+#journey .sgControls button:hover {
+  transform: translateY(-2px);
+  border-color: rgba(var(--pf-gold-rgb), 0.7);
+  background: rgba(var(--pf-gold-rgb), 0.25);
+  color: var(--sg-ink);
+}
+
+#journey .sgControls button:focus-visible {
+  outline: 2px solid var(--sg-red);
+  outline-offset: 3px;
+}
+
+/* ---------- hint ---------- */
+
+#journey .sgHint {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: clamp(26px, 4vh, 40px);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  pointer-events: none;
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--sg-faint);
+  transition: opacity 0.6s ease;
+}
+
+#journey .sgHintTrack {
+  position: relative;
+  width: 44px;
+  height: 1px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+#journey .sgHintTrack i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 16px;
+  background: var(--sg-red);
+  animation: sgSlide 2.2s var(--sg-ease) infinite;
+}
+
+@keyframes sgSlide {
+  from {
+    transform: translateX(-16px);
+  }
+  to {
+    transform: translateX(44px);
+  }
+}
+
+#journey .sgShell.isTouched .sgHint {
+  opacity: 0;
+}
+
+/* ---------- custom cursor (fine pointers only) ---------- */
+
+#journey .sgCursor {
+  position: absolute;
+  z-index: 7;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  will-change: transform;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #journey .sgShell.isPointerIn .sgCanvas:hover ~ .sgCursor {
+    opacity: 1;
+  }
+}
+
+#journey .sgCursorRing {
+  position: absolute;
+  left: -34px;
+  top: -34px;
+  width: 68px;
+  height: 68px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  background: rgba(var(--pf-ink-rgb), 0.28);
+  transition: transform 0.45s var(--sg-ease), background 0.35s ease, border-color 0.35s ease;
+}
+
+#journey .sgCursorLabel {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sg-ink);
+  transition: opacity 0.25s ease;
+}
+
+#journey .sgCursorOpen {
+  opacity: 0;
+}
+
+#journey .sgShell.isHovering .sgCursorRing {
+  transform: scale(1.3);
+  border-color: transparent;
+  background: rgba(var(--pf-accent-rgb), 0.92);
+}
+
+#journey .sgShell.isHovering .sgCursorDrag {
+  opacity: 0;
+}
+
+#journey .sgShell.isHovering .sgCursorOpen {
+  opacity: 1;
+}
+
+#journey .sgShell.isDragging .sgCursorRing {
+  transform: scale(0.72);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ---------- empty ---------- */
+
+#journey .sgEmpty {
+  min-height: 640px;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  padding: 40px;
+  text-align: center;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(var(--pf-gold-rgb), 0.14), transparent 30%),
+    rgb(var(--pf-stage-rgb));
+  color: #ffffff;
+}
+
+#journey .sgEmpty > svg {
+  width: 30px;
+  height: 30px;
+  color: var(--pf-accent-text);
+}
+
+#journey .sgEmpty span {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  color: rgba(255, 255, 255, 0.52);
+}
+
+#journey .sgEmpty h3 {
+  max-width: 500px;
+  margin: 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(30px, 4vw, 52px);
+  font-weight: 500;
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 1100px) {
+  #journey .sgCaption {
+    width: min(320px, 34vw);
+  }
+}
+
+@media (max-width: 760px) {
+  #journey .sgShell {
+    height: clamp(640px, 100svh, 760px);
+  }
+
+  #journey .sgTop {
+    top: 22px;
+    font-size: 9.5px;
+    letter-spacing: 0.18em;
+  }
+
+  #journey .sgCount b {
+    font-size: 24px;
+  }
+
+  #journey .sgCaption {
+    left: 20px;
+    right: 20px;
+    bottom: 86px;
+    width: auto;
+  }
+
+  #journey .sgCaptionIndex {
+    display: none;
+  }
+
+  #journey .sgCanvas {
+    inset: 62px 0 200px;
+  }
+
+  #journey .sgCaption h3 {
+    max-width: 88%;
+    font-size: clamp(24px, 7vw, 30px);
+  }
+
+  #journey .sgCaption small {
+    margin-bottom: 10px;
+    font-size: 9.5px;
+  }
+
+  #journey .sgOpen {
+    margin-top: 16px;
+    height: 40px;
+  }
+
+  #journey .sgRail {
+    display: none;
+  }
+
+  #journey .sgControls {
+    left: 50%;
+    right: auto;
+    bottom: 24px;
+    transform: translateX(-50%);
+  }
+
+  #journey .sgHint {
+    top: 52px;
+    bottom: auto;
+    left: 20px;
+    transform: none;
+    font-size: 9px;
+  }
+
+  #journey .sgVignette {
+    background:
+      linear-gradient(180deg, rgb(var(--pf-stage-rgb)) 0%, transparent 14%, transparent 62%, rgba(var(--pf-stage-rgb), 0.94) 76%, rgb(var(--pf-stage-rgb)) 100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #journey .sgGlowRed,
+  #journey .sgLive i::after,
+  #journey .sgHintTrack i,
+  #journey .sgCaption {
+    animation: none;
+  }
+}

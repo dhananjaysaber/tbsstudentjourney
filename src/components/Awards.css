@@ -1,0 +1,846 @@
+/* =========================================================================
+   AWARD BUILDER · premium navy & gold (v33)
+   ========================================================================= */
+
+.portal.ws {
+  --aw-navy: #151449;
+  --aw-navy2: #1e1d5c;
+  --aw-navy3: #2a2970;
+  --aw-deep: #0d0c33;
+  --aw-gold: #eec058;
+  --aw-goldD: #b8892a;
+  --aw-goldL: #f6dc9c;
+  --aw-paper: #f5f5f9;
+  --aw-ink: #151449;
+  --aw-soft: rgba(21, 20, 73, .66);
+  --aw-faint: rgba(21, 20, 73, .44);
+  --aw-line: rgba(21, 20, 73, .10);
+  --aw-lav: #c9c7e6;
+  --aw-ok: #2d805b;
+}
+
+.awPage {
+  display: grid;
+  gap: 20px;
+  padding-bottom: 110px;
+  color: var(--aw-ink);
+}
+
+.awKicker {
+  font-family: "DM Mono", monospace;
+  font-size: 9.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--aw-goldD);
+  margin-bottom: 8px;
+}
+
+.awMuted { color: var(--aw-soft); font-size: 13px; }
+.awPad { padding: 18px 22px; }
+.awPh { color: rgba(21, 20, 73, .28); }
+.awHint { margin: 10px 0 0; font-size: 12px; color: var(--aw-faint); }
+.spin { animation: awSpin 1s linear infinite; }
+@keyframes awSpin { to { transform: rotate(360deg); } }
+
+/* ---------- Stage (navy header) ---------- */
+.awStage {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+  padding: 28px 32px 24px;
+  color: #fff;
+  background:
+    radial-gradient(70% 140% at 100% 0%, rgba(238, 192, 88, .17), transparent 60%),
+    radial-gradient(120% 160% at 0% 0%, var(--aw-navy3), var(--aw-navy) 55%, var(--aw-deep));
+  box-shadow: 0 24px 60px rgba(13, 12, 51, .22);
+}
+.awStage::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--aw-goldD), var(--aw-gold) 35%, var(--aw-goldL) 50%, var(--aw-gold) 65%, var(--aw-goldD));
+}
+.awWatermark {
+  position: absolute;
+  right: 24px;
+  bottom: -40px;
+  font-family: "Playfair Display", serif;
+  font-weight: 600;
+  font-size: 160px;
+  line-height: 1;
+  color: rgba(255, 255, 255, .045);
+  pointer-events: none;
+  white-space: nowrap;
+}
+.awStageRow { position: relative; display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; }
+.awEyebrow {
+  font-family: "DM Mono", monospace;
+  font-size: 10px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--aw-gold);
+}
+.awStage h1 {
+  margin: 8px 0 0;
+  font-family: "Playfair Display", serif;
+  font-weight: 400;
+  font-size: clamp(28px, 3.2vw, 40px);
+  line-height: 1.08;
+  letter-spacing: -.01em;
+  color: #fff;
+}
+.awStage h1 em { color: var(--aw-gold); font-style: italic; }
+.awStage p { margin: 8px 0 0; color: var(--aw-lav); font-size: 14px; max-width: 620px; }
+.awStageActions { display: flex; gap: 10px; flex: none; }
+.awCtrls { position: relative; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+
+.awSel {
+  position: relative;
+  display: grid;
+  align-content: center;
+  min-width: 140px;
+  height: 50px;
+  padding: 6px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  background: rgba(255, 255, 255, .06);
+  backdrop-filter: blur(4px);
+  cursor: pointer;
+  transition: border-color .2s ease, background .2s ease;
+}
+.awSel:hover { border-color: rgba(238, 192, 88, .55); }
+.awSel.isGold { border-color: rgba(238, 192, 88, .6); background: rgba(238, 192, 88, .12); }
+.awSel small {
+  font-family: "DM Mono", monospace;
+  font-size: 8.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(201, 199, 230, .78);
+}
+.awSel span { position: relative; display: flex; align-items: center; }
+.awSel select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  padding: 0 22px 0 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font: 600 14px/1.3 Inter, system-ui, sans-serif;
+  cursor: pointer;
+  outline: none;
+}
+.awSel select option { color: var(--aw-ink); }
+.awSel svg { position: absolute; right: 0; width: 15px; height: 15px; color: var(--aw-gold); pointer-events: none; }
+
+.awStat {
+  min-width: 140px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  background: rgba(255, 255, 255, .05);
+}
+.awStat b { display: block; font-family: "Playfair Display", serif; font-size: 26px; color: var(--aw-gold); font-weight: 600; }
+.awStat small { font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--aw-lav); }
+
+/* ---------- Buttons ---------- */
+.awBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 20px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font: 600 13.5px/1 Inter, system-ui, sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .2s ease, background .2s ease, opacity .2s ease;
+}
+.awBtn svg { width: 16px; height: 16px; }
+.awBtn:disabled { opacity: .45; cursor: not-allowed; }
+.awBtn:not(:disabled):hover { transform: translateY(-1px); }
+.awBtn.sm { height: 36px; padding: 0 14px; font-size: 12.5px; }
+.awBtn.gold { background: linear-gradient(180deg, #f3cf74, var(--aw-gold)); color: var(--aw-navy); box-shadow: 0 8px 24px rgba(238, 192, 88, .28); }
+.awBtn.navy { background: var(--aw-navy); color: #fff; box-shadow: 0 8px 20px rgba(21, 20, 73, .22); }
+.awBtn.ghost { background: transparent; border-color: rgba(255, 255, 255, .26); color: #fff; }
+.awBtn.line { background: #fff; border-color: var(--aw-line); color: var(--aw-ink); }
+.awBtn.text { background: transparent; color: var(--aw-soft); padding: 0 10px; }
+.awBtn.text:hover { color: var(--aw-ink); }
+
+/* ---------- Panels ---------- */
+.awPanel {
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid rgba(21, 20, 73, .06);
+  box-shadow: 0 1px 2px rgba(21, 20, 73, .05), 0 18px 40px rgba(21, 20, 73, .07);
+  overflow: hidden;
+}
+.awPadded { padding: 20px 22px; }
+.awPanelTitle { margin: 0 0 12px; font-family: "Playfair Display", serif; font-size: 22px; font-weight: 600; display: flex; align-items: baseline; gap: 8px; }
+.awPanelTitle small { font-family: "DM Mono", monospace; font-size: 11px; color: var(--aw-faint); font-weight: 400; }
+
+/* ---------- Tables ---------- */
+.awPage table { width: 100%; border-collapse: collapse; }
+.awPage th {
+  font-family: "DM Mono", monospace;
+  font-size: 9px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--aw-faint);
+  font-weight: 400;
+  text-align: left;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--aw-line);
+  background: #fcfcfe;
+}
+.awPage td { padding: 11px 16px; border-bottom: 1px solid var(--aw-line); font-size: 13.5px; vertical-align: middle; }
+.awPage tbody tr:last-child td { border-bottom: 0; }
+.awPage th.c, .awPage td.c { text-align: center; }
+.awPage th.r, .awPage td.r { text-align: right; }
+.awThNote { text-transform: none; letter-spacing: 0; font-family: Inter, sans-serif; font-size: 11px; color: var(--aw-faint); margin-left: 6px; }
+
+.awWho { display: flex; align-items: center; gap: 12px; font-weight: 500; }
+.awWho small { display: block; font-family: "DM Mono", monospace; font-size: 10px; letter-spacing: .06em; color: var(--aw-faint); font-weight: 400; margin-top: 2px; }
+.awWho small.lower { text-transform: lowercase; letter-spacing: .02em; }
+.awAv {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--aw-navy);
+  background: linear-gradient(160deg, #ecebf6, #dcdaee);
+}
+
+/* ---------- Medal / chips / toggles ---------- */
+.awMedal {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-grid;
+  place-items: center;
+  border: 1.5px dashed rgba(21, 20, 73, .22);
+  background: transparent;
+  color: rgba(21, 20, 73, .25);
+  font: 700 13px/1 Inter, sans-serif;
+  cursor: pointer;
+  transition: transform .18s cubic-bezier(.2, 1.4, .4, 1), box-shadow .2s ease;
+}
+.awMedal svg { width: 15px; height: 15px; }
+.awMedal:not(:disabled):hover { transform: scale(1.08); border-color: var(--aw-goldD); color: var(--aw-goldD); }
+.awMedal.on {
+  border: 0;
+  color: var(--aw-navy);
+  background: radial-gradient(circle at 34% 30%, #fff1c9, var(--aw-gold) 45%, #c89a3a);
+  box-shadow: 0 4px 14px rgba(184, 137, 42, .4), inset 0 -2px 0 rgba(0, 0, 0, .12);
+}
+.awMedal.on svg.lucide-star { fill: currentColor; }
+.awMedal.on svg.lucide-check { stroke-width: 3; }
+.awMedal:disabled { cursor: default; }
+
+.awChips { display: flex; flex-wrap: wrap; gap: 7px; }
+.awChipScroll { max-height: 180px; overflow: auto; padding: 2px; }
+.awChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1px dashed rgba(21, 20, 73, .24);
+  background: #fff;
+  color: var(--aw-soft);
+  font: 500 12.5px/1 Inter, sans-serif;
+  cursor: pointer;
+  transition: background .18s ease, color .18s ease;
+}
+.awChip svg { width: 12px; height: 12px; color: var(--aw-gold); fill: var(--aw-gold); }
+.awChip.on { border: 1px solid transparent; background: var(--aw-navy); color: #fff; }
+.awChip:disabled { cursor: default; opacity: .7; }
+.awChip.removable { padding-right: 6px; cursor: default; }
+.awChip.removable button { display: grid; place-items: center; width: 20px; height: 20px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .14); color: #fff; cursor: pointer; }
+.awChip.removable button svg { width: 11px; height: 11px; fill: none; color: #fff; }
+.awOptRow { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.awToggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--aw-line);
+  background: var(--aw-paper);
+  text-align: left;
+  cursor: pointer;
+  color: var(--aw-ink);
+}
+.awToggle i {
+  flex: none;
+  position: relative;
+  width: 38px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(21, 20, 73, .18);
+  transition: background .2s ease;
+  margin-top: 1px;
+}
+.awToggle i::after {
+  content: "";
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
+  transition: transform .2s ease;
+}
+.awToggle.on i { background: var(--aw-navy); }
+.awToggle.on i::after { transform: translateX(16px); background: var(--aw-gold); }
+.awToggle b { display: block; font-size: 13px; font-weight: 600; }
+.awToggle small { display: block; margin-top: 3px; font-size: 11.5px; color: var(--aw-soft); }
+
+/* ---------- Setup ---------- */
+.awSetupGrid { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 20px; align-items: start; }
+.awList { padding: 10px; display: grid; gap: 4px; position: sticky; top: 20px; }
+.awList .awKicker { padding: 10px 12px 2px; }
+.awList .awMuted { padding: 4px 12px 12px; }
+.awListItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--aw-ink);
+  text-align: left;
+  cursor: pointer;
+  transition: background .18s ease;
+}
+.awListItem:hover { background: var(--aw-paper); }
+.awListItem b { display: block; font-size: 14px; font-weight: 600; }
+.awListItem small { display: block; margin-top: 4px; font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--aw-faint); }
+.awListItem.on { background: var(--aw-navy); color: #fff; box-shadow: 0 10px 24px rgba(21, 20, 73, .25); }
+.awListItem.on small { color: var(--aw-gold); }
+
+.awPill {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-family: "DM Mono", monospace;
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.awPill.is-open { background: rgba(45, 128, 91, .13); color: var(--aw-ok); }
+.awPill.is-open::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #3aa57a; box-shadow: 0 0 0 3px rgba(58, 165, 122, .2); }
+.awPill.is-soon { background: rgba(238, 192, 88, .22); color: #8a6418; }
+.awPill.is-closed, .awPill.is-archived { background: rgba(21, 20, 73, .07); color: var(--aw-faint); }
+.awPill.is-draft { border: 1px dashed rgba(21, 20, 73, .28); color: var(--aw-faint); }
+.awPill.onDark.is-open { background: rgba(58, 165, 122, .25); color: #9be0c1; }
+.awPill.onDark.is-soon { color: var(--aw-gold); }
+.awPill.onDark.is-closed, .awPill.onDark.is-draft, .awPill.onDark.is-archived { color: var(--aw-lav); border-color: rgba(255, 255, 255, .3); background: rgba(255, 255, 255, .06); }
+
+.awEditor { padding: 26px 28px; }
+.awEditorHead { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
+.awEditorHead > div:first-child { flex: 1; min-width: 0; }
+.awEditorState { display: grid; justify-items: end; gap: 8px; }
+.awEditorState small { font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--aw-faint); }
+.awTitleInput {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px dashed transparent;
+  background: transparent;
+  font-family: "Playfair Display", serif;
+  font-size: 30px;
+  font-weight: 500;
+  color: var(--aw-ink);
+  padding: 2px 0;
+  outline: none;
+}
+.awTitleInput:focus, .awTitleInput:hover { border-bottom-color: rgba(21, 20, 73, .2); }
+.awDesc {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--aw-line);
+  background: #fcfcfe;
+  font: 400 13.5px/1.5 Inter, sans-serif;
+  color: var(--aw-ink);
+  resize: vertical;
+}
+.awWindow {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: end;
+  gap: 18px;
+  margin: 18px 0 22px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--aw-paper);
+}
+.awWindow label { display: grid; gap: 4px; }
+.awWindow small { font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--aw-faint); }
+.awWindow input { border: 1px solid var(--aw-line); border-radius: 9px; padding: 7px 10px; font: 500 13px Inter, sans-serif; color: var(--aw-ink); background: #fff; }
+.awWindowBar { position: relative; height: 6px; border-radius: 4px; background: #e4e3ef; margin-bottom: 14px; }
+.awWindowBar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: linear-gradient(90deg, var(--aw-goldD), var(--aw-gold)); }
+.awWindowBar b { position: absolute; top: -4px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: #fff; border: 3px solid var(--aw-gold); }
+
+.awFormGrid { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 18px; }
+.awSelectPlain { position: relative; }
+.awSelectPlain select {
+  appearance: none;
+  width: 100%;
+  height: 42px;
+  padding: 0 34px 0 12px;
+  border-radius: 10px;
+  border: 1px solid var(--aw-line);
+  background: #fcfcfe;
+  font: 600 14px Inter, sans-serif;
+  color: var(--aw-ink);
+}
+.awSelectPlain svg { position: absolute; right: 12px; top: 13px; width: 15px; height: 15px; color: var(--aw-goldD); pointer-events: none; }
+.awBlock { margin-top: 22px; }
+.awAddOption { display: inline-flex; align-items: center; border: 1px solid var(--aw-line); border-radius: 999px; padding: 2px 2px 2px 12px; background: #fff; }
+.awAddOption.wide { display: flex; margin-top: 12px; }
+.awAddOption input { border: 0; outline: none; width: 120px; font: 500 12.5px Inter, sans-serif; color: var(--aw-ink); background: transparent; }
+.awAddOption.wide input { flex: 1; width: auto; }
+.awAddOption button { display: grid; place-items: center; width: 28px; height: 28px; border: 0; border-radius: 50%; background: var(--aw-navy); color: var(--aw-gold); cursor: pointer; }
+.awAddOption button svg { width: 14px; height: 14px; }
+.awPresets { margin-top: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 11.5px; color: var(--aw-faint); }
+.awPresets button { border: 0; background: rgba(238, 192, 88, .16); color: #8a6418; border-radius: 999px; padding: 5px 10px; font: 500 11.5px Inter, sans-serif; cursor: pointer; }
+
+.awPermTable { border: 1px solid var(--aw-line); border-radius: 12px; overflow: hidden; }
+.awPermTable th, .awPermTable td { padding: 9px 14px !important; }
+.awPermTable td:nth-child(n+3), .awPermTable th:nth-child(n+3) { text-align: center; width: 76px; }
+.awPermTable .awMedal { width: 30px; height: 30px; }
+
+.awToggles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 22px; }
+.awLimit { grid-column: 1 / -1; display: grid; gap: 10px; }
+.awLimitRow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: var(--aw-soft); padding-left: 4px; }
+.awLimitRow input { width: 60px; height: 34px; border-radius: 8px; border: 1px solid var(--aw-line); text-align: center; font: 600 14px Inter, sans-serif; color: var(--aw-ink); }
+.awLimitRow select { height: 34px; border-radius: 8px; border: 1px solid var(--aw-line); padding: 0 8px; font: 500 13px Inter, sans-serif; color: var(--aw-ink); background: #fff; }
+
+.awEditorFoot { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--aw-line); flex-wrap: wrap; }
+.awFootLeft, .awFootRight { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+/* ---------- Entry ---------- */
+.awLead { margin: 0; font-size: 14px; color: var(--aw-soft); }
+.awMetaRow { display: flex; flex-wrap: wrap; gap: 8px; margin-top: -6px; }
+.awTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--aw-line);
+  font-family: "DM Mono", monospace;
+  font-size: 9.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--aw-soft);
+}
+.awTag svg { width: 12px; height: 12px; }
+.awTag.isWarn { background: rgba(238, 192, 88, .18); color: #8a6418; border-color: transparent; }
+.awSheet tr.won td { background: rgba(238, 192, 88, .08); }
+.awSheet tr.won td:first-child { box-shadow: inset 3px 0 0 var(--aw-gold); }
+.awReason {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px dashed rgba(21, 20, 73, .18);
+  background: transparent;
+  padding: 6px 0;
+  font-family: "Playfair Display", serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--aw-navy);
+  outline: none;
+}
+.awReason:focus { border-bottom-color: var(--aw-goldD); }
+.awReason::placeholder { font-family: Inter, sans-serif; font-style: normal; font-size: 12.5px; color: rgba(21, 20, 73, .32); }
+
+.awStatus {
+  display: inline-flex;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-family: "DM Mono", monospace;
+  font-size: 9px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.awStatus.is-approved { background: rgba(45, 128, 91, .12); color: var(--aw-ok); }
+.awStatus.is-submitted { background: rgba(238, 192, 88, .2); color: #8a6418; }
+.awStatus.is-draft { background: rgba(21, 20, 73, .06); color: var(--aw-faint); }
+.awStatus.is-rejected { background: rgba(199, 45, 61, .1); color: #a3283a; }
+.awStatus.is-new { border: 1px dashed rgba(21, 20, 73, .25); color: var(--aw-faint); }
+
+.awDock {
+  position: fixed;
+  z-index: 40;
+  left: calc(264px + 40px);
+  right: 40px;
+  bottom: 22px;
+  max-width: 1120px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 12px 10px 16px;
+  border-radius: 999px;
+  background: var(--aw-navy);
+  color: #fff;
+  box-shadow: 0 18px 40px rgba(13, 12, 51, .38);
+  animation: awRise .35s cubic-bezier(.16, 1, .3, 1);
+}
+@keyframes awRise { from { transform: translateY(30px); opacity: 0; } }
+.awDockText { display: flex; align-items: center; gap: 12px; font-size: 14px; min-width: 0; }
+.awDockText .awMedal { width: 32px; height: 32px; font-size: 12px; cursor: default; }
+.awDockText small { color: var(--aw-lav); font-size: 12.5px; }
+.awDockBtns { display: flex; gap: 8px; flex: none; }
+
+/* ---------- Reports ---------- */
+.awReportGrid { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 20px; align-items: start; }
+.awSideStack { display: grid; gap: 14px; }
+.awBigNums { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.awBigNums b { display: block; font-family: "Playfair Display", serif; font-size: 30px; font-weight: 600; color: var(--aw-goldD); line-height: 1; }
+.awBigNums small { font-family: "DM Mono", monospace; font-size: 8.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--aw-faint); }
+.awBars { display: grid; gap: 12px; margin-top: 4px; }
+.awBarHead { display: flex; justify-content: space-between; font-size: 13px; }
+.awBar { height: 6px; border-radius: 4px; background: #ecebf4; margin-top: 6px; overflow: hidden; }
+.awBar i { display: block; height: 100%; border-radius: 4px; }
+.awBar i.tone0 { background: linear-gradient(90deg, var(--aw-goldD), var(--aw-gold)); }
+.awBar i.tone1 { background: linear-gradient(90deg, var(--aw-navy), var(--aw-navy3)); }
+.awBar i.tone2 { background: #998670; }
+.awCols { display: flex; align-items: flex-end; gap: 10px; height: 120px; overflow-x: auto; }
+.awCols > div { flex: 1; min-width: 34px; display: grid; justify-items: center; gap: 4px; }
+.awCols i { display: block; width: 100%; border-radius: 6px 6px 2px 2px; background: #dcdaee; }
+.awCols i.top { background: linear-gradient(180deg, var(--aw-gold), var(--aw-goldD)); }
+.awCols small { font-family: "DM Mono", monospace; font-size: 9px; color: var(--aw-faint); }
+.awCols b { font-size: 11px; }
+.awTagCloud { display: flex; flex-wrap: wrap; gap: 4px; }
+.awMini { display: inline-flex; padding: 4px 9px; border-radius: 999px; background: var(--aw-navy); color: #fff; font-size: 11.5px; }
+.awMini.isWaiting { background: rgba(238, 192, 88, .22); color: #8a6418; }
+.awTotal { font-size: 15px; display: inline-block; min-width: 36px; text-align: center; }
+.awReportTable .awMedal { width: 32px; height: 32px; cursor: default; }
+.awClickRow { cursor: pointer; transition: background .15s ease; }
+.awClickRow:hover td, .awClickRow.isOpen td { background: #fafaff; }
+.awDetailRow td { background: var(--aw-paper); }
+.awDetail { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.awDetail > div { padding: 12px 14px; border-radius: 12px; background: #fff; border: 1px solid var(--aw-line); font-size: 13px; }
+.awDetail small { display: block; margin-top: 4px; color: var(--aw-faint); font-size: 11.5px; }
+.awDetail em { display: block; margin-top: 6px; font-family: "Playfair Display", serif; color: var(--aw-navy); }
+.awTableFoot { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; border-top: 1px solid var(--aw-line); font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--aw-faint); }
+
+/* ---------- Approvals ---------- */
+.awApprovals { padding: 0 !important; overflow: hidden; }
+.awApprovalsHead { display: flex; justify-content: space-between; align-items: flex-end; padding: 24px 26px 14px; }
+.awApprovalsHead h2 { margin: 2px 0 0; font-family: "Playfair Display", serif; font-size: 28px; font-weight: 600; }
+.awBulkBar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 12px 18px;
+  background: var(--aw-navy);
+  color: #fff;
+}
+.awCheck { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.awCheck input, .awQueueRow input { width: 18px; height: 18px; accent-color: var(--aw-goldD); }
+.awBulkFilters { display: flex; gap: 8px; }
+.awBulkFilters select { height: 34px; border-radius: 9px; border: 1px solid rgba(255, 255, 255, .2); background: rgba(255, 255, 255, .08); color: #fff; padding: 0 8px; font: 500 12.5px Inter, sans-serif; }
+.awBulkFilters select option { color: var(--aw-ink); }
+.awBulkBtns { margin-left: auto; display: flex; gap: 8px; }
+.awBulkBtns .awBtn.line { background: transparent; color: #fff; border-color: rgba(255, 255, 255, .28); }
+.awBulkBtns .awBtn.navy { background: linear-gradient(180deg, #f3cf74, var(--aw-gold)); color: var(--aw-navy); }
+.awQueue { display: grid; }
+.awQueueRow {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) 160px auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--aw-line);
+  cursor: pointer;
+  transition: background .15s ease;
+}
+.awQueueRow:hover { background: #fafaff; }
+.awQueueRow.on { background: rgba(238, 192, 88, .09); }
+.awQueueMain { min-width: 0; font-size: 14px; }
+.awQueueMain small { font-family: "DM Mono", monospace; font-size: 10px; color: var(--aw-faint); }
+.awQueueAward { display: flex; align-items: center; gap: 6px; margin-top: 3px; font-size: 12.5px; color: var(--aw-soft); }
+.awQueueAward svg { width: 12px; height: 12px; color: var(--aw-goldD); fill: var(--aw-goldD); }
+.awQueueMain em { display: block; margin-top: 4px; font-family: "Playfair Display", serif; font-size: 13.5px; color: var(--aw-navy); }
+.awQueueBy { font-size: 12.5px; color: var(--aw-soft); }
+.awQueueBy small { display: block; font-size: 11px; color: var(--aw-faint); }
+.awQueueBtns { display: flex; gap: 6px; }
+.awIconBtn { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--aw-line); background: #fff; color: var(--aw-soft); cursor: pointer; }
+.awIconBtn svg { width: 15px; height: 15px; }
+.awIconBtn.ok { background: var(--aw-navy); color: var(--aw-gold); border-color: transparent; }
+
+/* ---------- Staff ---------- */
+.awTableTools { padding: 14px 16px; border-bottom: 1px solid var(--aw-line); }
+.awSearch { width: min(420px, 100%); height: 40px; border-radius: 10px; border: 1px solid var(--aw-line); padding: 0 14px; font: 400 13.5px Inter, sans-serif; background: #fcfcfe; color: var(--aw-ink); }
+.awStaffTable tr.isOff td { opacity: .5; }
+.awRole { display: inline-flex; padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+.awRole.is-key_stage_office { background: var(--aw-navy); color: var(--aw-gold); }
+.awRole.is-head_of_year { background: rgba(238, 192, 88, .2); color: #8a6418; }
+.awRole.is-class_teacher { background: #ecebf6; color: var(--aw-navy); }
+.awRole.is-subject_teacher { background: #fff; color: var(--aw-navy); box-shadow: inset 0 0 0 1px rgba(21, 20, 73, .2); }
+
+.awModalShade { position: fixed; inset: 0; z-index: 80; display: grid; place-items: center; padding: 20px; background: rgba(13, 12, 51, .55); backdrop-filter: blur(6px); }
+.awModal { position: relative; width: min(620px, 100%); max-height: calc(100vh - 40px); overflow: auto; display: grid; gap: 14px; padding: 28px; border-radius: 20px; background: #fff; color: var(--aw-ink); box-shadow: 0 40px 100px rgba(13, 12, 51, .4); }
+.awModal h2 { margin: -6px 0 4px; font-family: "Playfair Display", serif; font-size: 28px; font-weight: 500; }
+.awModal .awKicker { margin: 4px 0 -4px; }
+.awModalX { position: absolute; top: 16px; right: 16px; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--aw-line); background: #fff; display: grid; place-items: center; cursor: pointer; color: var(--aw-soft); }
+.awModalX svg { width: 16px; height: 16px; }
+.awFields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.awFields label { display: grid; gap: 6px; font-size: 12px; font-weight: 600; color: var(--aw-soft); }
+.awFields input { height: 42px; border-radius: 10px; border: 1px solid var(--aw-line); padding: 0 12px; font: 400 14px Inter, sans-serif; color: var(--aw-ink); background: #fcfcfe; }
+.awFields input:disabled { opacity: .6; }
+.awModalFoot { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; }
+
+/* ---------- Lists ---------- */
+.awListsGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; align-items: start; }
+.awListItems { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; max-height: 460px; overflow: auto; }
+.awListItems li { display: flex; align-items: center; gap: 8px; padding: 4px 4px 4px 10px; border-radius: 10px; }
+.awListItems li:hover { background: var(--aw-paper); }
+.awListItems li.isOff input { color: var(--aw-faint); text-decoration: line-through; }
+.awListItems input { flex: 1; min-width: 0; border: 0; background: transparent; font: 500 13.5px Inter, sans-serif; color: var(--aw-ink); padding: 6px 0; outline: none; }
+.awListItems input:focus { border-bottom: 1px dashed var(--aw-goldD); }
+.awMiniToggle { position: relative; flex: none; width: 32px; height: 18px; border-radius: 999px; border: 0; background: rgba(21, 20, 73, .16); cursor: pointer; }
+.awMiniToggle i { position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: transform .2s ease; }
+.awMiniToggle.on { background: var(--aw-navy); }
+.awMiniToggle.on i { transform: translateX(14px); background: var(--aw-gold); }
+
+/* ---------- Empty / flash / loading ---------- */
+.awEmpty { display: grid; justify-items: center; gap: 8px; padding: 54px 24px; text-align: center; background: #fff; border-radius: 18px; border: 1px dashed rgba(21, 20, 73, .14); }
+.awPanel .awEmpty { border: 0; }
+.awEmpty > span { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; background: rgba(238, 192, 88, .16); color: var(--aw-goldD); }
+.awEmpty > span svg { width: 24px; height: 24px; }
+.awEmpty b { font-family: "Playfair Display", serif; font-size: 22px; font-weight: 500; }
+.awEmpty p { margin: 0; max-width: 420px; color: var(--aw-soft); font-size: 13.5px; }
+.awLoading { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 40px; color: var(--aw-soft); font-size: 13.5px; }
+.awLoading svg { width: 18px; height: 18px; color: var(--aw-goldD); }
+.awFlash {
+  position: fixed;
+  z-index: 90;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(560px, calc(100vw - 32px));
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: var(--aw-navy);
+  color: #fff;
+  font-size: 13.5px;
+  box-shadow: 0 18px 40px rgba(13, 12, 51, .35);
+  cursor: pointer;
+  animation: awDrop .3s cubic-bezier(.16, 1, .3, 1);
+}
+.awFlash svg { width: 17px; height: 17px; color: var(--aw-gold); flex: none; }
+.awFlash.is-error { background: #6e1a28; }
+@keyframes awDrop { from { transform: translate(-50%, -16px); opacity: 0; } }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1100px) {
+  .awSetupGrid, .awReportGrid { grid-template-columns: 1fr; }
+  .awList { position: static; }
+  .awListsGrid { grid-template-columns: 1fr; }
+  .awFormGrid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 860px) {
+  .awDock { left: 16px; right: 16px; border-radius: 20px; flex-direction: column; align-items: stretch; }
+  .awDockBtns .awBtn { flex: 1; }
+}
+@media (max-width: 680px) {
+  .awStage { padding: 22px 18px 18px; border-radius: 16px; }
+  .awStageRow { flex-direction: column; align-items: flex-start; }
+  .awSel { min-width: calc(50% - 5px); flex: 1 1 calc(50% - 5px); }
+  .awFormGrid, .awToggles, .awFields { grid-template-columns: 1fr; }
+  .awWindow { grid-template-columns: 1fr 1fr; }
+  .awWindowBar { grid-column: 1 / -1; grid-row: 2; }
+  .awQueueRow { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .awQueueRow .awAv, .awQueueBy { display: none; }
+  .awPage td, .awPage th { padding: 10px; }
+  .awSheet, .awReportTable, .awStaffTable { overflow-x: auto; }
+  .awSheet table { min-width: 560px; }
+  .awEditor { padding: 20px 16px; }
+}
+
+.awReportTable .awWho { white-space: nowrap; }
+.awReportTable td { vertical-align: top; }
+.awReportTable td:first-child { width: 220px; }
+
+/* Award pages use the full width of the screen (less cramped on large displays). */
+.portal.ws .portalBody.isWide {
+  width: min(1680px, calc(100% - 64px));
+}
+.portal.ws .portalBody.isWide .awDock {
+  max-width: 1680px;
+  left: calc(264px + 32px);
+  right: 32px;
+}
+@media (max-width: 860px) {
+  .portal.ws .portalBody.isWide { width: calc(100% - 32px); }
+  .portal.ws .portalBody.isWide .awDock { left: 16px; right: 16px; }
+}
+
+/* Teacher's comment (optional) */
+.awComment { position: relative; }
+.awComment textarea.awReason { resize: none; overflow: hidden; line-height: 1.45; min-height: 30px; }
+.awComment small { position: absolute; right: 0; bottom: -14px; font-size: 10.5px; color: var(--aw-faint); }
+.awDetail em cite { font-style: normal; font-family: Inter, sans-serif; font-size: 11.5px; color: var(--aw-faint); }
+.awNoComment { display: block; margin-top: 4px; font-size: 11.5px; color: var(--aw-faint); }
+
+/* Archive / delete */
+.awArchivedToggle { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 8px 6px 4px; padding: 10px; border: 1px dashed rgba(21, 20, 73, .18); border-radius: 12px; background: transparent; color: var(--aw-soft); font: 500 12.5px Inter, sans-serif; cursor: pointer; }
+.awArchivedToggle:hover { color: var(--aw-ink); border-color: var(--aw-goldD); }
+.awArchivedToggle svg { width: 15px; height: 15px; }
+.awBtn.text.danger { color: #a3283a; }
+.awBtn.text.danger:hover { color: #7d101d; background: rgba(199, 45, 61, .07); }
+
+/* Staff import / per-year lists */
+.awStageActions .awBtn.ghost { border-color: rgba(255, 255, 255, .3); }
+.awStat.isAlert { cursor: pointer; text-align: left; border-color: rgba(238, 192, 88, .55); background: rgba(238, 192, 88, .12); color: inherit; font: inherit; }
+.awStat.isAlert.on { background: rgba(238, 192, 88, .26); }
+.awTableTools { display: flex; align-items: center; gap: 12px; }
+.awNeeds { border: 1px dashed rgba(184, 137, 42, .6); background: rgba(238, 192, 88, .12); color: #8a6418; border-radius: 999px; padding: 6px 12px; font: 600 12px Inter, sans-serif; cursor: pointer; }
+.awNeeds:hover { background: rgba(238, 192, 88, .24); }
+.awYearPick { display: grid; gap: 8px; max-height: 260px; overflow: auto; padding: 2px; }
+.awYearRow { display: grid; grid-template-columns: 92px 1fr; gap: 10px; align-items: start; }
+.awYearBtn { height: 32px; border-radius: 9px; border: 1px solid var(--aw-line); background: var(--aw-paper); font: 600 12px Inter, sans-serif; color: var(--aw-soft); cursor: pointer; }
+.awYearBtn.on { background: var(--aw-navy); color: var(--aw-gold); border-color: var(--aw-navy); }
+.awModal.awImport { width: min(980px, 100%); }
+.awImportBar { display: flex; gap: 10px; flex-wrap: wrap; }
+.awImportBar label { cursor: pointer; }
+.awPaste { width: 100%; border: 1px solid var(--aw-line); border-radius: 12px; padding: 12px; font: 400 12.5px/1.5 "DM Mono", monospace; color: var(--aw-ink); background: #fcfcfe; resize: vertical; }
+.awImportPreview { border: 1px solid var(--aw-line); border-radius: 12px; overflow: auto; max-height: 340px; }
+.awImportPreview table { width: 100%; border-collapse: collapse; }
+.awImportPreview th { position: sticky; top: 0; background: #fcfcfe; font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--aw-faint); font-weight: 400; text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--aw-line); }
+.awImportPreview td { padding: 9px 12px; border-bottom: 1px solid var(--aw-line); font-size: 13px; vertical-align: top; }
+.awImportPreview td small { display: block; font-size: 11px; color: var(--aw-faint); }
+.awImportPreview tr.isBad td { background: rgba(199, 45, 61, .05); }
+.awImportSummary { display: flex; gap: 16px; flex-wrap: wrap; padding: 10px 12px; font-size: 12.5px; color: var(--aw-soft); border-bottom: 1px solid var(--aw-line); }
+.awImportSummary .bad b { color: #a3283a; }
+.awImportSummary .warn b { color: #8a6418; }
+.awImportOk { color: var(--aw-ok); font-size: 12.5px; font-weight: 600; }
+.awImportOk small { font-weight: 400; color: #8a6418 !important; }
+.awModalFoot { align-items: center; flex-wrap: wrap; }
+.awModalFoot .awMuted { margin-right: auto; }
+.awYearsTag { flex: none; font-family: "DM Mono", monospace; font-size: 9.5px; letter-spacing: .06em; color: var(--aw-faint); padding: 3px 8px; border-radius: 999px; background: var(--aw-paper); white-space: nowrap; }
+.awOffer { display: flex; align-items: center; gap: 10px; padding: 7px 0; font-size: 13.5px; font-weight: 500; cursor: pointer; flex: 1; }
+.awListItems .awOffer input { flex: none; width: 17px; height: 17px; padding: 0; accent-color: var(--aw-navy); }
+.awOffer span { flex: 1; text-align: left; }
+.isOff .awOffer { color: var(--aw-faint); }
+
+/* Light-outline buttons on the navy stage: on hover / focus they turn white
+   with navy text (never white-on-white). */
+.awPage .awBtn.ghost { min-height: 44px; font-size: 13.5px; }
+.awPage .awBtn.ghost:hover,
+.awPage .awBtn.ghost:focus,
+.awPage .awBtn.ghost:focus-visible,
+.awPage .awBtn.ghost:active {
+  background: #fff;
+  color: var(--aw-navy);
+  border-color: #fff;
+  outline: none;
+}
+.awPage .awBtn.ghost:hover svg,
+.awPage .awBtn.ghost:focus svg { color: var(--aw-goldD); }
+.awTemplateLink { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; border: 0; background: none; color: var(--aw-goldD); font: 600 12.5px Inter, sans-serif; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.awTemplateLink svg { width: 14px; height: 14px; }
+
+/* Several roles per person, bulk assign */
+.awTick { width: 18px; height: 18px; accent-color: var(--aw-navy); cursor: pointer; }
+.awStaffTable tr.isPicked td { background: rgba(238, 192, 88, .08); }
+.awRoleList { display: grid; gap: 6px; }
+.awRoleLine { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: var(--aw-soft); }
+.awRoleLine em { font-style: normal; font-size: 11.5px; padding: 2px 8px; border-radius: 999px; background: rgba(238, 192, 88, .16); color: #8a6418; }
+.awRoleLine.isNeeds > span:nth-child(2) { color: #a3283a; font-weight: 600; }
+.awPanel > .awBulkBar { border-radius: 0; }
+.awBulkBar .awCheck b { color: var(--aw-gold); }
+.awPersonModal { width: min(760px, 100%); }
+.awRoleCard { display: grid; gap: 10px; padding: 16px; border: 1px solid var(--aw-line); border-radius: 14px; background: #fcfcfe; }
+.awRoleCardHead { display: flex; justify-content: space-between; align-items: center; }
+.awAddRole { display: grid; gap: 8px; padding: 14px 16px; border: 1px dashed rgba(21, 20, 73, .18); border-radius: 14px; }
+.awAddRole .awChip svg { width: 13px; height: 13px; color: var(--aw-goldD); fill: none; }
+.awPickedNames { margin: -6px 0 0; font-size: 12.5px; max-height: 60px; overflow: auto; }
+.awRoleList .awNeeds { justify-self: start; }
+
+/* ---------- Subject grid (Enter awards) ---------- */
+.awFocus { display: grid; align-content: center; min-height: 50px; padding: 6px 16px; border-radius: 12px; background: linear-gradient(180deg, #f3cf74, var(--aw-gold)); color: var(--aw-navy); }
+.awFocus small { font-family: "DM Mono", monospace; font-size: 8.5px; letter-spacing: .14em; text-transform: uppercase; opacity: .75; }
+.awFocus b { font-family: "Playfair Display", serif; font-size: 17px; font-weight: 600; }
+.awTag.isInfo { background: rgba(21, 20, 73, .05); }
+.awTagIcon { width: 11px !important; height: 11px !important; }
+.awSheet.isGrid { overflow: visible; }
+.awGridWrap { overflow: auto; max-height: calc(100vh - 220px); border-radius: 18px; }
+.awPage table.awGrid { width: max-content; min-width: 100%; border-collapse: separate; border-spacing: 0; }
+.awGrid th, .awGrid td { border-bottom: 1px solid var(--aw-line); }
+.awGrid thead th { position: sticky; top: 0; z-index: 3; background: #fcfcfe; vertical-align: bottom; }
+.awGrid .awGridStudent { position: sticky; left: 0; z-index: 2; background: #fff; width: 280px; min-width: 240px; box-shadow: 1px 0 0 var(--aw-line); }
+.awGrid thead .awGridStudent { z-index: 4; background: #fcfcfe; vertical-align: bottom; }
+.awGrid tr.won .awGridStudent { background: #fffbef; }
+.awPage .awGrid th.awGridHead { min-width: 58px; padding: 12px 4px 8px; text-align: center; text-transform: none; letter-spacing: 0; border-left: 1px solid var(--aw-line); }
+.awVert { display: inline-block; writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; max-height: 150px; overflow: hidden; text-overflow: ellipsis; font: 600 12.5px Inter, sans-serif; color: var(--aw-ink); }
+.awGridHead.isLocked .awVert { color: var(--aw-faint); font-weight: 500; }
+.awGridHead.isMine { background: #fbf3dc !important; }
+.awGridHead.isMine .awVert { color: var(--aw-navy); }
+.awColCount { display: block; margin: 8px auto 0; min-width: 24px; height: 22px; line-height: 22px; border-radius: 999px; background: var(--aw-navy); color: var(--aw-gold); font: 700 11px Inter, sans-serif; }
+.awGridHead.isLocked .awColCount { background: rgba(21, 20, 73, .08); color: var(--aw-soft); }
+.awPage .awGrid td.awGridCell { position: relative; min-width: 58px; padding: 8px 4px; text-align: center; border-left: 1px solid var(--aw-line); }
+.awGridCell.isLocked { background: repeating-linear-gradient(135deg, rgba(21, 20, 73, .018) 0 6px, transparent 6px 12px); }
+.awGridCell .awMedal { width: 32px; height: 32px; }
+.awGridCell .awMedal svg { width: 14px; height: 14px; }
+.awGridCell.isLocked .awMedal:not(.on) { opacity: .35; }
+.awGridCell.isLocked .awMedal.on { opacity: .75; }
+.awCellPick { width: 36px; height: 30px; border-radius: 9px; border: 1px dashed rgba(21, 20, 73, .22); background: transparent; color: var(--aw-faint); font: 700 11px Inter, sans-serif; cursor: pointer; }
+.awCellPick svg { width: 13px; height: 13px; }
+.awCellPick.on { border: 0; background: var(--aw-navy); color: var(--aw-gold); }
+.awCellPick:disabled { cursor: default; }
+.awCellNote { position: absolute; top: 3px; left: calc(50% + 10px); width: 18px; height: 18px; display: grid; place-items: center; border-radius: 50%; border: 1px solid var(--aw-line); background: #fff; color: var(--aw-goldD); cursor: pointer; padding: 0; }
+.awCellNote svg { width: 10px; height: 10px; }
+.awCellNote.has { background: var(--aw-navy); color: var(--aw-gold); border-color: var(--aw-navy); }
+.awCellNote:disabled { cursor: default; }
+.awPage .awGrid th.awGridTotal, .awPage .awGrid td.awGridTotal { width: 54px; text-align: center; border-left: 1px solid var(--aw-line); }
+.awCellModal { width: min(520px, 100%); }
+.awCellComment { font-family: "Playfair Display", serif !important; font-style: italic; font-size: 15px !important; }
+.awFocusGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+.awFocusPick { display: grid; gap: 4px; }
+.awFocusPick small { font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: var(--aw-faint); }
+.awFocusPick .awSelectPlain svg { top: 13px; }
+
+/* Grid header: fully opaque so rows never show through when scrolling. */
+.awGrid thead th { background: #fafafd !important; box-shadow: inset 0 -1px 0 var(--aw-line); }
+.awGrid thead th.awGridHead.isMine { background: #fbf3dc !important; }
+.awGrid thead th.awGridStudent { z-index: 5; }
+.awGrid tbody tr.won td.awGridStudent { background: #fffbef; }
+.awGrid tbody td { background-clip: padding-box; }
+
+/* Publish to portfolio (v33) */
+.awPubTabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 2px; }
+.awPubTabs button { display: inline-flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--aw-line); background: #fff; color: var(--aw-ink); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.awPubTabs button span { min-width: 22px; padding: 2px 8px; border-radius: 999px; background: rgba(21, 20, 73, .07); font-size: 12px; color: var(--aw-soft); text-align: center; }
+.awPubTabs button.on { background: var(--aw-navy); border-color: var(--aw-navy); color: #fff; }
+.awPubTabs button.on span { background: var(--aw-gold); color: var(--aw-navy); }
+.awPubTabs button:focus-visible { outline: 2px solid var(--aw-gold); outline-offset: 2px; }

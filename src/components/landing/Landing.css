@@ -1,0 +1,2016 @@
+/* =========================================================================
+   TBS STUDENT PORTFOLIO · LANDING
+   Official TBS palette (navy, gold, white + grey, beige, taupe) in a light
+   and a dark theme — colours come from src/theme.css. Behind everything is
+   the universe (sky.js); students are small student cards with a
+   graduation cap, orbiting the heading. All classes use the ld* prefix.
+   ========================================================================= */
+
+.ld {
+  --ld-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ld-ink: var(--c-text);
+  --ld-dim: var(--c-text-2);
+  --ld-faint: var(--c-text-3);
+  --ld-line: var(--c-line);
+
+  /* Landing-only colours, light theme */
+  /* Daybreak: warm white sky, a soft gold glow behind the heading,
+   * beige clouds and a cool navy haze at the edges. */
+  --ld-bg:
+    radial-gradient(42% 46% at 50% 47%, rgba(231, 192, 105, 0.24) 0%, rgba(231, 192, 105, 0.08) 45%, transparent 75%),
+    radial-gradient(70% 55% at 50% 108%, rgba(218, 202, 190, 0.55) 0%, transparent 70%),
+    radial-gradient(60% 50% at 0% 0%, rgba(18, 61, 134, 0.1) 0%, transparent 70%),
+    radial-gradient(60% 50% at 100% 0%, rgba(18, 61, 134, 0.08) 0%, transparent 70%),
+    linear-gradient(180deg, #f5f7fb 0%, #fffdf8 52%, #fbf3e6 100%);
+  --ld-nebula-a: rgba(218, 202, 190, 0.45);
+  --ld-nebula-b: rgba(231, 192, 105, 0.2);
+  --ld-nebula-c: rgba(18, 61, 134, 0.07);
+  --ld-link: rgba(5, 31, 82, 0.3);
+  --ld-link-hot: rgba(5, 31, 82, 0.8);
+  --ld-glass: rgba(255, 255, 255, 0.86);
+  --ld-btn: #ffffff;
+  --ld-btn-line: rgba(5, 31, 82, 0.16);
+
+  --ld-card: linear-gradient(180deg, #ffffff 0%, #fbf8f2 100%);
+  --ld-card-solid: #fffdf8;
+  --ld-card-line: rgba(156, 141, 122, 0.28);
+  --ld-card-shadow: 0 14px 30px rgba(5, 31, 82, 0.1), 0 3px 8px rgba(156, 141, 122, 0.14);
+  --ld-card-shadow-hot: 0 20px 44px rgba(5, 31, 82, 0.2), 0 4px 10px rgba(5, 31, 82, 0.08);
+  --ld-face: #051f52;
+  --ld-face-ink: #ffffff;
+  --ld-cap-board: #051f52;
+  --ld-cap-base: #031538;
+  --ld-cap-edge: #123d86;
+  --ld-tassel: #e7c069;
+  --ld-open-ring: #e7c069;
+  --ld-redacted: rgba(5, 31, 82, 0.1);
+
+  position: relative;
+  height: 100vh;
+  height: 100svh;
+  min-height: 560px;
+  overflow: hidden;
+  isolation: isolate;
+  color: var(--ld-ink);
+  background: var(--ld-bg);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+:root[data-theme='dark'] .ld {
+  --ld-bg:
+    radial-gradient(120% 80% at 50% 115%, #0b2c68 0%, transparent 62%),
+    radial-gradient(90% 70% at 50% 40%, #082660 0%, #051f52 62%, #03153a 100%);
+  --ld-nebula-a: rgba(231, 192, 105, 0.1);
+  --ld-nebula-b: rgba(18, 61, 134, 0.55);
+  --ld-nebula-c: rgba(218, 202, 190, 0.06);
+  --ld-link: rgba(255, 255, 255, 0.3);
+  --ld-link-hot: rgba(231, 192, 105, 0.95);
+  --ld-glass: rgba(5, 31, 82, 0.86);
+  --ld-btn: #0b2c68;
+  --ld-btn-line: rgba(255, 255, 255, 0.18);
+
+  --ld-card: #0b2c68;
+  --ld-card-solid: #0b2c68;
+  --ld-card-line: rgba(255, 255, 255, 0.12);
+  --ld-card-shadow: 0 12px 30px rgba(2, 12, 34, 0.5), 0 2px 6px rgba(2, 12, 34, 0.3);
+  --ld-card-shadow-hot: 0 22px 48px rgba(2, 12, 34, 0.65), 0 0 0 1px rgba(231, 192, 105, 0.4);
+  --ld-face: #123d86;
+  --ld-face-ink: #ffffff;
+  --ld-cap-board: #e7c069;
+  --ld-cap-base: #b8964a;
+  --ld-cap-edge: #ecd08e;
+  --ld-tassel: #ffffff;
+  --ld-open-ring: #e7c069;
+  --ld-redacted: rgba(255, 255, 255, 0.12);
+}
+
+@keyframes ldFadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes ldRise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
+/* ---------- the universe: stars, galaxies and shooting stars ---------- */
+
+.ldSky {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.ldNebula {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.ldNebulaA {
+  left: -18%;
+  top: 6%;
+  width: 70vw;
+  height: 70vw;
+  background: radial-gradient(closest-side, var(--ld-nebula-a), transparent);
+}
+
+.ldNebulaB {
+  right: -22%;
+  bottom: -30%;
+  width: 80vw;
+  height: 80vw;
+  background: radial-gradient(closest-side, var(--ld-nebula-b), transparent);
+}
+
+.ldNebulaC {
+  right: 8%;
+  top: -24%;
+  width: 46vw;
+  height: 46vw;
+  background: radial-gradient(closest-side, var(--ld-nebula-c), transparent);
+}
+
+.ldStars {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  animation: ldFadeIn 1.6s ease both;
+}
+
+.ldVignette {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(ellipse 36% 30% at 50% 50%, var(--c-bg) 0%, transparent 100%);
+  opacity: 0.7;
+}
+
+:root[data-theme='dark'] .ldVignette {
+  background: radial-gradient(ellipse 38% 32% at 50% 50%, rgba(11, 10, 44, 0.92) 0%, transparent 100%);
+  opacity: 1;
+}
+
+/* ---------- tracks ---------- */
+
+.ldOrbit {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+}
+
+/* ---------- student card ---------- */
+
+.ldStar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ld-ink);
+  cursor: pointer;
+  will-change: transform, opacity;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ldStar:focus-visible {
+  outline: none;
+}
+
+.ldCard {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: var(--card-w);
+  height: var(--card-h);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 8px;
+  border: 1px solid var(--ld-card-line);
+  border-radius: 14px;
+  background: var(--ld-card);
+  box-shadow: var(--ld-card-shadow);
+  transition: transform 0.45s var(--ld-ease), box-shadow 0.45s ease, border-color 0.3s ease;
+}
+
+.ldStar:hover .ldCard,
+.ldStar:focus-visible .ldCard {
+  transform: translateY(-4px) scale(1.08);
+  box-shadow: var(--ld-card-shadow-hot);
+  border-color: var(--c-accent);
+}
+
+.ldCardPhoto {
+  position: relative;
+  flex: none;
+  width: var(--photo);
+  height: var(--photo);
+}
+
+.ldCardFace {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--ld-face);
+  color: var(--ld-face-ink);
+}
+
+.ldCardFace b {
+  margin-top: 18%; /* clear of the cap */
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: calc(var(--photo) * 0.32);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  line-height: 1;
+}
+
+.ldCardFace img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: 50% 28%;
+}
+
+.ldCard.isOpen .ldCardFace {
+  box-shadow: 0 0 0 2px var(--ld-card-solid), 0 0 0 4px var(--ld-open-ring);
+}
+
+.ldCardBadge {
+  position: absolute;
+  right: -5px;
+  bottom: -3px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  background: var(--ld-card-solid);
+  color: var(--ld-faint);
+  box-shadow: 0 0 0 1px var(--ld-card-line);
+}
+
+.ldCardBadge.isPending {
+  color: var(--c-taupe);
+}
+
+.ldCardBadge svg {
+  width: 10px;
+  height: 10px;
+}
+
+/* The graduation cap sits on the photo like it's being worn. */
+.ldCap {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: calc(100% - var(--photo) * 0.3);
+  width: calc(var(--photo) * 1.24);
+  margin-left: calc(var(--photo) * -0.62);
+  transform: rotate(var(--tilt));
+  transform-origin: 50% 80%;
+  perspective: 120px;
+  filter: drop-shadow(0 3px 3px rgba(13, 12, 51, 0.25));
+  transition: transform 0.5s var(--ld-ease);
+}
+
+.ldCapSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  animation: ldCapSpin 10s var(--ld-ease) var(--spin-delay) infinite;
+  transform-origin: 50% 50%;
+}
+
+/* Every so often the cap spins round once, as if tossed. */
+@keyframes ldCapSpin {
+  0%,
+  84% {
+    transform: rotateY(0) translateY(0);
+  }
+  90% {
+    transform: rotateY(180deg) translateY(-5px);
+  }
+  96%,
+  100% {
+    transform: rotateY(360deg) translateY(0);
+  }
+}
+
+.ldCapBoard {
+  fill: var(--ld-cap-board);
+}
+
+.ldCapBase {
+  fill: var(--ld-cap-base);
+}
+
+.ldCapEdge {
+  fill: none;
+  stroke: var(--ld-cap-edge);
+  stroke-width: 0.8;
+  stroke-linejoin: round;
+}
+
+.ldCapButton {
+  fill: var(--ld-tassel);
+}
+
+.ldCapTassel {
+  transform-origin: 39.5px 12.6px;
+  animation: ldSway var(--sway) ease-in-out infinite alternate;
+}
+
+.ldCapTassel path {
+  fill: none;
+  stroke: var(--ld-tassel);
+  stroke-width: 1.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ldCapTassel rect {
+  fill: var(--ld-tassel);
+}
+
+@keyframes ldSway {
+  from {
+    transform: rotate(-9deg);
+  }
+  to {
+    transform: rotate(11deg);
+  }
+}
+
+.ldStar:hover .ldCap,
+.ldStar:focus-visible .ldCap {
+  transform: rotate(calc(var(--tilt) * -0.4)) translateY(-3px);
+}
+
+.ldCardName {
+  max-width: calc(100% - 8px);
+  margin-top: 6px;
+  overflow: hidden;
+  font-size: max(10px, calc(var(--photo) * 0.27));
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--ld-ink);
+}
+
+.ldCardName.isLong {
+  max-width: calc(100% - 4px);
+  font-size: max(9px, calc(var(--photo) * 0.23));
+  letter-spacing: -0.01em;
+}
+
+.ldCardName.isLonger {
+  max-width: calc(100% - 4px);
+  font-size: max(8.5px, calc(var(--photo) * 0.2));
+  letter-spacing: -0.02em;
+}
+
+/* Visitors: no name — a redacted line instead. */
+.ldCardRedacted {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  width: 100%;
+  margin-top: 9px;
+}
+
+.ldCardRedacted i {
+  display: block;
+  width: 58%;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--ld-redacted);
+}
+
+.ldCardRedacted i + i {
+  width: 34%;
+}
+
+.ldCardRibbon {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 0;
+  height: 4px;
+  border-radius: 4px 4px 0 0;
+  background: var(--ribbon);
+}
+
+:root[data-theme='dark'] .ldCardFace {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+:root[data-theme='dark'] .ldCard.isOpen .ldCardFace {
+  box-shadow: 0 0 0 2px var(--ld-card-solid), 0 0 0 4px var(--ld-open-ring);
+}
+
+:root[data-theme='dark'] .ldCardRibbon {
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.18);
+}
+
+/* Status chip under the card on hover */
+.ldStarTip {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 8px);
+  z-index: 4;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+  box-shadow: var(--c-shadow-sm);
+  white-space: nowrap;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  transform: translate(-50%, -4px);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.4s var(--ld-ease);
+}
+
+.ldStar:hover .ldStarTip,
+.ldStar:focus-visible .ldStarTip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* ---------- top bar ---------- */
+
+.ldTop {
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px clamp(20px, 3vw, 44px);
+  pointer-events: none;
+}
+
+.ldTop > * {
+  pointer-events: auto;
+}
+
+.ldBrand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.ldCrest {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  overflow: hidden;
+}
+
+.ldCrest img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  font-size: 0; /* no alt text spilling out if the image is slow */
+}
+
+.ldBrandText {
+  display: grid;
+  gap: 3px;
+}
+
+.ldBrandText b {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.ldBrandText small {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ld-dim);
+}
+
+.ldTopNav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ldTopStat {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 8px;
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ld-dim);
+}
+
+.ldTopStat i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--c-gold);
+  box-shadow: 0 0 0 4px var(--c-gold-soft);
+}
+
+.ldLogin,
+.ldIconBtn,
+.ldTopSearchBtn,
+.ldThemeToggle.themeToggle {
+  border: 1px solid var(--ld-btn-line);
+  background: var(--ld-btn);
+  color: var(--ld-ink);
+  box-shadow: var(--c-shadow-sm);
+}
+
+.ldLogin {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  padding: 0 22px 0 18px;
+  border-radius: 999px;
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.4s var(--ld-ease);
+}
+
+.ldLogin svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Visitors: Login is the main action */
+.isVisitor .ldLogin {
+  border-color: var(--c-accent);
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+}
+
+.ldLogin:hover {
+  transform: translateY(-1px);
+  border-color: var(--c-accent);
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+}
+
+.ldLogin:focus-visible,
+.ldIconBtn:focus-visible,
+.ldTopSearchBtn:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 3px;
+}
+
+.ldIconBtn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: border-color 0.25s ease, transform 0.4s var(--ld-ease);
+}
+
+.ldIconBtn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.ldIconBtn:hover {
+  border-color: var(--c-accent);
+  transform: scale(1.05);
+}
+
+/* ---------- search in the top bar (slides out right → left) ---------- */
+
+.ldTopSearch {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ldTopSearchBtn {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.35s ease, border-color 0.35s ease, color 0.35s ease, transform 0.45s var(--ld-ease);
+}
+
+.ldTopSearchBtn svg {
+  width: 17px;
+  height: 17px;
+}
+
+.ldTopSearchBtn:hover {
+  border-color: var(--c-accent);
+  transform: scale(1.05);
+}
+
+.ldTopSearch.isExpanded .ldTopSearchBtn {
+  border-color: var(--c-accent);
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+}
+
+.ldTopSearchField {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  width: 0;
+  height: 44px;
+  margin-right: 0;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  opacity: 0;
+  transition:
+    width 0.6s var(--ld-ease),
+    margin 0.6s var(--ld-ease),
+    background 0.4s ease,
+    border-color 0.4s ease,
+    opacity 0.3s ease;
+}
+
+.ldTopSearch.isExpanded .ldTopSearchField {
+  width: min(380px, 34vw);
+  margin-right: -44px;
+  padding-right: 44px;
+  border-color: var(--ld-btn-line);
+  background: var(--c-surface);
+  box-shadow: var(--c-shadow);
+  opacity: 1;
+}
+
+.ldTopSearch.isExpanded .ldTopSearchField:focus-within {
+  border-color: var(--c-accent);
+  box-shadow: var(--c-shadow), 0 0 0 5px var(--c-accent-ring);
+}
+
+.ldTopSearchField input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0 6px 0 20px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ld-ink);
+  font: 400 15px/1 'Inter', system-ui, sans-serif;
+}
+
+.ldTopSearchField input::placeholder {
+  color: var(--ld-faint);
+}
+
+.ldTopSearchField input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.ldTopSearchClose {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-right: 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--c-accent-soft);
+  color: var(--ld-dim);
+  cursor: pointer;
+}
+
+.ldTopSearchClose svg {
+  width: 14px;
+  height: 14px;
+}
+
+.ldTopSearchClose:hover {
+  color: var(--ld-ink);
+}
+
+/* Make room: the signed-in name steps aside while searching. */
+.ldTopNav:has(.ldTopSearch.isExpanded) .ldTopStat {
+  display: none;
+}
+
+.ldTopResults {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: min(460px, calc(100vw - 40px));
+  max-height: min(480px, 64vh);
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid var(--ld-line);
+  border-radius: 22px;
+  background: var(--c-surface);
+  box-shadow: var(--c-shadow-lg);
+  text-align: left;
+  transform-origin: top right;
+  animation: ldDrop 0.45s var(--ld-ease) both;
+}
+
+@keyframes ldDrop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}
+
+.ldTopResult {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  animation: ldRowIn 0.5s var(--ld-ease) both;
+  animation-delay: calc(min(var(--i, 0), 10) * 35ms);
+}
+
+@keyframes ldRowIn {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+}
+
+.ldTopResult.isActive {
+  background: var(--c-accent-soft);
+}
+
+.ldTopResults.isLoading .ldTopResult {
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.ldResultText {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.ldResultText b {
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ldResultText small {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ld-faint);
+}
+
+.ldBadge {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--ld-line);
+  border-radius: 999px;
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ld-dim);
+}
+
+.ldBadge svg {
+  width: 12px;
+  height: 12px;
+}
+
+.ldBadge.isOpen {
+  border-color: var(--c-accent);
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+}
+
+.ldBadge.isPending {
+  border-color: var(--c-taupe);
+  color: var(--c-taupe);
+}
+
+.ldEmpty,
+.ldMore {
+  margin: 0;
+  padding: 14px 14px 6px;
+  font-size: 13.5px;
+  color: var(--ld-dim);
+}
+
+.ldMore {
+  padding-top: 8px;
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ld-faint);
+}
+
+.ldGate {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px;
+  text-align: left;
+}
+
+.ldGate > div {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.ldGate b {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 14.5px;
+  font-weight: 500;
+}
+
+.ldGate small {
+  font-size: 12px;
+  color: var(--ld-dim);
+}
+
+.ldGateIcon {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--c-gold-soft);
+  color: var(--c-gold-ink);
+}
+
+.ldGateIcon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.ldGateBtn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+.ldGateBtn:hover {
+  background: var(--c-accent-hover);
+}
+
+.ldGateBtn svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* ---------- avatar (search results and dialogs) ---------- */
+
+.ldAvatar {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--tbs-navy);
+  color: #fff;
+}
+
+:root[data-theme='dark'] .ldAvatar {
+  background: var(--tbs-navy-high);
+}
+
+.ldAvatar.is-square {
+  border-radius: 14px;
+}
+
+.ldAvatarIcon {
+  color: var(--tbs-gold);
+}
+
+.ldAvatarIcon svg {
+  width: 30px;
+  height: 30px;
+}
+
+.ldAvatar > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: inherit;
+  object-fit: cover;
+  object-position: 50% 28%;
+}
+
+.ldAvatar.isOpen {
+  box-shadow: 0 0 0 2px var(--c-surface), 0 0 0 4px var(--c-gold);
+  overflow: visible;
+}
+
+.ldInitials {
+  color: #fff;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.ldTopResults .ldInitials {
+  font-size: 14px;
+}
+
+/* ---------- centre ---------- */
+
+.ldCentre {
+  position: absolute;
+  z-index: 8;
+  left: 50%;
+  top: 50%;
+  max-width: calc(100% - 40px);
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+.ldCentreInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 24px;
+  pointer-events: auto;
+}
+
+.ldEyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 18px;
+  padding: 7px 14px 7px 11px;
+  border: 1px solid var(--ld-line);
+  border-radius: 999px;
+  background: var(--ld-glass);
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ld-dim);
+  animation: ldRise 1s var(--ld-ease) 0.1s both;
+}
+
+.ldEyebrow svg {
+  width: 16px;
+  height: 16px;
+  color: var(--c-gold-ink);
+}
+
+:root:not([data-theme='dark']) .ldEyebrow svg {
+  color: var(--tbs-navy);
+}
+
+.ldWordmark {
+  margin: 0 0 16px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(46px, 7vw, 100px);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+  color: var(--ld-ink);
+  animation: ldRise 1.2s var(--ld-ease) 0.2s both;
+}
+
+.ldTbs {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+:root[data-theme='dark'] .ldTbs {
+  color: var(--tbs-gold);
+}
+
+/* "Student", marked with a gold highlighter */
+.ldWordmark em {
+  position: relative;
+  z-index: 0;
+  font-style: italic;
+  font-weight: 500;
+}
+
+.ldWordmark em::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: -0.06em;
+  right: -0.02em;
+  bottom: 0.08em;
+  height: 0.3em;
+  border-radius: 0.08em 0.14em 0.1em 0.06em;
+  background: var(--tbs-gold);
+  opacity: 0.85;
+  transform: skewX(-12deg) scaleX(0);
+  transform-origin: left center;
+  animation: ldHighlight 0.9s var(--ld-ease) 1s forwards;
+}
+
+:root[data-theme='dark'] .ldWordmark em::before {
+  bottom: 0.02em;
+  height: 0.07em;
+  opacity: 1;
+}
+
+@keyframes ldHighlight {
+  to {
+    transform: skewX(-12deg) scaleX(1);
+  }
+}
+
+.ldTagline {
+  max-width: 520px;
+  margin: 0 0 26px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(17px, 1.5vw, 21px);
+  font-style: italic;
+  line-height: 1.4;
+  color: var(--ld-dim);
+  animation: ldRise 1.2s var(--ld-ease) 0.3s both;
+}
+
+.ldActions {
+  display: flex;
+  gap: 12px;
+  animation: ldRise 1.2s var(--ld-ease) 0.4s both;
+}
+
+.ldCta,
+.ldGhostBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 46px;
+  padding: 0 24px;
+  border-radius: 999px;
+  font: 500 14.5px 'Inter', system-ui, sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.4s var(--ld-ease), background 0.25s ease, border-color 0.25s ease;
+}
+
+.ldCta svg,
+.ldGhostBtn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.ldCta {
+  border: 0;
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+  box-shadow: 0 14px 36px rgba(5, 31, 82, 0.24);
+}
+
+:root[data-theme='dark'] .ldCta {
+  box-shadow: 0 14px 36px rgba(231, 192, 105, 0.22);
+}
+
+.ldCta:hover {
+  transform: translateY(-1px);
+  background: var(--c-accent-hover);
+}
+
+.ldGhostBtn {
+  border: 1px solid var(--ld-btn-line);
+  background: var(--ld-btn);
+  color: var(--ld-ink);
+  box-shadow: var(--c-shadow-sm);
+}
+
+.ldGhostBtn svg {
+  color: var(--c-taupe);
+}
+
+.ldGhostBtn:hover {
+  transform: translateY(-1px);
+  border-color: var(--c-accent);
+}
+
+.ldMeta {
+  margin: 20px 0 0;
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ld-faint);
+  animation: ldRise 1.2s var(--ld-ease) 0.5s both;
+}
+
+/* ---------- footer strip ---------- */
+
+.ldFoot {
+  position: absolute;
+  z-index: 9;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 clamp(20px, 3vw, 44px);
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, rgba(231, 192, 105, 0) 0%, rgba(231, 192, 105, 0.9) 50%, rgba(231, 192, 105, 0) 100%) top / 100% 1px no-repeat,
+    var(--c-surface);
+  box-shadow: 0 -12px 30px rgba(5, 31, 82, 0.06);
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ld-dim);
+}
+
+:root[data-theme='dark'] .ldFoot {
+  background:
+    linear-gradient(90deg, rgba(231, 192, 105, 0) 0%, rgba(231, 192, 105, 0.6) 50%, rgba(231, 192, 105, 0) 100%) top / 100% 1px no-repeat,
+    var(--c-bg-deep);
+  box-shadow: 0 -18px 40px rgba(2, 12, 34, 0.5);
+}
+
+.ldFoot em {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 15px;
+  font-style: italic;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--ld-ink);
+}
+
+/* ---------- dialogs ---------- */
+
+/* The dialog can open outside the landing page (e.g. from the sign-in
+ * screen), so it carries its own copy of the landing tokens. */
+.ldModalBackdrop {
+  --ld-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ld-ink: var(--c-text);
+  --ld-dim: var(--c-text-2);
+  --ld-faint: var(--c-text-3);
+  --ld-line: var(--c-line);
+  color: var(--c-text);
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  overflow-y: auto;
+  background: var(--c-backdrop);
+  animation: ldFadeIn 0.3s ease both;
+}
+
+.ldModal {
+  position: relative;
+  width: min(560px, 100%);
+  padding: 30px 30px 26px;
+  border: 1px solid var(--ld-line);
+  border-top: 4px solid var(--c-gold);
+  border-radius: 24px;
+  background: var(--c-surface);
+  color: var(--ld-ink);
+  box-shadow: var(--c-shadow-lg);
+  animation: ldRise 0.5s var(--ld-ease) both;
+}
+
+.ldModalClose {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--ld-line);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ld-dim);
+  cursor: pointer;
+}
+
+.ldModalClose:hover {
+  border-color: var(--c-accent);
+  color: var(--ld-ink);
+}
+
+.ldModalClose svg {
+  width: 16px;
+  height: 16px;
+}
+
+.ldModalHead {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-right: 40px;
+  margin-bottom: 20px;
+}
+
+.ldModalHead small {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--c-taupe);
+}
+
+.ldModalHead small svg {
+  width: 12px;
+  height: 12px;
+}
+
+.ldModalHead h2 {
+  margin: 6px 0 4px;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 30px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.ldModalHead > div > span {
+  font-size: 13px;
+  color: var(--ld-dim);
+}
+
+.ldForm {
+  display: grid;
+  gap: 14px;
+}
+
+.ldFormIntro {
+  margin: 0 0 4px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ld-dim);
+}
+
+.ldFormRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.ldForm label {
+  display: grid;
+  gap: 7px;
+}
+
+.ldForm label > span {
+  font-family: 'DM Mono', ui-monospace, monospace;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ld-dim);
+}
+
+.ldForm label em {
+  font-style: normal;
+  color: var(--ld-faint);
+}
+
+.ldForm input,
+.ldForm select,
+.ldForm textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--c-line-2);
+  border-radius: 12px;
+  background: var(--c-surface-2);
+  color: var(--ld-ink);
+  font: 400 15px 'Inter', system-ui, sans-serif;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ldForm select option {
+  background: var(--c-surface);
+  color: var(--ld-ink);
+}
+
+.ldForm textarea {
+  resize: vertical;
+  min-height: 84px;
+}
+
+.ldForm input:focus,
+.ldForm select:focus,
+.ldForm textarea:focus {
+  border-color: var(--c-accent);
+  box-shadow: 0 0 0 4px var(--c-accent-ring);
+}
+
+.ldHoney {
+  position: absolute !important;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.ldFormError {
+  padding: 11px 14px;
+  border: 1px solid var(--c-danger);
+  border-radius: 12px;
+  background: var(--c-danger-soft);
+  color: var(--c-danger);
+  font-size: 13.5px;
+}
+
+.ldFormActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.ldFormActions a.ldGhost {
+  margin-right: auto;
+  text-decoration: none;
+}
+
+.ldPrimary,
+.ldGhost {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 46px;
+  padding: 0 22px;
+  border-radius: 999px;
+  font: 500 14px 'Inter', system-ui, sans-serif;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.35s var(--ld-ease);
+}
+
+.ldPrimary {
+  border: 0;
+  background: var(--c-accent);
+  color: var(--c-on-accent);
+}
+
+.ldPrimary:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: var(--c-accent-hover);
+}
+
+.ldPrimary:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.ldPrimary svg {
+  width: 16px;
+  height: 16px;
+}
+
+.ldGhost {
+  border: 1px solid var(--c-line-2);
+  background: transparent;
+  color: var(--ld-dim);
+}
+
+.ldGhost:hover {
+  border-color: var(--c-accent);
+  color: var(--ld-ink);
+}
+
+.ldModalDone {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 10px 0 4px;
+  text-align: center;
+}
+
+.ldModalDone > svg {
+  width: 40px;
+  height: 40px;
+  color: var(--c-success);
+}
+
+.ldModalDone > svg.isPending {
+  color: var(--c-taupe);
+}
+
+.ldModalDone h3 {
+  margin: 0;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 26px;
+  font-weight: 500;
+}
+
+.ldModalDone p {
+  max-width: 420px;
+  margin: 0 0 12px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--ld-dim);
+}
+
+.ldModalDone b {
+  color: var(--ld-ink);
+  font-weight: 500;
+}
+
+/* View / edit choice */
+.ldChoiceGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.ldChoiceGrid > * {
+  display: grid;
+  justify-items: start;
+  align-content: start;
+  gap: 6px;
+  padding: 18px;
+  border: 1px solid var(--ld-line);
+  border-radius: 16px;
+  background: var(--c-surface-2);
+  color: var(--ld-ink);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.25s ease, background 0.25s ease, transform 0.35s var(--ld-ease);
+}
+
+.ldChoiceGrid > *:hover {
+  transform: translateY(-2px);
+  border-color: var(--c-accent);
+  background: var(--c-accent-soft);
+}
+
+.ldChoiceGrid svg {
+  width: 20px;
+  height: 20px;
+  color: var(--c-taupe);
+}
+
+.ldChoiceGrid b {
+  font-size: 15.5px;
+  font-weight: 500;
+}
+
+.ldChoiceGrid small {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ld-dim);
+}
+
+/* Signed in, but not yet a member */
+.ldNotice {
+  position: absolute;
+  z-index: 12;
+  left: 50%;
+  bottom: 66px;
+  width: min(680px, calc(100% - 32px));
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px 12px 18px;
+  border: 1px solid var(--c-gold);
+  border-radius: 14px;
+  background: var(--c-surface);
+  color: var(--ld-ink);
+  box-shadow: var(--c-shadow);
+  font-size: 13.5px;
+  line-height: 1.45;
+  transform: translateX(-50%);
+}
+
+.ldNotice span {
+  flex: 1;
+}
+
+.ldNotice a {
+  flex: none;
+  color: var(--ld-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--c-gold);
+  text-underline-offset: 3px;
+}
+
+.ldNotice button {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.ldNotice button svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* ---------- leaving for a portfolio ---------- */
+
+.ldCurtain {
+  position: fixed;
+  z-index: 60;
+  inset: 0;
+  background: var(--c-bg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.ld.isLeaving .ldCurtain {
+  opacity: 1;
+}
+
+/* Back to the landing page from a member-opened portfolio */
+.memberBack {
+  position: fixed;
+  z-index: 120;
+  right: 20px;
+  bottom: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 18px;
+  border: 1px solid var(--c-line-2);
+  border-radius: 999px;
+  background: var(--c-surface);
+  color: var(--c-text);
+  font: 500 13px 'Inter', system-ui, sans-serif;
+  text-decoration: none;
+  box-shadow: var(--c-shadow);
+}
+
+.memberBack:hover {
+  border-color: var(--c-accent);
+}
+
+.memberBack svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* ---------- small screens ---------- */
+
+@media (max-width: 760px) {
+  .ld {
+    min-height: 600px;
+  }
+
+  /* A solid header bar so cards never pass under the logo or buttons. */
+  .ldTop {
+    position: fixed;
+    z-index: 25;
+    height: 64px;
+    padding: 0 12px 0 14px;
+    gap: 10px;
+    border-bottom: 1px solid var(--ld-line);
+    background: var(--c-surface);
+    box-shadow: var(--c-shadow-sm);
+    pointer-events: auto;
+  }
+
+  .ldBrand {
+    min-width: 0;
+    gap: 10px;
+  }
+
+  .ldCrest {
+    width: 40px;
+    height: 40px;
+  }
+
+  .ldBrandText {
+    min-width: 0;
+    gap: 2px;
+  }
+
+  .ldBrandText b {
+    overflow: hidden;
+    font-size: 15px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .ldBrandText small {
+    font-size: 8.5px;
+    letter-spacing: 0.22em;
+  }
+
+  .ldTopStat {
+    display: none;
+  }
+
+  .ldTopNav {
+    flex: none;
+    gap: 6px;
+  }
+
+  .ldLogin,
+  .ldIconBtn,
+  .ldTopSearchBtn,
+  .ldThemeToggle.themeToggle {
+    box-shadow: none;
+  }
+
+  .ldTopSearchBtn,
+  .ldTopNav .ldIconBtn,
+  .ldThemeToggle.themeToggle,
+  .isMember .ldTopNav .ldLogin.isQuiet {
+    width: 38px;
+    height: 38px;
+  }
+
+  .isMember .ldLogin {
+    justify-content: center;
+    padding: 0;
+    font-size: 0;
+  }
+
+  .isMember .ldLogin svg {
+    display: block;
+  }
+
+  .isVisitor .ldTopNav .ldLogin {
+    height: 38px;
+    padding: 0 14px 0 12px;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+  }
+
+  /* On phones the search field slides in over the whole top bar. */
+  .ldTopSearchField {
+    position: fixed;
+    top: 9px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    height: 46px;
+    margin: 0;
+    transform: translateX(105%);
+    transition: transform 0.55s var(--ld-ease), opacity 0.3s ease, background 0.3s ease;
+  }
+
+  .ldTopSearch.isExpanded .ldTopSearchField {
+    z-index: 30;
+    width: auto;
+    margin: 0;
+    padding-right: 0;
+    transform: translateX(0);
+  }
+
+  .ldTopResults {
+    position: fixed;
+    z-index: 30;
+    top: 72px;
+    left: 14px;
+    right: 14px;
+    width: auto;
+    max-height: calc(100vh - 110px);
+  }
+
+  .ldGate {
+    flex-wrap: wrap;
+  }
+
+  .ldGateBtn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .ldTopResult .ldBadge {
+    padding: 6px 8px;
+    font-size: 9px;
+  }
+
+  .ldCentre {
+    top: 48%;
+  }
+
+  .ldCentreInner {
+    padding: 8px 14px;
+  }
+
+  .ldEyebrow {
+    margin-bottom: 12px;
+    padding: 6px 11px 6px 9px;
+    font-size: 8.5px;
+    letter-spacing: 0.1em;
+  }
+
+  .ldEyebrow svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* The wordmark always fits on one line */
+  .ldWordmark {
+    margin-bottom: 12px;
+    font-size: min(8.6vw, 44px);
+  }
+
+  .ldTagline {
+    margin-bottom: 18px;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  .ldCta,
+  .ldGhostBtn {
+    height: 42px;
+    padding: 0 20px;
+    font-size: 13.5px;
+  }
+
+  .ldMeta {
+    margin-top: 14px;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+  }
+
+  .ldCard {
+    border-radius: 12px;
+    padding-top: 6px;
+  }
+
+  .ldCardName {
+    margin-top: 4px;
+  }
+
+  .ldCardRibbon {
+    left: 8px;
+    right: 8px;
+    height: 3px;
+  }
+
+  .ldStarTip {
+    display: none;
+  }
+
+  .ldFoot {
+    min-height: 48px;
+    justify-content: center;
+    padding: 0 16px;
+  }
+
+  .ldFoot span {
+    display: none;
+  }
+
+  .ldNotice {
+    bottom: 56px;
+    font-size: 12.5px;
+  }
+
+  .ldFormRow,
+  .ldChoiceGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .ldModal {
+    padding: 24px 20px 20px;
+  }
+
+  .ldPrimary,
+  .ldGhost {
+    height: 44px;
+    padding: 0 16px;
+    font-size: 13.5px;
+  }
+
+  .ldModalHead h2 {
+    font-size: 25px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ld *,
+  .ld *::before {
+    animation: none !important;
+  }
+
+  .ldWordmark em::before {
+    transform: skewX(-12deg);
+  }
+}
+
+/* =========================================================================
+   School website palette (british-school.org): navy #051f52,
+   gold #e7c069, beige #dacabe, taupe #9c8d7a. Landing page and its
+   pop-ups only; the rest of the app keeps its own theme.
+   ========================================================================= */
+.ld,
+.ldModalBackdrop {
+  --tbs-navy: #051f52;
+  --tbs-gold: #e7c069;
+  --tbs-beige: #dacabe;
+  --tbs-taupe: #9c8d7a;
+  --tbs-navy-deep: #031538;
+  --tbs-navy-raised: #0b2c68;
+  --tbs-navy-high: #123d86;
+  --tbs-gold-soft: #ecd08e;
+  --c-text: #051f52;
+  --c-text-2: rgba(5, 31, 82, 0.74);
+  --c-text-3: rgba(5, 31, 82, 0.54);
+  --c-line: rgba(5, 31, 82, 0.12);
+  --c-line-2: rgba(5, 31, 82, 0.22);
+  --c-accent: #051f52;
+  --c-accent-hover: #123d86;
+  --c-on-accent: #ffffff;
+  --c-accent-soft: rgba(5, 31, 82, 0.07);
+  --c-accent-ring: rgba(5, 31, 82, 0.16);
+  --c-gold: #e7c069;
+  --c-gold-soft: rgba(231, 192, 105, 0.24);
+  --c-gold-ink: #051f52;
+  --c-taupe: #9c8d7a;
+  --c-beige: #dacabe;
+  --c-shadow-sm: 0 6px 18px rgba(5, 31, 82, 0.08);
+  --c-shadow: 0 22px 60px rgba(5, 31, 82, 0.12);
+  --c-shadow-lg: 0 40px 110px rgba(5, 31, 82, 0.18);
+  --c-backdrop: rgba(5, 31, 82, 0.45);
+}
+:root[data-theme='dark'] .ld,
+:root[data-theme='dark'] .ldModalBackdrop {
+  --c-bg: #051f52;
+  --c-bg-soft: #041a46;
+  --c-bg-deep: #03153a;
+  --c-surface: #0b2c68;
+  --c-surface-2: #0f3474;
+  --c-surface-3: #123d86;
+  --c-text: #ffffff;
+  --c-text-2: rgba(255, 255, 255, 0.78);
+  --c-text-3: rgba(255, 255, 255, 0.56);
+  --c-line: rgba(255, 255, 255, 0.12);
+  --c-line-2: rgba(255, 255, 255, 0.24);
+  --c-accent: #e7c069;
+  --c-accent-hover: #ecd08e;
+  --c-on-accent: #051f52;
+  --c-accent-soft: rgba(231, 192, 105, 0.12);
+  --c-accent-ring: rgba(231, 192, 105, 0.28);
+  --c-gold: #e7c069;
+  --c-gold-soft: rgba(231, 192, 105, 0.18);
+  --c-gold-ink: #e7c069;
+  --c-taupe: #dacabe;
+  --c-beige: #dacabe;
+  --c-shadow-sm: 0 6px 18px rgba(2, 12, 34, 0.35);
+  --c-shadow: 0 22px 60px rgba(2, 12, 34, 0.45);
+  --c-shadow-lg: 0 40px 110px rgba(2, 12, 34, 0.55);
+  --c-backdrop: rgba(2, 12, 34, 0.6);
+}
+
+/* ---------- desktop: larger small print, steadier rhythm ---------- */
+@media (min-width: 1024px) {
+  .ldEyebrow {
+    margin-bottom: 26px;
+    padding: 9px 18px 9px 14px;
+    font-size: 11.5px;
+    letter-spacing: 0.18em;
+  }
+  .ldWordmark {
+    margin-bottom: 22px;
+    font-size: clamp(72px, 6.4vw, 118px);
+  }
+  .ldTagline {
+    max-width: 640px;
+    margin-bottom: 34px;
+    font-size: clamp(21px, 1.55vw, 26px);
+    line-height: 1.45;
+  }
+  .ldCta,
+  .ldGhostBtn {
+    height: 54px;
+    padding: 0 30px;
+    font-size: 16px;
+  }
+  .ldCta svg,
+  .ldGhostBtn svg {
+    width: 18px;
+    height: 18px;
+  }
+  .ldMeta {
+    margin-top: 26px;
+    font-size: 12px;
+    letter-spacing: 0.16em;
+  }
+  .ldFoot {
+    min-height: 60px;
+    font-size: 11.5px;
+    letter-spacing: 0.14em;
+  }
+  .ldFoot em {
+    font-size: 17px;
+  }
+  .ldBrandText b {
+    font-size: 20px;
+  }
+  .ldBrandText small {
+    font-size: 11px;
+  }
+  .ldTopStat {
+    font-size: 11.5px;
+  }
+  .ldLogin {
+    height: 48px;
+    font-size: 12px;
+  }
+}

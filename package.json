@@ -1,0 +1,28 @@
+{
+  "name": "tbs-student-journey-portfolio",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@fontsource/dm-mono": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/playfair-display": "^5.3.0",
+    "@gsap/react": "^2.1.2",
+    "@react-pdf/renderer": "^4.9.0",
+    "@supabase/supabase-js": "^2.117.2",
+    "@vitejs/plugin-react": "latest",
+    "gsap": "^3.15.0",
+    "lucide-react": "latest",
+    "pdfjs-dist": "^4.10.38",
+    "qrcode": "^1.5.4",
+    "react": "latest",
+    "react-dom": "latest",
+    "three": "^0.186.1",
+    "vite": "latest"
+  }
+}

@@ -1,0 +1,36 @@
+/* Journey · Carousel view (curved screen) */
+.journeyCarousel { position: relative; padding: 8px 0 40px; overflow: hidden; color: rgb(var(--pf-ink-rgb, 255, 255, 255)); }
+.jcStage { position: relative; width: 100%; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; perspective-origin: 50% 50%; }
+.jcStage:active { cursor: grabbing; }
+.jcRing { position: absolute; inset: 0; transform-style: preserve-3d; }
+.jcCard { position: absolute; left: 50%; top: 50%; padding: 0; border: 0; border-radius: 14px; overflow: hidden; background: #151449; box-shadow: 0 24px 50px -24px rgba(10, 10, 40, .55); cursor: inherit; visibility: hidden; backface-visibility: hidden; will-change: transform; outline-offset: 4px; }
+.jcCard img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+.jcCard:focus-visible { outline: 3px solid #eec058; }
+.jcCover { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; gap: 6px; padding: 18px; text-align: left; color: #fff; background: radial-gradient(circle at 78% 16%, rgba(238, 192, 88, .38), transparent 46%), linear-gradient(150deg, #24236a, #151449 60%, #0d0c33); }
+.jcCover small, .jcCaption small { font-family: 'DM Mono', monospace; font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; color: #eec058; }
+.jcCover b { font-family: 'Playfair Display', Georgia, serif; font-size: 19px; font-weight: 500; line-height: 1.15; }
+.jcCaption { position: absolute; inset: auto 0 0; display: grid; gap: 4px; padding: 40px 16px 14px; text-align: left; color: #fff; background: linear-gradient(transparent, rgba(8, 8, 30, .82)); opacity: 0; transform: translateY(8px); transition: opacity .3s ease, transform .3s ease; pointer-events: none; }
+.jcCaption b { font-family: 'Playfair Display', Georgia, serif; font-size: 16px; font-weight: 500; line-height: 1.2; }
+.jcCover + .jcCaption { display: none; }
+.jcCard:hover .jcCaption, .jcCard:focus-visible .jcCaption { opacity: 1; transform: none; }
+
+.jcBar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 6px; }
+.jcHint { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 999px; border: 1px solid rgba(var(--pf-ink-rgb, 255, 255, 255), .18); font-family: 'DM Mono', monospace; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; opacity: .8; white-space: nowrap; }
+.jcHint svg { width: 15px; height: 15px; }
+.jcNow { flex: 1; min-width: 0; display: grid; justify-items: center; gap: 4px; text-align: center; }
+.jcNow small { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--pf-accent-text, #eec058); }
+.jcNow button { max-width: 100%; padding: 0; border: 0; background: none; color: inherit; font-family: 'Playfair Display', Georgia, serif; font-size: clamp(18px, 2vw, 24px); line-height: 1.2; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.jcNow button:hover { text-decoration: underline; text-underline-offset: 4px; }
+.jcControls { display: flex; align-items: center; gap: 10px; }
+.jcControls button { width: 44px; height: 44px; display: grid; place-items: center; padding: 0; border-radius: 50%; border: 1px solid rgba(var(--pf-ink-rgb, 255, 255, 255), .2); background: transparent; color: inherit; cursor: pointer; transition: background .25s ease, border-color .25s ease; }
+.jcControls button:hover { border-color: rgba(var(--pf-ink-rgb, 255, 255, 255), .5); background: rgba(var(--pf-ink-rgb, 255, 255, 255), .06); }
+.jcControls button svg { width: 17px; height: 17px; }
+
+@media (max-width: 700px) {
+  .jcBar { flex-wrap: wrap; justify-content: center; }
+  .jcNow { order: -1; flex-basis: 100%; }
+  .jcHint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .jcCaption { transition: none; }
+}

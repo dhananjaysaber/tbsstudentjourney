@@ -1,0 +1,217 @@
+/* =========================================================================
+   AWARD REPORTS · navy & gold (v33)
+   ========================================================================= */
+
+/* ---------- Tabs ---------- */
+.awTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px;
+  background: #fff;
+  border-radius: 16px;
+  border: 1px solid rgba(21, 20, 73, .06);
+  box-shadow: 0 1px 2px rgba(21, 20, 73, .05), 0 10px 26px rgba(21, 20, 73, .06);
+}
+.awTabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: var(--aw-soft);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+.awTabs button svg { width: 16px; height: 16px; }
+.awTabs button:hover { background: #f3f2fa; color: var(--aw-navy); }
+.awTabs button.on { background: var(--aw-navy); color: #fff; box-shadow: 0 6px 16px rgba(21, 20, 73, .22); }
+.awTabs button.on svg { color: var(--aw-gold); }
+
+/* ---------- Layout ---------- */
+.awPrintHead { display: none; }
+.awRepGrid2 { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; align-items: start; }
+.awRepGrid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; align-items: start; }
+.awRepActions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.awRepActions > :first-child { margin-right: auto; }
+.awRepActions > :only-child { margin-right: 0; margin-left: auto; }
+.awPanelHeadRow { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px 6px; }
+.awPanelHeadRow .awKicker { margin: 0; }
+
+/* ---------- KPIs ---------- */
+.awKpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; }
+.awKpi { padding: 18px 20px; display: grid; gap: 2px; position: relative; }
+.awKpi::before { content: ""; position: absolute; left: 0; top: 18px; bottom: 18px; width: 3px; border-radius: 0 3px 3px 0; background: var(--aw-gold); }
+.awKpi b { font-family: "Playfair Display", serif; font-size: 30px; font-weight: 600; line-height: 1.1; color: var(--aw-navy); }
+.awKpi span { font-size: 13px; font-weight: 500; color: var(--aw-ink); }
+.awKpi small { font-size: 11.5px; color: var(--aw-faint); }
+
+/* ---------- Tables ---------- */
+.awRepTable td { vertical-align: middle; }
+.awRepTable .awWho { white-space: nowrap; }
+.awRepTable .awAv { width: 30px; height: 30px; font-size: 10.5px; }
+.awClickRow { cursor: pointer; transition: background .12s ease; }
+.awClickRow:hover td { background: #faf8ef; }
+.awTotal { display: inline-grid; place-items: center; min-width: 30px; height: 30px; padding: 0 8px; border-radius: 999px; background: #f0eff8; color: var(--aw-navy); font-size: 13px; }
+.awRepTable tfoot td { background: #fbf6e7; border-top: 2px solid rgba(238, 192, 88, .55); border-bottom: 0; font-size: 13.5px; }
+
+.awRepWrap { max-height: calc(100vh - 260px); border-radius: 0; }
+.awRepMatrix thead th, .awHeat thead th { position: sticky; top: 0; z-index: 3; background: #fafafd; box-shadow: inset 0 -1px 0 var(--aw-line); white-space: nowrap; }
+.awRepMatrix thead th:first-child, .awHeat thead th:first-child { left: 0; z-index: 4; }
+.awRepMatrix tbody td:first-child, .awHeat tbody td:first-child, .awRepMatrix tfoot td:first-child { position: sticky; left: 0; z-index: 1; background: #fff; box-shadow: inset -1px 0 0 var(--aw-line); }
+.awRepMatrix tfoot td:first-child { background: #fbf6e7; }
+.awRepMatrix tfoot td { position: sticky; bottom: 0; }
+.awRepMatrix tr.isZero td { background: #fdfcf8; }
+.awRepMatrix tr.isZero td:first-child { background: #fdfcf8; }
+.awRepMatrix tr.awClickRow:hover td:first-child { background: #faf8ef; }
+.awCellTags { display: inline-flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+.awCellTags .awMini { font-size: 11px; padding: 3px 8px; }
+.awZero { font-family: "DM Mono", monospace; font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: #a5781e; background: rgba(238, 192, 88, .16); padding: 4px 8px; border-radius: 999px; white-space: nowrap; }
+
+.awHeat td { font-variant-numeric: tabular-nums; }
+.awHeat td.c { min-width: 54px; }
+
+/* ---------- Class columns (overview) ---------- */
+.awColBtn { flex: 1; min-width: 34px; display: grid; justify-items: center; align-content: end; gap: 4px; height: 100%; padding: 0; border: 0; background: none; cursor: pointer; font: inherit; color: inherit; }
+.awColBtn i { display: block; width: 100%; border-radius: 6px 6px 2px 2px; background: #dcdaee; transition: background .15s ease; }
+.awColBtn:hover i { background: var(--aw-navy3); }
+.awColBtn i.top { background: linear-gradient(180deg, var(--aw-gold), var(--aw-goldD)); }
+.awColBtn small { font-family: "DM Mono", monospace; font-size: 9px; color: var(--aw-faint); }
+.awColBtn b { font-size: 11px; }
+
+/* ---------- Quotes ---------- */
+.awQuotes { display: grid; gap: 14px; }
+.awQuotes figure { margin: 0; padding: 14px 16px; border-radius: 14px; background: #fbf8ee; border-left: 3px solid var(--aw-gold); }
+.awQuotes blockquote { margin: 0 0 8px; font-family: "Playfair Display", serif; font-style: italic; font-size: 15px; line-height: 1.45; color: var(--aw-ink); }
+.awQuotes figcaption { font-size: 12.5px; color: var(--aw-soft); }
+.awQuotes figcaption small { display: block; margin-top: 2px; font-family: "DM Mono", monospace; font-size: 9.5px; letter-spacing: .06em; color: var(--aw-faint); }
+
+/* ---------- Class picker ---------- */
+.awClassPick { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+.awClassCard { position: relative; display: grid; gap: 4px; padding: 18px 20px 22px; text-align: left; font: inherit; color: inherit; cursor: pointer; transition: transform .15s ease, box-shadow .15s ease; }
+.awClassCard:hover { transform: translateY(-2px); box-shadow: 0 2px 4px rgba(21, 20, 73, .06), 0 22px 44px rgba(21, 20, 73, .12); }
+.awClassCard b { font-family: "Playfair Display", serif; font-size: 24px; font-weight: 600; color: var(--aw-navy); }
+.awClassCard span { font-size: 13.5px; font-weight: 500; }
+.awClassCard small { font-size: 11.5px; color: var(--aw-faint); }
+.awClassCard i { position: absolute; left: 0; bottom: 0; height: 4px; background: linear-gradient(90deg, var(--aw-goldD), var(--aw-gold)); }
+.awClassCard::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: #efeef6; z-index: -1; }
+.awClassPick .awEmpty { grid-column: 1 / -1; }
+
+/* ---------- Not yet ---------- */
+.awNotYet span { display: inline-flex; padding: 5px 10px; border-radius: 999px; background: #fff; border: 1px dashed rgba(184, 137, 42, .55); color: var(--aw-ink); font-size: 12.5px; }
+.awNotYetRow { display: grid; grid-template-columns: 80px 1fr; gap: 12px; align-items: start; padding: 10px 0; border-top: 1px solid var(--aw-line); }
+.awNotYetRow:first-of-type { border-top: 0; }
+.awNotYetRow > b { font-family: "DM Mono", monospace; font-size: 12px; padding-top: 5px; color: var(--aw-navy); }
+
+/* ---------- Student picker ---------- */
+.awStudentPick { position: relative; max-width: 560px; }
+.awSearchBox { display: flex; align-items: center; gap: 10px; padding: 0 16px; height: 48px; background: #fff; border-radius: 14px; border: 1px solid rgba(21, 20, 73, .1); box-shadow: 0 8px 22px rgba(21, 20, 73, .06); }
+.awSearchBox:focus-within { border-color: var(--aw-gold); box-shadow: 0 0 0 3px rgba(238, 192, 88, .25); }
+.awSearchBox svg { width: 18px; height: 18px; color: var(--aw-faint); flex: none; }
+.awSearchBox input { flex: 1; border: 0; outline: 0; background: transparent; font: inherit; font-size: 14.5px; color: var(--aw-ink); min-width: 0; }
+.awSearchResults { position: absolute; z-index: 20; top: 54px; left: 0; right: 0; display: grid; padding: 6px; background: #fff; border-radius: 14px; border: 1px solid rgba(21, 20, 73, .08); box-shadow: 0 24px 50px rgba(21, 20, 73, .18); max-height: 360px; overflow: auto; }
+.awSearchResults button { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border: 0; border-radius: 10px; background: none; text-align: left; font: inherit; color: var(--aw-ink); cursor: pointer; }
+.awSearchResults button:hover { background: #f6f4ea; }
+.awSearchResults button span:last-child { display: grid; font-size: 14px; font-weight: 500; }
+.awSearchResults small { font-family: "DM Mono", monospace; font-size: 10px; color: var(--aw-faint); font-weight: 400; }
+.awStudentPick > .awMuted { margin: 8px 2px 0; }
+
+/* ---------- Student record ---------- */
+.awRecordHead { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; padding: 26px 28px; background: linear-gradient(135deg, var(--aw-navy), var(--aw-navy3)); color: #fff; }
+.awAv.big { width: 64px; height: 64px; font-size: 20px; background: linear-gradient(160deg, var(--aw-goldL), var(--aw-gold)); color: var(--aw-navy); }
+.awRecordHead > div:nth-child(2) { flex: 1; min-width: 200px; }
+.awRecordHead small { font-family: "DM Mono", monospace; font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--aw-gold); }
+.awRecordHead h2 { margin: 4px 0 2px; font-family: "Playfair Display", serif; font-size: 30px; font-weight: 600; color: #fff; }
+.awRecordHead p { margin: 0; color: rgba(255, 255, 255, .72); font-size: 13.5px; }
+.awRecordStats { display: flex; flex-wrap: wrap; gap: 10px; }
+.awRecordStats > div { display: grid; gap: 2px; min-width: 96px; padding: 10px 14px; border-radius: 12px; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .12); }
+.awRecordStats b { font-family: "Playfair Display", serif; font-size: 20px; font-weight: 600; color: var(--aw-gold); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.awRecordStats span { font-size: 11px; color: rgba(255, 255, 255, .7); }
+.awRecordYear { padding: 20px 28px 6px; }
+.awRecordYear h3 { margin: 0 0 12px; font-family: "Playfair Display", serif; font-size: 20px; font-weight: 600; color: var(--aw-navy); display: flex; align-items: baseline; gap: 10px; }
+.awRecordYear h3 small { font-family: "DM Mono", monospace; font-size: 10px; letter-spacing: .08em; color: var(--aw-faint); font-weight: 400; }
+.awRecordList { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.awRecordList article { display: flex; gap: 14px; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--aw-line); background: #fff; break-inside: avoid; }
+.awRecordList article .awMedal { flex: none; cursor: default; }
+.awRecordList article > div { display: grid; gap: 2px; min-width: 0; align-content: start; }
+.awRecordList b { font-size: 14.5px; color: var(--aw-navy); }
+.awRecordList span { font-size: 13px; color: var(--aw-ink); }
+.awRecordList small { font-size: 11.5px; color: var(--aw-faint); }
+.awRecordList em { margin-top: 6px; font-family: "Playfair Display", serif; font-size: 14px; color: var(--aw-soft); line-height: 1.4; }
+.awRecordFoot { margin-top: 18px; padding: 14px 28px; border-top: 1px solid var(--aw-line); font-family: "DM Mono", monospace; font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--aw-goldD); text-align: center; }
+.awRecord .awEmpty { margin: 20px 28px 0; }
+
+/* ---------- Coverage ---------- */
+.awHisto { display: flex; align-items: flex-end; gap: 16px; height: 190px; padding-top: 10px; }
+.awHisto > div { flex: 1; display: grid; justify-items: center; align-content: end; gap: 4px; }
+.awHisto i { display: block; width: 100%; max-width: 72px; border-radius: 8px 8px 3px 3px; background: linear-gradient(180deg, var(--aw-navy3), var(--aw-navy)); }
+.awHisto i.zero { background: repeating-linear-gradient(135deg, rgba(238, 192, 88, .5) 0 6px, rgba(238, 192, 88, .25) 6px 12px); }
+.awHisto b { font-size: 15px; color: var(--aw-navy); }
+.awHisto small { font-family: "DM Mono", monospace; font-size: 9.5px; color: var(--aw-faint); white-space: nowrap; }
+.awCover { display: flex; align-items: center; gap: 10px; width: 100%; min-width: 140px; }
+.awCover::before { content: none; }
+.awCover i { display: block; flex: none; height: 8px; min-width: 2px; max-width: calc(100% - 50px); border-radius: 4px; background: linear-gradient(90deg, var(--aw-goldD), var(--aw-gold)); }
+.awCover span { font-size: 12.5px; font-weight: 600; color: var(--aw-navy); min-width: 38px; }
+
+/* ---------- Export centre ---------- */
+.awExportGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.awExportCard { display: grid; grid-template-rows: auto auto 1fr auto; gap: 8px; padding: 22px; }
+.awExportCard h3 { margin: 6px 0 0; font-family: "Playfair Display", serif; font-size: 19px; font-weight: 600; color: var(--aw-navy); }
+.awExportCard p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--aw-soft); }
+.awExportCard .awBtn { justify-self: start; margin-top: 8px; }
+.awExportIcon { display: inline-grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: #f0eff8; color: var(--aw-navy); }
+.awExportIcon svg { width: 20px; height: 20px; }
+.awExportCard.isPrint { background: linear-gradient(135deg, var(--aw-navy), var(--aw-navy3)); }
+.awExportCard.isPrint h3 { color: #fff; }
+.awExportCard.isPrint p { color: rgba(255, 255, 255, .72); }
+.awExportCard.isPrint .awExportIcon { background: rgba(238, 192, 88, .18); color: var(--aw-gold); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1100px) {
+  .awRepGrid3 { grid-template-columns: 1fr 1fr; }
+  .awRepGrid2 { grid-template-columns: 1fr; }
+}
+@media (max-width: 720px) {
+  .awRepGrid3 { grid-template-columns: 1fr; }
+  .awTabs { flex-wrap: nowrap; overflow-x: auto; }
+  .awTabs button { white-space: nowrap; }
+  .awRecordHead { padding: 20px; }
+  .awRecordYear { padding: 16px 20px 4px; }
+  .awNotYetRow { grid-template-columns: 1fr; gap: 6px; }
+}
+
+/* ---------- Print / Save as PDF ("Generate report") ---------- */
+@media print {
+  @page { size: A4; margin: 14mm 12mm; }
+  html, body { background: #fff !important; }
+  .side, .portalTop, .awStage, .awCtrls, .awStageActions, .awTabs, .awDock,
+  .awNoPrint, .awFlash, .awReports button.awBtn { display: none !important; }
+  .portal, .portalMain, .portalBody, .portalBody.isWide { display: block !important; margin: 0 !important; padding: 0 !important; max-width: none !important; width: auto !important; background: #fff !important; }
+  .awPage { padding: 0 !important; gap: 14px; }
+  .awReports * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .awPrintHead { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; padding-bottom: 10px; border-bottom: 2px solid #eec058; }
+  .awPrintHead small { font-family: "DM Mono", monospace; font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: #b8892a; }
+  .awPrintHead h1 { margin: 4px 0 2px; font-family: "Playfair Display", serif; font-size: 24px; color: #151449; }
+  .awPrintHead p { margin: 0; font-size: 11px; color: rgba(21, 20, 73, .7); }
+  .awPrintHead > span { font-size: 10px; color: rgba(21, 20, 73, .6); white-space: nowrap; }
+  .awPanel { box-shadow: none !important; border: 1px solid rgba(21, 20, 73, .14) !important; overflow: visible !important; break-inside: auto; }
+  .awKpi, .awPadded, .awExportCard { break-inside: avoid; }
+  .awRepWrap, .awGridWrap { max-height: none !important; overflow: visible !important; }
+  .awRepMatrix thead th, .awHeat thead th, .awRepMatrix td, .awHeat td { position: static !important; }
+  .awRepTable th, .awRepTable td { padding: 6px 8px; font-size: 11px; }
+  .awRepTable thead { display: table-header-group; }
+  .awRepTable tr { break-inside: avoid; }
+  .awKpis { grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .awKpi { padding: 10px 12px; }
+  .awKpi b { font-size: 20px; }
+  .awRepGrid2, .awRepGrid3 { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .awRecord { border: 0 !important; }
+  .awRecordList { grid-template-columns: 1fr 1fr; }
+  .awClickRow:hover td { background: inherit; }
+  .awMuted.awNoPrint { display: none; }
+}

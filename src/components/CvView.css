@@ -1,0 +1,353 @@
+/* =========================================================================
+   STUDENT CV · an A4 sheet on screen, and exactly the sheet when printed
+   ========================================================================= */
+
+.cvOverlay {
+  --cv-navy: #151449;
+  --cv-gold: #c9a24a;
+  --cv-ink: #1f1e3a;
+  --cv-muted: #6b6a80;
+  --cv-line: #e4e1da;
+
+  position: fixed;
+  z-index: 400;
+  inset: 0;
+  overflow-y: auto;
+  padding: 84px 20px 60px;
+  background: rgba(9, 8, 36, 0.86);
+  animation: cvFade 0.35s ease both;
+}
+
+@keyframes cvFade {
+  from {
+    opacity: 0;
+  }
+}
+
+.cvToolbar {
+  position: fixed;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 64px;
+  padding: 0 20px;
+  background: #0d0c33;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.cvToolbar > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cvPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: #eec058;
+  color: #151449;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  cursor: pointer;
+}
+
+.cvPrimary svg,
+.cvClose svg {
+  width: 16px;
+  height: 16px;
+}
+
+.cvClose {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 50%;
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.cvPrimary:disabled { opacity: 0.8; cursor: progress; }
+.cvSpin { animation: cvSpin 0.8s linear infinite; }
+@keyframes cvSpin { to { transform: rotate(360deg); } }
+.cvError { color: #f3b7b7; font-style: normal; text-transform: none; letter-spacing: 0; font-family: 'Inter', sans-serif; font-size: 12px; }
+
+/* ---------- the A4 sheet (preview) ---------- */
+.cvSheet {
+  --navy: #151449;
+  --gold: #eec058;
+  --goldDeep: #b8892a;
+  --taupe: #998670;
+  --beige: #decaba;
+  --grey: #e7e7e7;
+  --ink: #1d1c33;
+  --soft: #5d5b72;
+  --lav: #c9c7e6;
+  width: 794px;
+  max-width: 100%;
+  margin: 0 auto;
+  background: #fff;
+  color: var(--ink);
+  font-family: 'Inter', system-ui, sans-serif;
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.45);
+  animation: cvRise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  overflow: hidden;
+}
+@keyframes cvRise { from { opacity: 0; transform: translateY(16px); } }
+
+.cvSheet h1, .cvSheet h2, .cvSheet h3, .cvSheet h4, .cvSheet h5, .cvSheet p { margin: 0; }
+.cvSheet .cvLbl, .cvKicker, .cvFacts dt, .cvH, .cvNums small, .cvBadge, .cvExpDate, .cvExpTags, .cvQr small, .cvCoach small, .cvFoot {
+  font-family: 'DM Mono', monospace;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* navy cover */
+.cvHero {
+  position: relative;
+  padding: 34px 44px 26px;
+  color: #fff;
+  background:
+    radial-gradient(90% 70% at 92% -10%, rgba(238, 192, 88, 0.16), transparent 60%),
+    radial-gradient(120% 120% at 0% 0%, #26247a 0%, var(--navy) 55%, #100f3a 100%);
+  overflow: hidden;
+}
+.cvHero::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--goldDeep), var(--gold) 30%, #f8e2a4 50%, var(--gold) 70%, var(--goldDeep));
+}
+.cvWatermark {
+  position: absolute; right: -18px; bottom: -40px;
+  font-family: 'Playfair Display', Georgia, serif; font-weight: 600; font-size: 220px;
+  color: rgba(255, 255, 255, 0.035); letter-spacing: -0.04em; pointer-events: none;
+}
+.cvId { position: relative; display: grid; grid-template-columns: 112px 1fr auto; gap: 24px; align-items: center; }
+.cvPhoto {
+  width: 112px; height: 112px; border-radius: 50%; padding: 4px;
+  border: 1.5px solid var(--gold); box-shadow: 0 0 0 6px rgba(238, 192, 88, 0.08); overflow: hidden;
+}
+.cvPhoto > *, .cvPhoto img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }
+.cvPhoto > span {
+  display: grid; place-items: center;
+  font-family: 'Playfair Display', Georgia, serif; font-size: 38px; color: var(--gold);
+  background: linear-gradient(160deg, #3a3880, #1b1a55);
+}
+.cvKicker { font-size: 8.6px; color: var(--gold); }
+.cvIdText h1 {
+  margin: 7px 0 2px; font-family: 'Playfair Display', Georgia, serif;
+  font-size: 38px; line-height: 1.04; font-weight: 600; letter-spacing: -0.01em; color: #fff;
+}
+.cvPref { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 13px; color: var(--lav); }
+.cvPref b { color: var(--gold); font-weight: 400; }
+.cvHeadline {
+  margin-top: 8px !important; font-family: 'Playfair Display', Georgia, serif; font-style: italic;
+  font-size: 15.5px; line-height: 1.35; color: var(--gold);
+}
+.cvQr { text-align: center; }
+.cvQr img { display: block; width: 86px; height: 86px; padding: 8px; background: #fff; border-radius: 6px; margin: 0 auto; }
+.cvQr small { display: block; margin-top: 7px; font-size: 7px; color: var(--lav); line-height: 1.5; }
+
+.cvFacts {
+  position: relative; display: flex; margin: 20px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12); border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+.cvFacts > div { flex: 1; padding: 10px 6px 9px; text-align: center; }
+.cvFacts > div + div { border-left: 1px solid rgba(255, 255, 255, 0.12); }
+.cvFacts dt { font-size: 7px; color: var(--lav); opacity: 0.85; }
+.cvFacts dd { margin: 4px 0 0; font-size: 11.5px; font-weight: 600; color: #fff; }
+.cvFacts dd em { font-style: normal; color: var(--gold); }
+
+.cvLbl { font-size: 8px; color: var(--gold); display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.cvLbl::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(238, 192, 88, 0.45), transparent); }
+
+.cvAbout { position: relative; display: grid; grid-template-columns: 1.25fr 1fr; gap: 28px; margin-top: 20px; }
+.cvAbout.isChipsOnly { grid-template-columns: 1fr; }
+.cvAboutText { font-size: 11.6px; line-height: 1.68; color: #e6e5f4; white-space: pre-line; }
+.cvChipSet + .cvChipSet { margin-top: 12px; }
+.cvChips { display: flex; flex-wrap: wrap; gap: 5px; }
+.cvChips span { font-size: 9.4px; padding: 3.5px 9px; border-radius: 20px; border: 1px solid rgba(238, 192, 88, 0.45); color: #f3ead2; }
+.cvChips.isSolid span { background: rgba(238, 192, 88, 0.14); border-color: transparent; color: #fff; }
+
+.cvTrio { position: relative; display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+.cvCard { border: 1px solid rgba(255, 255, 255, 0.13); background: rgba(255, 255, 255, 0.035); border-radius: 4px; padding: 13px 14px 12px; }
+.cvCard .cvLbl { margin-bottom: 7px; }
+.cvCard p { font-size: 10.2px; line-height: 1.55; color: #dddcef; }
+.cvCard.isProud p { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 12px; line-height: 1.45; color: #fff; }
+
+/* numbers */
+.cvNums { display: grid; grid-template-columns: repeat(var(--cols, 4), 1fr); margin: 0 44px; border-bottom: 1px solid var(--grey); }
+.cvNums > div { position: relative; padding: 15px 0 12px; text-align: center; }
+.cvNums > div + div::before { content: ''; position: absolute; left: 0; top: 18px; bottom: 14px; width: 1px; background: var(--grey); }
+.cvNums b { display: block; font-family: 'Playfair Display', Georgia, serif; font-weight: 600; font-size: 28px; line-height: 1; color: var(--goldDeep); }
+.cvNums small { display: block; margin-top: 6px; font-size: 7.2px; color: var(--soft); }
+
+/* body */
+.cvBody { display: block; padding: 18px 44px 10px; }
+.cvSide { float: right; width: 214px; margin: 0 0 14px 26px; }
+.cvAwards, .cvExp, .cvYear h3 { overflow: hidden; } /* sit beside the float, then go full width */
+.cvClear { clear: both; }
+.cvBody section + section { margin-top: 20px; }
+.cvH { font-size: 8.3px; font-weight: 400; color: var(--goldDeep); display: flex; align-items: center; gap: 10px; margin-bottom: 10px !important; }
+.cvH::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--beige), transparent); }
+
+.cvAwards { border: 1.2px solid var(--gold); border-radius: 4px; padding: 6px 16px 2px; background: linear-gradient(180deg, #fffaf0, #fff 70%); }
+.cvAward { display: grid; grid-template-columns: 26px 1fr auto; gap: 11px; align-items: start; padding: 8px 0; border-bottom: 1px dashed #eadfcf; }
+.cvAward:last-child { border-bottom: 0; }
+.cvMedal {
+  width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+  background: radial-gradient(circle at 35% 30%, #fbe3a3, var(--gold) 55%, #c89a3a); color: var(--navy); font-size: 11px;
+}
+.cvAward h4 { font-family: 'Playfair Display', Georgia, serif; font-weight: 600; font-size: 12.6px; color: var(--navy); }
+.cvAward p { font-size: 9.4px; color: var(--soft); margin-top: 1px; }
+.cvBadge { font-size: 7.6px; letter-spacing: 0.12em; color: var(--navy); background: #f6eedc; padding: 3px 7px; border-radius: 20px; white-space: nowrap; margin-top: 2px; }
+
+.cvYear h3 { font-family: 'Playfair Display', Georgia, serif; font-weight: 400; font-size: 14px; color: var(--navy); margin: 4px 0 4px; }
+.cvExp { display: grid; grid-template-columns: 58px 1fr; gap: 12px; padding: 6px 0; break-inside: avoid; }
+.cvExpDate { font-size: 7.6px; color: var(--taupe); padding-top: 3px; }
+.cvExp h5 { font-size: 10.8px; font-weight: 600; color: var(--ink); }
+.cvExpMeta { font-size: 8.6px; color: var(--taupe); margin-top: 1px; }
+.cvExp p { font-size: 9.6px; color: var(--soft); line-height: 1.5; margin-top: 2px; }
+.cvExp .cvExpReflect { font-family: 'Playfair Display', Georgia, serif; font-style: italic; color: var(--navy); }
+.cvExpTags { margin-top: 3px; font-size: 7px; color: var(--goldDeep); }
+
+.cvSkill { margin-bottom: 8px; }
+.cvSkill > div { display: flex; justify-content: space-between; font-size: 9.8px; margin-bottom: 3px; }
+.cvSkill > div span:last-child { font-family: 'DM Mono', monospace; font-size: 7.6px; color: var(--taupe); }
+.cvSkill i { display: block; height: 4px; background: #efebe4; border-radius: 4px; }
+.cvSkill i b { display: block; height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--goldDeep), var(--gold)); }
+
+.cvTeams { list-style: none; margin: 0; padding: 0; font-size: 9.8px; line-height: 1.5; }
+.cvTeams li + li { margin-top: 7px; }
+.cvTeams b { font-weight: 600; color: var(--ink); }
+.cvTeams span { color: var(--taupe); }
+.cvTeams em { display: block; font-style: normal; font-size: 8.6px; color: var(--goldDeep); margin-top: 1px; }
+
+.cvCoach { background: var(--navy); color: #fff; padding: 14px 15px 12px; border-radius: 4px; }
+.cvCoach > span { display: block; height: 12px; font-family: 'Playfair Display', Georgia, serif; font-size: 36px; line-height: 0.6; color: var(--gold); }
+.cvCoach p { font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 12.6px; line-height: 1.4; }
+.cvCoach small { display: block; margin-top: 8px; font-size: 7px; line-height: 1.5; color: var(--gold); }
+
+.cvFoot {
+  margin: 8px 44px 0; padding: 10px 0 16px; border-top: 1px solid var(--grey);
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 7.2px; color: var(--taupe);
+}
+.cvVer { display: inline-flex; align-items: center; gap: 7px; color: var(--navy); }
+.cvVer svg { width: 13px; height: 13px; color: var(--goldDeep); flex: none; }
+
+/* phones: the sheet becomes a single column */
+@media (max-width: 760px) {
+  .cvOverlay { padding: 76px 10px 40px; }
+  .cvToolbar > span { display: none; }
+  .cvToolbar { justify-content: flex-end; }
+  .cvHero { padding: 24px 20px 20px; }
+  .cvId { grid-template-columns: 76px 1fr; gap: 14px; }
+  .cvPhoto { width: 76px; height: 76px; }
+  .cvIdText h1 { font-size: 27px; }
+  .cvQr { display: none; }
+  .cvFacts { flex-wrap: wrap; }
+  .cvFacts > div { flex: 1 1 50%; }
+  .cvFacts > div:nth-child(3) { border-left: 0; }
+  .cvAbout { grid-template-columns: 1fr; gap: 16px; }
+  .cvTrio { grid-template-columns: 1fr; }
+  .cvNums { margin: 0 20px; grid-template-columns: repeat(2, 1fr); }
+  .cvNums > div:nth-child(3)::before { display: none; }
+  .cvBody { padding: 18px 20px 10px; }
+  .cvSide { float: none; width: auto; margin: 0 0 18px; }
+  .cvFoot { margin: 8px 20px 0; flex-direction: column; align-items: flex-start; }
+}
+
+/* ---------- award write-up inside the list box ---------- */
+.cvAwardMeta { margin-top: 1px; font-size: 8.6px; color: var(--taupe); }
+.cvAward p { margin-top: 4px !important; font-size: 9.4px; line-height: 1.5; color: var(--soft); }
+.cvAward blockquote {
+  margin: 5px 0 1px; padding-left: 8px; border-left: 1.5px solid var(--gold);
+  font-family: 'Playfair Display', Georgia, serif; font-style: italic; font-size: 10.2px; line-height: 1.4; color: var(--navy);
+}
+.cvAward blockquote cite {
+  display: block; margin-top: 2px; font-family: 'DM Mono', monospace; font-style: normal;
+  font-size: 6.4px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--goldDeep);
+}
+
+/* ---------- view-only CV: no selecting, dragging or printing ---------- */
+.cvSheet, .cvSheet * { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.cvSheet img { pointer-events: none; -webkit-user-drag: none; }
+@media print {
+  html.cvOpen body * { visibility: hidden !important; }
+  html.cvOpen body::after {
+    content: 'Printing is turned off for CVs. Use “Download PDF” in the TBS Student Portfolio.';
+    visibility: visible; position: fixed; inset: 40% 10% auto; text-align: center;
+    font: 16px/1.5 'Inter', sans-serif; color: #151449;
+  }
+}
+
+/* ---------- download code dialog ---------- */
+.cvGate {
+  position: fixed; z-index: 5; inset: 0; display: grid; place-items: center; padding: 16px;
+  background: rgba(9, 8, 36, 0.72); backdrop-filter: blur(6px);
+}
+.cvGateCard {
+  width: min(420px, 100%); padding: 26px 24px 18px; border-radius: 16px;
+  background: #ffffff; color: #151449; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+  font-family: 'Inter', system-ui, sans-serif;
+}
+.cvGateIcon {
+  display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%;
+  background: #151449; color: #eec058; margin-bottom: 14px;
+}
+.cvGateIcon svg { width: 20px; height: 20px; }
+.cvGateCard h3 { margin: 0 0 6px; font-family: 'Playfair Display', Georgia, serif; font-weight: 600; font-size: 24px; }
+.cvGateCard p { margin: 0; font-size: 14px; line-height: 1.55; color: rgba(21, 20, 73, 0.74); }
+.cvGateField { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; margin-top: 18px; min-width: 0; }
+.cvGateField span {
+  font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(21, 20, 73, 0.55);
+}
+.cvGateField input {
+  height: 56px; padding: 0 14px; border-radius: 10px; border: 1px solid rgba(21, 20, 73, 0.22);
+  font: 600 26px/1 'DM Mono', monospace; letter-spacing: 0.5em; text-align: center; color: #151449; background: #f6f6f8;
+  -webkit-user-select: text; user-select: text;
+  /* stay inside the card; balance the trailing letter-spacing so the code is centred */
+  box-sizing: border-box; width: 100%; max-width: 100%; min-width: 0; margin: 0; padding-left: calc(14px + 0.5em);
+}
+.cvGateCard { box-sizing: border-box; }
+.cvGateField input:focus { outline: none; border-color: #eec058; box-shadow: 0 0 0 3px rgba(238, 192, 88, 0.3); background: #fff; }
+.cvGateError { margin-top: 10px !important; color: #a3312c !important; font-size: 13px !important; }
+.cvGateActions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+.cvGateMain, .cvGateGhost {
+  display: inline-flex; align-items: center; gap: 8px; height: 42px; padding: 0 18px; border-radius: 999px;
+  font: 600 13px/1 'Inter', sans-serif; cursor: pointer; text-decoration: none;
+}
+.cvGateMain { border: 0; background: #151449; color: #ffffff; }
+.cvGateMain svg { width: 15px; height: 15px; color: #eec058; }
+.cvGateMain:disabled { opacity: 0.5; cursor: not-allowed; }
+.cvGateGhost { border: 1px solid rgba(21, 20, 73, 0.2); background: #fff; color: #151449; }
+.cvGateResend {
+  display: block; margin: 14px auto 0; border: 0; background: none; color: #151449;
+  font: 500 12px/1 'Inter', sans-serif; text-decoration: underline; text-underline-offset: 3px; cursor: pointer;
+}
+.cvGateResend:disabled { color: rgba(21, 20, 73, 0.45); text-decoration: none; cursor: default; }
+.cvGateMain:focus-visible, .cvGateGhost:focus-visible, .cvGateResend:focus-visible { outline: 2px solid #eec058; outline-offset: 2px; }
+.cvAwardReport { margin-top: 4px !important; font-size: 8.6px !important; color: var(--taupe) !important; }
