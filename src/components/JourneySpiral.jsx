@@ -62,7 +62,7 @@ function storyCard(story) {
   };
 }
 
-export function buildVisualCards(items, evidence) {
+export function buildVisualCards(items, evidence, { featuredOnly = false } = {}) {
   const stories = items || [];
   if (!stories.length) return [];
 
@@ -70,7 +70,8 @@ export function buildVisualCards(items, evidence) {
   const buckets = new Map(stories.map(item => [item.id, [storyCard(item)]]));
   const usedEvidence = new Set(stories.map(item => item.evidence?.id).filter(Boolean));
 
-  (evidence || [])
+  /* featuredOnly: just each moment's featured photo (repeated to fill). */
+  (featuredOnly ? [] : evidence || [])
     .filter(
       item =>
         item.entry_id &&
@@ -488,7 +489,7 @@ export default function JourneySpiral({
 
   onOpenRef.current = onOpen;
 
-  const builtCards = useMemo(() => buildVisualCards(items, evidence), [items, evidence]);
+  const builtCards = useMemo(() => buildVisualCards(items, evidence, { featuredOnly: true }), [items, evidence]);
 
   /* Only rebuild the WebGL scene when the arrangement itself changes, never
    * because a parent re-rendered with equal data. */
