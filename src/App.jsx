@@ -5963,16 +5963,23 @@ function PortfolioFooter() {
 }
 
 function Story({ story, token, preview, onClose }) {
+  const photo = story.evidence ? (
+    <SecureEvidenceImage
+      evidence={story.evidence}
+      token={token}
+      preview={preview}
+      alt={story.title}
+      className="storyPhotoImg"
+      fallback={<div className="storyPhotoEmpty"><span>{story.number}</span></div>}
+    />
+  ) : null;
+
   return (
     <div className="storyOverlay">
-      <div className="storyBackground">
-        {story.evidence ? (
-          <SecureEvidenceImage
-            evidence={story.evidence}
-            token={token}
-            preview={preview}
-            alt={story.title}
-          />
+      {/* Soft, blurred copy of the photo as the room's atmosphere. */}
+      <div className="storyBackground" aria-hidden="true">
+        {photo ? (
+          <SecureEvidenceImage evidence={story.evidence} token={token} preview={preview} alt="" fallback={<div className="storyFallback" />} />
         ) : (
           <div className="storyFallback" />
         )}
@@ -5985,30 +5992,42 @@ function Story({ story, token, preview, onClose }) {
         <button onClick={onClose}>CLOSE <X /></button>
       </div>
 
-      <div className="storyContent">
-        <small>{domainLabel(story.domain)} · {formatDate(story.event_date)}</small>
-        <h2>{story.title}</h2>
+      <div className={`storyLayout${photo ? ' hasPhoto' : ''}`}>
+        <div className="storyContent">
+          <small>{domainLabel(story.domain)} · {formatDate(story.event_date)}</small>
+          <h2>{story.title}</h2>
 
-        <div className="storyMeta">
-          <span>{story.organisation}</span>
-          {story.verification_status === 'verified' && (
-            <span className="verifiedMeta"><ShieldCheck /> TBS VERIFIED</span>
+          <div className="storyMeta">
+            {story.organisation && <span>{story.organisation}</span>}
+            {story.verification_status === 'verified' && (
+              <span className="verifiedMeta"><ShieldCheck /> TBS VERIFIED</span>
+            )}
+          </div>
+
+          <p className="storyDescription">{story.description}</p>
+
+          {story.reflection && (
+            <blockquote>
+              <small>WHAT THIS TAUGHT ME</small>
+              {story.reflection}
+            </blockquote>
+          )}
+
+          {!!arr(story.skills).length && (
+            <div className="storySkills">
+              {arr(story.skills).map(skill => <span key={skill}>{skill}</span>)}
+            </div>
           )}
         </div>
 
-        <p className="storyDescription">{story.description}</p>
-
-        {story.reflection && (
-          <blockquote>
-            <small>WHAT THIS TAUGHT ME</small>
-            {story.reflection}
-          </blockquote>
-        )}
-
-        {!!arr(story.skills).length && (
-          <div className="storySkills">
-            {arr(story.skills).map(skill => <span key={skill}>{skill}</span>)}
-          </div>
+        {photo && (
+          <figure className="storyPhoto">
+            <div className="storyPhotoFrame">{photo}</div>
+            <figcaption>
+              <span>{story.title}</span>
+              <i>{story.number}</i>
+            </figcaption>
+          </figure>
         )}
       </div>
     </div>
